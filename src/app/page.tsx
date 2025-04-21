@@ -8,8 +8,7 @@ export default function App() {
         <>
             <NavbarElement />
             <main className="p-4">
-                <div className="h-[100vh] w-full">
-                </div>
+                <div className="h-[100vh] w-full"></div>
             </main>
             <FooterElement />
         </>
