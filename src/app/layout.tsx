@@ -1,8 +1,9 @@
-import React from "react";
+import React, { Suspense } from "react";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import Loading from "@/app/representative/loading";
 import { Providers } from "@/components/providres";
 import siteMetadata from "@/conf/site-metadata";
 
@@ -26,7 +27,9 @@ export default function RootLayout({
     return (
         <html lang="ru" suppressHydrationWarning>
             <body className={inter.className}>
-                <Providers>{children}</Providers>
+                <Suspense fallback={<Loading />}>
+                    <Providers>{children}</Providers>
+                </Suspense>
             </body>
         </html>
     );
