@@ -7,3 +7,130 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum SportsCategory {
+  HMS
+  MS
+  CMS
+  A
+  B
+  C
+  Ay
+  By
+  Cy
+}
+
+model Region {
+  id   String @id @default(uuid())
+  name String @unique
+
+  athletes        Athlete[]
+  representatives Representative[]
+}
+
+model Discipline {
+  id   String @id @default(uuid())
+  name String @unique
+
+  events Event[]
+}
+
+model Athlete {
+  id              String          @id @default(uuid())
+  lastname        String
+  firstname       String
+  middlename      String?
+  birthDate       DateTime        @db.Date()
+  regionId        String
+  address         String
+  sportCategoryId SportsCategory?
+
+  phoneNumber      String  @unique
+  email            String  @unique
+  password         String
+  telegramUsername String? @unique
+  github           String? @unique
+
+  region Region          @relation(fields: [regionId], references: [id])
+  teams  AthleteOfTeam[]
+}
+
+enum TeamRole {
+  MEMBER
+  LEADER
+  COACH
+}
+
+model AthleteOfTeam {
+  id        String   @id @default(uuid())
+  teamId    String
+  athleteId String
+  role      TeamRole @default(MEMBER)
+
+  team    Team    @relation(fields: [teamId], references: [id])
+  athlete Athlete @relation(fields: [athleteId], references: [id])
+
+  @@unique([teamId, athleteId])
+}
+
+model Team {
+  id      String @id @default(uuid())
+  name    String
+  eventId String
+  score   Int?
+
+  event    Event           @relation(fields: [eventId], references: [id])
+  athletes AthleteOfTeam[]
+}
+
+enum EventStatus {
+  PENDING
+  DECLINED
+  APPROVED
+}
+
+model Event {
+  id               String      @id @default(uuid())
+  name             String
+  description      String
+  cover            Bytes       @db.ByteA
+  applicationTime  DateTime
+  start            DateTime
+  end              DateTime
+  representativeId String
+  disciplineId     String
+  isOnline         Boolean
+  address          String?
+  awards           Int[]       @db.SmallInt
+  status           EventStatus @default(PENDING)
+
+  representative Representative @relation(fields: [representativeId], references: [id])
+  discipline     Discipline     @relation(fields: [disciplineId], references: [id])
+  files          File[]
+  teams          Team[]
+}
+
+model File {
+  id      String  @id @default(uuid())
+  name    String
+  content Bytes   @db.ByteA
+  eventId String?
+
+  event Event? @relation(fields: [eventId], references: [id])
+}
+
+model Representative {
+  id         String  @id @default(uuid())
+  lastname   String
+  firstname  String
+  middlename String?
+  regionId   String
+
+  phoneNumber      String  @unique
+  email            String  @unique
+  password         String
+  telegramUsername String? @unique
+
+  region Region  @relation(fields: [regionId], references: [id])
+  events Event[]
+}

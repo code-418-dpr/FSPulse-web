@@ -38,3 +38,6 @@ next-env.d.ts
 ### Temp directory
 .temp/
 .tmp/
+
+### Misc
+src/app/generated
