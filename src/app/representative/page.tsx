@@ -8,81 +8,79 @@ import CompetitionCards from "@/app/representative/_components/competition-cards
 import EventCards from "@/app/representative/_components/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
+import { EventItem, Tab } from "@/types";
 import { Pagination } from "@heroui/react";
 
-// Заглушка данных (13 элементов для демонстрации пагинации)
-const competitions = Array(13).fill({
-    title: "Кубок НР",
-    region: "ДНР",
-    startDate: "23.05.2025",
-    endDate: "25.05.2025",
-    applicationDate: "17.04.2025",
-    status: "На рассмотрении",
-    format: "Онлайн",
-    discipline: "Продуктовое программирование",
-    image: "https://heroui.com/images/hero-card-complete.jpeg",
-}) as Record<string, string>[];
-
-// Заглушка данных (13 элементов для демонстрации пагинации)
-const events = Array(13).fill({
-    title: "Кубок НР",
-    region: "ДНР",
-    startDate: "23.05.2025",
-    endDate: "25.05.2025",
-    format: "Онлайн",
-    discipline: "Продуктовое программирование",
-    image: "https://heroui.com/images/hero-card-complete.jpeg",
-}) as Record<string, string>[];
+interface PagedResponse<T> {
+    items: T[];
+    pagination: {
+        page: number;
+        pageSize: number;
+        totalItems: number;
+        totalPages: number;
+    };
+}
 
 export default function RequestsPage() {
     const [page, setPage] = useState(1);
-    const [activeTab, setActiveTab] = useState("requests");
-    const itemsPerPage = 12;
+    const [activeTab, setActiveTab] = useState<Tab>("events");
+    const [eventsData, setEventsData] = useState<PagedResponse<EventItem> | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // При монтировании проверяем URL и устанавливаем активную вкладку
+    // Синхронизируем вкладку с параметром ?tab=
     useEffect(() => {
-        if (!pathname.startsWith("/representative")) {
-            router.push("/representative?tab=events");
-            return;
-        }
-
-        const tab = searchParams.get("tab");
+        const tab = searchParams.get("tab") as Tab | null;
         if (tab && ["requests", "events", "team"].includes(tab)) {
             setActiveTab(tab);
         } else {
-            // Если параметр tab отсутствует, устанавливаем по умолчанию "events"
-            router.replace(`/representative?tab=events`);
+            router.replace("/representative?tab=events");
             setActiveTab("events");
         }
-    }, [pathname, router, searchParams]);
+    }, [pathname, router, searchParams, setActiveTab]);
 
-    const data = activeTab === "requests" ? competitions : events;
+    // Подгружаем события при смене вкладки или страницы
+    useEffect(() => {
+        if (activeTab !== "events") return;
 
-    const paginatedData = data.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+        setIsLoading(true);
+        // void чтобы ESLint не жаловался на «плавающий» промис
+        void fetch(`/api/events?page=${page}&pageSize=12`)
+            .then((res) => res.json())
+            .then((json: PagedResponse<EventItem>) => {
+                setEventsData(json);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, [activeTab, page]);
 
     return (
         <>
             <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
+
             <div className="flex min-h-[100vh] w-full flex-col">
                 <div className="container mx-auto w-[70%] flex-1 px-4 py-8">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {activeTab === "requests" ? (
-                            <CompetitionCards paginatedData={paginatedData} />
-                        ) : (
-                            <EventCards paginatedData={paginatedData} />
-                        )}
+                            // TODO: заменить [] на реальные CompetitionItem[]
+                            <CompetitionCards paginatedData={[]} />
+                        ) : isLoading ? (
+                            <p>Загрузка...</p>
+                        ) : eventsData ? (
+                            <EventCards paginatedData={eventsData.items} />
+                        ) : null}
                     </div>
 
-                    {data.length > itemsPerPage && (
+                    {activeTab === "events" && eventsData && eventsData.pagination.totalPages > 1 && (
                         <div className="mt-8 flex justify-center">
                             <Pagination
                                 showControls
-                                page={page}
-                                total={Math.ceil(data.length / itemsPerPage)}
+                                page={eventsData.pagination.page}
+                                total={eventsData.pagination.totalPages}
                                 onChange={setPage}
                             />
                         </div>

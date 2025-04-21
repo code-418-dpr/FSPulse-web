@@ -1,22 +1,30 @@
-import { Card, CardBody, Chip, Image } from "@heroui/react";
+// src/app/representative/_components/event-cards.tsx
+"use client";
 
-export default function EventCards({ paginatedData }: { paginatedData: Record<string, string>[] }) {
+import { EventItem } from "@/types";
+import { Card, CardBody, Image } from "@heroui/react";
+
+// src/app/representative/_components/event-cards.tsx
+
+interface EventCardsProps {
+    paginatedData: EventItem[];
+}
+
+export default function EventCards({ paginatedData }: EventCardsProps) {
     return (
         <>
-            {paginatedData.map((event, index) => (
-                <Card key={index} className="transition-shadow hover:shadow-lg">
+            {paginatedData.map((event) => (
+                <Card key={event.id} className="transition-shadow hover:shadow-lg">
                     <CardBody className="space-y-4">
-                        <Image alt={event.title} className="w-full rounded-xl object-cover" src={event.image} />
+                        <Image
+                            alt={event.name}
+                            className="w-full rounded-xl object-cover"
+                            src={`data:image/jpeg;base64,${event.imageBase64}`}
+                        />
                         <div className="space-y-2">
-                            <h3 className="text-2xl font-bold">{event.title}</h3>
-                            <div className="grid grid-cols-3 pt-2">
-                                <Chip color="success" variant="solid">
-                                    {event.format}
-                                </Chip>
-                                <p className="col-span-2 pt-1 text-right text-sm">
-                                    {event.startDate} - {event.endDate}
-                                </p>
-                            </div>
+                            <h3 className="text-2xl font-bold">{event.name}</h3>
+                            <p>Начало: {new Date(event.start).toLocaleDateString()}</p>
+                            <p>Статус: {event.status}</p>
                         </div>
                     </CardBody>
                 </Card>
