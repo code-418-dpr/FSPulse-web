@@ -6,7 +6,7 @@ import SignInForm from "@/components/auth/signin-form";
 import SpokesmanSignupForm from "@/components/auth/spokesman-signup-form";
 import UserSignupForm from "@/components/auth/user-signup-form";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/react";
+import { Button, DropdownMenuProps, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/react";
 import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from "@heroui/react";
 import { Tab, Tabs } from "@heroui/react";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
@@ -28,7 +28,14 @@ export default function AuthDialogOrDrawer() {
 function AuthDialog({ isOpen, onOpen, onOpenChange }: Props) {
     return (
         <>
-            <Button onPress={onOpen} color="primary" variant="flat" startContent={<Icon icon="lucide:user" />}>
+            <Button
+                onPress={() => {
+                    onOpen(true);
+                }}
+                color="primary"
+                variant="flat"
+                startContent={<Icon icon="lucide:user" />}
+            >
                 Login
             </Button>
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -46,7 +53,14 @@ function AuthDialog({ isOpen, onOpen, onOpenChange }: Props) {
 function AuthDrawer({ isOpen, onOpen, onOpenChange }: Props) {
     return (
         <>
-            <Button onPress={onOpen} color="primary" variant="flat" startContent={<Icon icon="lucide:user" />}>
+            <Button
+                onPress={() => {
+                    onOpen(true);
+                }}
+                color="primary"
+                variant="flat"
+                startContent={<Icon icon="lucide:user" />}
+            >
                 Login
             </Button>
             <Drawer placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -75,9 +89,23 @@ function AuthTabs() {
 }
 
 function Register() {
-    const [selectedKeys, setSelectedKeys] = React.useState(new Set(["Спортсмен"]));
+    const [selectedKeys, setSelectedKeys] = React.useState<Set<string>>(new Set(["Спортсмен"]));
 
     const selectedValue = React.useMemo(() => Array.from(selectedKeys).join(", ").replace(/_/g, ""), [selectedKeys]);
+
+    const handleSelectionChange: DropdownMenuProps["onSelectionChange"] = (keys) => {
+        if (keys === "all") {
+            setSelectedKeys(new Set(["Спортсмен", "Представитель"]));
+        } else {
+            const stringKeys = new Set<string>();
+            (keys as Set<string>).forEach((key) => {
+                if (typeof key === "string") {
+                    stringKeys.add(key);
+                }
+            });
+            setSelectedKeys(stringKeys);
+        }
+    };
 
     return (
         <>
@@ -94,7 +122,7 @@ function Register() {
                         selectedKeys={selectedKeys}
                         selectionMode="single"
                         variant="flat"
-                        onSelectionChange={setSelectedKeys}
+                        onSelectionChange={handleSelectionChange}
                     >
                         <DropdownItem key="Спортсмен">Спортсмен</DropdownItem>
                         <DropdownItem key="Представитель">Представитель</DropdownItem>
