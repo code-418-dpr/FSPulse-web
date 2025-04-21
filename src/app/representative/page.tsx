@@ -8,7 +8,7 @@ import CompetitionCards from "@/app/representative/_components/competition/compe
 import EventCards from "@/app/representative/_components/event/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
-import { Pagination } from "@heroui/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Pagination } from "@heroui/react";
 
 // Заглушка данных (13 элементов для демонстрации пагинации)
 const competitions = Array(13).fill({
@@ -68,25 +68,38 @@ export default function RequestsPage() {
         <>
             <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
             <div className="flex min-h-[100vh] w-full flex-col">
-                <div className="container mx-auto w-[70%] flex-1 px-4 py-8">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {activeTab === "requests" ? (
-                            <CompetitionCards paginatedData={paginatedData} />
-                        ) : (
-                            <EventCards paginatedData={paginatedData} />
+                <div className="grid grid-cols-4">
+                    <div className="w-full ps-3">
+                        <Card className="sticky top-50">
+                            <CardHeader>Поиск</CardHeader>
+                            <CardBody>
+                                <p>Параметры поиска</p>
+                            </CardBody>
+                            <CardFooter>
+                                <Button>Поиск</Button>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                    <div className="col-span-3 container mx-auto w-[95%] flex-1 px-4 py-8">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {activeTab === "requests" ? (
+                                <CompetitionCards paginatedData={paginatedData} />
+                            ) : (
+                                <EventCards paginatedData={paginatedData} />
+                            )}
+                        </div>
+
+                        {data.length > itemsPerPage && (
+                            <div className="mt-8 flex justify-center">
+                                <Pagination
+                                    showControls
+                                    page={page}
+                                    total={Math.ceil(data.length / itemsPerPage)}
+                                    onChange={setPage}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    {data.length > itemsPerPage && (
-                        <div className="mt-8 flex justify-center">
-                            <Pagination
-                                showControls
-                                page={page}
-                                total={Math.ceil(data.length / itemsPerPage)}
-                                onChange={setPage}
-                            />
-                        </div>
-                    )}
                 </div>
                 <FooterElement />
             </div>
