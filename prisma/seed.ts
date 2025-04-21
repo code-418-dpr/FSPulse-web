@@ -1,20 +1,12 @@
-import { Prisma, PrismaClient } from "@/app/generated/prisma";
+import { createDisciplines } from "@/data/discipline";
+import { createRegions } from "@/data/region";
 
-import disciplines from "./data/disciplines";
-import regions from "./data/regions";
-
-const prisma = new PrismaClient();
-
-const regionsData: Prisma.RegionCreateInput[] = regions.map((region) => ({ name: region }));
-const disciplinesData: Prisma.DisciplineCreateInput[] = disciplines.map((discipline) => ({ name: discipline }));
+import disciplineNames from "./data/disciplines";
+import regionNames from "./data/regions";
 
 export async function main() {
-    for (const region of regionsData) {
-        await prisma.region.create({ data: region });
-    }
-    for (const discipline of disciplinesData) {
-        await prisma.discipline.create({ data: discipline });
-    }
+    await createRegions(regionNames);
+    await createDisciplines(disciplineNames);
 }
 
 void main();
