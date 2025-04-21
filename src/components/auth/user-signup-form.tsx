@@ -9,6 +9,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import PasswordInput from "@/components/password-input";
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 const userSchema = z
     .object({
@@ -23,12 +24,8 @@ const userSchema = z
             .min(3, "Имя должно содержать минимум 3 символа")
             .regex(/^[а-яА-ЯёЁ\s]+$/, "Имя должно содержать только кириллические буквы"),
         middlename: z.string().nullable(),
-        birthDate: z.date(),
-        address: z
-            .string()
-            .min(1, "Адрес обязателен")
-            .min(3, "Адрес должен содержать минимум 3 символа")
-            .regex(/^[а-яА-ЯёЁ\s]+$/, "Адрес должен содержать только кириллические буквы"),
+        birthDate: z.string().refine((val) => !isNaN(new Date(val).getTime())),
+        address: z.string().min(1, "Адрес обязателен").min(3, "Адрес должен содержать минимум 3 символа"),
         region: z
             .string({
                 required_error: "Выберите регион",
@@ -126,12 +123,19 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.middlename}
                     errorMessage={errors.middlename?.message}
                 />
-                <DatePicker
-                    isRequired
-                    label="Дата рождения"
-                    {...register("birthDate")}
-                    isInvalid={!!errors.birthDate}
-                    errorMessage={errors.birthDate?.message}
+                <Controller
+                    name="birthDate"
+                    control={control}
+                    render={({ field }) => (
+                        <DatePicker
+                            showMonthAndYearPickers={true}
+                            label="Дата рождения"
+                            maxValue={today(getLocalTimeZone()).subtract({ years: 14 })}
+                            onChange={(date) => { field.onChange(date?.toString()); }}
+                            isInvalid={!!errors.birthDate}
+                            errorMessage={errors.birthDate?.message}
+                        />
+                    )}
                 />
                 <Controller
                     name="region"
@@ -154,9 +158,9 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     label="Адрес"
                     type="text"
                     variant="bordered"
-                    {...register("middlename")}
-                    isInvalid={!!errors.middlename}
-                    errorMessage={errors.middlename?.message}
+                    {...register("address")}
+                    isInvalid={!!errors.address}
+                    errorMessage={errors.address?.message}
                 />
                 <Controller
                     name="sportCategory"
