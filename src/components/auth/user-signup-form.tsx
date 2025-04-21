@@ -79,13 +79,13 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
         resolver: zodResolver(userSchema),
     });
 
-    const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = (data) => {
+    const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = async (data) => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
-            console.log(data);
-            // await new Promise((resolve) => setTimeout(resolve, 100));
+            console.log("Form data:", data);
+            await new Promise((resolve) => setTimeout(resolve, 100)); // Имитация загрузки
         } catch (error) {
-            console.error(error);
+            console.error("Error:", error);
         } finally {
             setIsLoading(false);
         }
@@ -128,10 +128,13 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     control={control}
                     render={({ field }) => (
                         <DatePicker
-                            showMonthAndYearPickers={true}
                             label="Дата рождения"
+                            showMonthAndYearPickers
                             maxValue={today(getLocalTimeZone()).subtract({ years: 14 })}
-                            onChange={(date) => { field.onChange(date?.toString()); }}
+                            minValue={today(getLocalTimeZone()).subtract({ years: 60 })}
+                            onChange={(date) => {
+                                field.onChange(date?.toString());
+                            }}
                             isInvalid={!!errors.birthDate}
                             errorMessage={errors.birthDate?.message}
                         />
