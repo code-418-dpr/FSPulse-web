@@ -13,6 +13,7 @@
         "db:gen": "bun run prisma generate",
         "db:push": "bun run prisma db push",
         "db:seed": "bun run prisma db seed",
+        "seed:events": "bun run prisma/seedEvents.ts",
         "db:studio": "bun run prisma studio"
     },
     "prisma": {

@@ -1,3 +1,4 @@
+// src/components/navbar.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -5,25 +6,29 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
-import { Button, Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, PressEvent, Spinner } from "@heroui/react";
+import { Tab } from "@/types";
+import { Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, PressEvent } from "@heroui/react";
 
 import { ThemeSwitcher } from "./theme-switcher";
-import { useAuth } from "@/hooks/useAuth";
-import { signOut } from "next-auth/react";
-const NavbarElement = ({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) => {
-    const { user, isLoading, isAuthenticated } = useAuth();
+
+// src/components/navbar.tsx
+
+interface NavbarProps {
+    activeTab: Tab;
+    setActiveTab: React.Dispatch<React.SetStateAction<Tab>>;
+}
+
+export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const handleNavigation = (e: PressEvent, tab: string) => {
-        // Обновляем URL с параметром tab
+    const handleNavigation = (e: PressEvent, tab: Tab) => {
         router.push(`/representative?tab=${tab}`);
         setActiveTab(tab);
     };
 
-    // При монтировании проверяем параметр tab в URL
     useEffect(() => {
-        const tab = searchParams.get("tab");
+        const tab = searchParams.get("tab") as Tab | null;
         if (tab && ["requests", "events", "team"].includes(tab)) {
             setActiveTab(tab);
         }
@@ -43,42 +48,26 @@ const NavbarElement = ({ activeTab, setActiveTab }: { activeTab: string; setActi
             </NavbarBrand>
 
             <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                <NavbarItem>
-                    <Link
-                        color="foreground"
-                        href="#"
-                        onPress={(e) => {
-                            handleNavigation(e, "requests");
-                        }}
-                        className={activeTab === "requests" ? "font-bold" : ""}
-                    >
-                        Заявки
-                    </Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link
-                        color="foreground"
-                        href="#"
-                        onPress={(e) => {
-                            handleNavigation(e, "events");
-                        }}
-                        className={activeTab === "events" ? "font-bold" : ""}
-                    >
-                        Соревнования
-                    </Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Link
-                        color="foreground"
-                        href="#"
-                        onPress={(e) => {
-                            handleNavigation(e, "team");
-                        }}
-                        className={activeTab === "team" ? "font-bold" : ""}
-                    >
-                        Сборная
-                    </Link>
-                </NavbarItem>
+                {(["requests", "events", "team"] as Tab[]).map((tab) => (
+                    <NavbarItem key={tab}>
+                        <Link
+                            color="foreground"
+                            href="#"
+                            onPress={(e) => {
+                                handleNavigation(e, tab);
+                            }}
+                            className={activeTab === tab ? "font-bold" : ""}
+                        >
+                            {
+                                {
+                                    requests: "Заявки",
+                                    events: "Соревнования",
+                                    team: "Сборная",
+                                }[tab]
+                            }
+                        </Link>
+                    </NavbarItem>
+                ))}
             </NavbarContent>
 
             <NavbarContent justify="end">
@@ -108,6 +97,4 @@ const NavbarElement = ({ activeTab, setActiveTab }: { activeTab: string; setActi
             </NavbarContent>
         </Navbar>
     );
-};
-
-export default NavbarElement;
+}
