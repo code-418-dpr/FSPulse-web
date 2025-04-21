@@ -45,11 +45,11 @@ model Athlete {
   address         String
   sportCategoryId SportsCategory?
 
-  phoneNumber      String  @unique
-  email            String  @unique
-  password         String
-  telegramUsername String? @unique
-  github           String? @unique
+  phoneNumber String  @unique
+  email       String  @unique
+  password    String
+  tg          String? @unique
+  github      String? @unique
 
   region Region          @relation(fields: [regionId], references: [id])
   teams  AthleteOfTeam[]
@@ -126,10 +126,10 @@ model Representative {
   middlename String?
   regionId   String
 
-  phoneNumber      String  @unique
-  email            String  @unique
-  password         String
-  telegramUsername String? @unique
+  phoneNumber String  @unique
+  email       String  @unique
+  password    String
+  tg          String? @unique
 
   region Region  @relation(fields: [regionId], references: [id])
   events Event[]
