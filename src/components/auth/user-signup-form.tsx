@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import PasswordInput from "@/components/password-input";
-import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
+import { Button, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
@@ -75,8 +75,8 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm({
-        resolver: zodResolver(userSchema),
+    } = useForm<z.infer<typeof userSchema>>({
+        resolver: zodResolver<z.infer<typeof userSchema>>(userSchema),
     });
 
     const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = async (data) => {
@@ -100,7 +100,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
         <form className={cn("grid items-start gap-4", className)} onSubmit={handleFormSubmit}>
             <div className="flex flex-col gap-4">
                 <Input
-                    label="Фамилия"
+                    label="ФИО"
                     type="text"
                     variant="bordered"
                     {...register("lastname")}
