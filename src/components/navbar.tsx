@@ -1,4 +1,4 @@
-import { Button, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
+import { Button, Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { ThemeSwitcher } from "./theme-switcher";
@@ -7,8 +7,8 @@ const NavbarElement = () => {
     return (
         <Navbar maxWidth="xl" isBordered>
             <NavbarBrand>
-                <Icon icon="lucide:layout-dashboard" className="text-2xl" />
-                <p className="ml-2 font-bold text-inherit">Project Name</p>
+                <Image src="/images/FSPLogo.svg" alt="FSPulse Logo" className="h-8 w-8" />
+                <p className="ml-2 text-2xl font-bold">FSPulse</p>
             </NavbarBrand>
 
             <NavbarContent className="hidden gap-4 sm:flex" justify="center">
