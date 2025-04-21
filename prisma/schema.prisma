@@ -90,24 +90,34 @@ enum EventStatus {
 }
 
 model Event {
-  id               String      @id @default(uuid())
-  name             String
-  description      String
-  cover            Bytes       @db.ByteA
-  applicationTime  DateTime
-  start            DateTime
-  end              DateTime
-  representativeId String
-  disciplineId     String
-  isOnline         Boolean
-  address          String?
-  awards           Int[]       @db.SmallInt
-  status           EventStatus @default(PENDING)
+  id              String      @id @default(uuid())
+  name            String
+  description     String
+  cover           Bytes       @db.ByteA
+  applicationTime DateTime
+  start           DateTime
+  end             DateTime
+  disciplineId    String
+  isOnline        Boolean
+  address         String?
+  awards          Int[]       @db.SmallInt
+  isFederal       Boolean
+  isOpen          Boolean
+  status          EventStatus @default(PENDING)
 
+  discipline      Discipline              @relation(fields: [disciplineId], references: [id])
+  representatives EventOfRepresentative[]
+  files           File[]
+  teams           Team[]
+}
+
+model EventOfRepresentative {
+  id               String @id @default(uuid())
+  representativeId String
+  eventId          String
+
+  event          Event          @relation(fields: [eventId], references: [id])
   representative Representative @relation(fields: [representativeId], references: [id])
-  discipline     Discipline     @relation(fields: [disciplineId], references: [id])
-  files          File[]
-  teams          Team[]
 }
 
 model File {
@@ -131,6 +141,6 @@ model Representative {
   password    String
   tg          String? @unique
 
-  region Region  @relation(fields: [regionId], references: [id])
-  events Event[]
+  region Region                  @relation(fields: [regionId], references: [id])
+  events EventOfRepresentative[]
 }
