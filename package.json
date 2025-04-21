@@ -10,8 +10,12 @@
         "build": "bun run --bun next build",
         "start": "bun run --bun next start",
         "prepare": "bun run --bun husky",
+        "db:gen": "bun run prisma generate",
         "db:push": "bun run prisma db push",
         "db:studio": "bun run prisma studio"
+    },
+    "prisma": {
+        "seed": "bun run --bun prisma/seed.ts"
     },
     "husky": {
         "hooks": {
@@ -33,6 +37,7 @@
     "dependencies": {
         "@heroui/react": "^2.8.0-beta.2",
         "@hookform/resolvers": "^5.0.1",
+        "@prisma/client": "^6.6.0",
         "@prisma/extension-accelerate": "^1.3.0",
         "framer-motion": "^12.6.0",
         "next": "~15.3.1",
