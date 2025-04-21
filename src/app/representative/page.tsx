@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import CompetitionCards from "@/app/representative/_components/competition-cards";
-import EventCards from "@/app/representative/_components/event-cards";
+import CompetitionCards from "@/app/representative/_components/competition/competition-cards";
+import EventCards from "@/app/representative/_components/event/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { Pagination } from "@heroui/react";

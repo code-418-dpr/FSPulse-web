@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import EventDetails from "@/app/representative/_components/event-details";
+import EventDetails from "@/app/representative/_components/event/event-details";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Modal, ModalBody, ModalContent } from "@heroui/react";
 import { Drawer, DrawerBody, DrawerContent } from "@heroui/react";

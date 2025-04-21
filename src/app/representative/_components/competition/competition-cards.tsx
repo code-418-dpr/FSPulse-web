@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import CompetitionDialogOrDrawer from "@/app/representative/_components/competition-modal-or-drawer";
+import CompetitionDialogOrDrawer from "@/app/representative/_components/competition/competition-modal-or-drawer";
 import { Card, CardBody, Chip, Image } from "@heroui/react";
 
 export default function CompetitionCards({ paginatedData }: { paginatedData: Record<string, string>[] }) {

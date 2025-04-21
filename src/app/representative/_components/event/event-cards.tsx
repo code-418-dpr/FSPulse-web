@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import EventDialogOrDrawer from "@/app/representative/_components/event-modal-or-drawer";
+import EventDialogOrDrawer from "@/app/representative/_components/event/event-modal-or-drawer";
 import { Card, CardBody, Chip, Image } from "@heroui/react";
 
 export default function EventCards({ paginatedData }: { paginatedData: Record<string, string>[] }) {

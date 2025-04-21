@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import CompetitionDetails from "@/app/representative/_components/competition-details";
+import CompetitionDetails from "@/app/representative/_components/competition/competition-details";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Modal, ModalBody, ModalContent } from "@heroui/react";
 import { Drawer, DrawerBody, DrawerContent } from "@heroui/react";
