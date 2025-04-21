@@ -16,6 +16,11 @@ const baseSchema = z.object({
         .min(1, "ФИО обязательно")
         .min(3, "ФИО должно содержать минимум 3 символа")
         .regex(/^[а-яА-ЯёЁ\s]+$/, "ФИО должно содержать только кириллические буквы"),
+    region: z
+        .string()
+        .min(1, "Регион обязателен")
+        .min(3, "Регион обязателен")
+        .regex(/^[а-яА-ЯёЁ\s]+$/, "Регион должно содержать только кириллические буквы"),
     email: z.string().min(1, "Email обязателен").email("Некорректный email"),
     password: z
         .string()
@@ -30,7 +35,7 @@ const userSchema = baseSchema.refine((data) => data.password === data.passwordRe
     path: ["passwordRepeat"],
 });
 
-export default function UserSignupForm({ className }: React.ComponentProps<"form">) {
+export default function SpokesmanSignupForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
 
     const {
@@ -68,6 +73,14 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     {...register("fullName")}
                     isInvalid={!!errors.fullName}
                     errorMessage={errors.fullName?.message}
+                />
+                <Input
+                    label="Регион"
+                    type="text"
+                    variant="bordered"
+                    {...register("region")}
+                    isInvalid={!!errors.region}
+                    errorMessage={errors.region?.message}
                 />
                 <Input
                     label="Email"

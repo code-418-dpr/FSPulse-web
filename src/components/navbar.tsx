@@ -1,5 +1,5 @@
-import { Button, Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
+import { Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
 
 import { ThemeSwitcher } from "./theme-switcher";
 
@@ -31,9 +31,7 @@ const NavbarElement = () => {
 
             <NavbarContent justify="end">
                 <NavbarItem>
-                    <Button color="primary" variant="flat" startContent={<Icon icon="lucide:user" />}>
-                        Login
-                    </Button>
+                    <AuthDialogOrDrawer />
                 </NavbarItem>
                 <NavbarItem>
                     <ThemeSwitcher />
