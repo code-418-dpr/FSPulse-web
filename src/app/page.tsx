@@ -1,14 +1,17 @@
 "use client";
 
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { Input } from "@heroui/input";
+import FooterElement from "@/components/footer";
+import NavbarElement from "@/components/navbar";
 
 export default function App() {
     return (
         <>
-            <Input />
-            <main>Hello, world!</main>
-            <ThemeSwitcher />
+            <NavbarElement />
+            <main className="p-4">
+                <div className="h-[100vh] w-full">
+                </div>
+            </main>
+            <FooterElement />
         </>
     );
 }
