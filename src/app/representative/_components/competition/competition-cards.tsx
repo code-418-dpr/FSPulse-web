@@ -10,6 +10,10 @@ import CompetitionDialogOrDrawer from "./competition-modal-or-drawer";
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
+// src/app/representative/_components/competition/competition-cards.tsx
+
+// src/app/representative/_components/competition/competition-cards.tsx
+
 interface Props {
     paginatedData: CompetitionItem[];
 }
@@ -30,7 +34,9 @@ export default function CompetitionCards({ paginatedData }: Props) {
                 <Card
                     key={idx}
                     className="cursor-pointer transition-shadow hover:shadow-lg"
-                    onPress={() => { handleClick(c); }} // switched to onPress
+                    onPress={() => {
+                        handleClick(c);
+                    }} // switched to onPress
                 >
                     <CardBody className="space-y-4">
                         <Image alt={c.title} src={c.image} className="w-full rounded-xl object-cover" />

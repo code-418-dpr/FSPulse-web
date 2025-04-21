@@ -14,6 +14,10 @@ import { Card, CardBody, CardHeader, Pagination } from "@heroui/react";
 
 // src/app/representative/page.tsx
 
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
 interface Paged<T> {
     items: T[];
     pagination: {
@@ -66,8 +70,12 @@ export default function RequestsPage() {
         setIsLoading(true);
         void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
             .then((r) => r.json())
-            .then((json: Paged<EventItem>) => { setEventsData(json); })
-            .finally(() => { setIsLoading(false); });
+            .then((json: Paged<EventItem>) => {
+                setEventsData(json);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, [activeTab, page]);
 
     const compPage = competitionsStub.slice((page - 1) * perPage, page * perPage);

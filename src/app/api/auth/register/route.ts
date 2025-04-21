@@ -79,13 +79,10 @@ export async function POST(req: NextRequest) {
         }
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2002") {
-              const field = (error.meta?.target as string[])[0];
-              return NextResponse.json(
-                { error: `Пользователь с таким ${field} уже существует` },
-                { status: 409 }
-              );
+                const field = (error.meta?.target as string[])[0];
+                return NextResponse.json({ error: `Пользователь с таким ${field} уже существует` }, { status: 409 });
             }
-          }
+        }
         return NextResponse.json({ error: "Внутренняя ошибка сервера" }, { status: 500 });
     }
 }

@@ -10,6 +10,10 @@ import EventDialogOrDrawer from "./event-modal-or-drawer";
 
 // src/app/representative/_components/event/event-cards.tsx
 
+// src/app/representative/_components/event/event-cards.tsx
+
+// src/app/representative/_components/event/event-cards.tsx
+
 interface Props {
     paginatedData: EventItem[];
 }
@@ -30,7 +34,9 @@ export default function EventCards({ paginatedData }: Props) {
                 <Card
                     key={e.id}
                     className="cursor-pointer transition-shadow hover:shadow-lg"
-                    onPress={() => { handleClick(e); }} // switched to onPress
+                    onPress={() => {
+                        handleClick(e);
+                    }} // switched to onPress
                 >
                     <CardBody className="space-y-4">
                         <Image

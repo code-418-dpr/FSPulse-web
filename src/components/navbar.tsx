@@ -3,13 +3,27 @@
 
 import { useEffect } from "react";
 
+import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
+import { useAuth } from "@/hooks/useAuth";
 import { Tab } from "@/types";
-import { Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, PressEvent } from "@heroui/react";
+import {
+    Button,
+    Image,
+    Link,
+    Navbar,
+    NavbarBrand,
+    NavbarContent,
+    NavbarItem,
+    PressEvent,
+    Spinner,
+} from "@heroui/react";
 
 import { ThemeSwitcher } from "./theme-switcher";
+
+// src/components/navbar.tsx
 
 // src/components/navbar.tsx
 
@@ -21,7 +35,7 @@ interface NavbarProps {
 export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
-
+    const { user, isLoading, isAuthenticated } = useAuth();
     const handleNavigation = (e: PressEvent, tab: Tab) => {
         router.push(`/representative?tab=${tab}`);
         setActiveTab(tab);
@@ -38,7 +52,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
         await signOut({ redirect: false });
         router.push("/");
         router.refresh();
-      };
+    };
 
     return (
         <Navbar maxWidth="xl" isBordered>
@@ -72,24 +86,24 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
 
             <NavbarContent justify="end">
                 <NavbarItem>
-                {isLoading ? (
-            <Spinner size="sm" />
-          ) : isAuthenticated ? (
-            <div className="flex items-center gap-4">
-              <span className="hidden sm:block">{user?.name}</span>
-              <Button 
-                color="danger" 
-                onPress={() => { 
-                    handleLogout().catch(console.error);
-                }}
-                variant="flat"
-              >
-                Выход
-              </Button>
-            </div>
-          ) : (
-            <AuthDialogOrDrawer />
-          )}
+                    {isLoading ? (
+                        <Spinner size="sm" />
+                    ) : isAuthenticated ? (
+                        <div className="flex items-center gap-4">
+                            <span className="hidden sm:block">{user?.name}</span>
+                            <Button
+                                color="danger"
+                                onPress={() => {
+                                    handleLogout().catch(console.error);
+                                }}
+                                variant="flat"
+                            >
+                                Выход
+                            </Button>
+                        </div>
+                    ) : (
+                        <AuthDialogOrDrawer />
+                    )}
                 </NavbarItem>
                 <NavbarItem>
                     <ThemeSwitcher />

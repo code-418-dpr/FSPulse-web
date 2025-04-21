@@ -276,7 +276,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.passwordRepeat}
                     errorMessage={errors.passwordRepeat?.message}
                 />
-                {formError && <div className="text-danger-500 text-sm text-center">{formError}</div>}
+                {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
                     Регистрация
                 </Button>
