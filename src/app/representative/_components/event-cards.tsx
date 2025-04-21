@@ -10,7 +10,6 @@ export default function EventCards({ paginatedData }: { paginatedData: Record<st
     const [isOpen, setIsOpen] = useState(false);
 
     const handleCardClick = (event: Record<string, string>) => {
-        console.log("nen");
         setSelectedEvent(event);
         setIsOpen(true);
     };
