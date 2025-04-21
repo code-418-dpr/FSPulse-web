@@ -3,13 +3,39 @@
 import { z } from "zod";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+import { SportsCategory } from "@/app/generated/prisma";
 import PasswordInput from "@/components/password-input";
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getLocalTimeZone, today } from "@internationalized/date";
+
+const sportsCategoryOptions = Object.values(SportsCategory).map((key) => ({
+    key,
+    label: getCategoryLabel(key),
+}));
+interface ErrorResponse {
+    error: string;
+}
+function getCategoryLabel(key: SportsCategory): string {
+    const map: Record<SportsCategory, string> = {
+        HMS: "Мастер спорта международного класса",
+        MS: "Мастер спорта",
+        CMS: "Кандидат в мастера спорта",
+        A: "1 взрослый разряд",
+        B: "2 взрослый разряд",
+        C: "3 взрослый разряд",
+        Ay: "1 юношеский разряд",
+        By: "2 юношеский разряд",
+        Cy: "3 юношеский разряд",
+    };
+    return map[key];
+}
 
 const userSchema = z
     .object({
@@ -30,19 +56,16 @@ const userSchema = z
             .string({
                 required_error: "Выберите регион",
             })
-            .min(1, "Регион обязателен")
-            .refine((val) => regions.some((r) => r.key === val), {
-                message: "Выберите регион из списка",
-            }),
-        sportCategory: z
-            .string({
-                required_error: "Выберите спортивный разряд",
-            })
-            .min(1, "Спортивный разряд обязателен")
-            .refine((val) => categories.some((r) => r.key === val), {
-                message: "Выберите спортивный разряд из списка",
-            }),
+            .min(1, "Регион обязателен"),
+        sportCategory: z.nativeEnum(SportsCategory, {
+            errorMap: () => ({ message: "Выберите спортивный разряд из списка" }),
+        }),
         email: z.string().min(1, "Email обязателен").email("Некорректный email"),
+        phoneNumber: z
+            .string()
+            .min(11, "Номер телефона должен содержать минимум 11 цифр")
+            .max(15, "Номер телефона должен содержать максимум 15 цифр")
+            .regex(/^\+?[0-9]+$/, "Некорректный формат номера телефона"),
         password: z
             .string()
             .min(6, "Пароль должен содержать минимум 6 символов")
@@ -55,37 +78,81 @@ const userSchema = z
         path: ["passwordRepeat"],
     });
 
-const regions = [
-    { key: "DPR", label: "Донецкая Народная Республика" },
-    { key: "LPR", label: "Луганская Народная Республика" },
-    { key: "Moscow", label: "Москва" },
-    { key: "Peter", label: "Санкт-Петербург" },
-];
-
-const categories = [
-    { key: "master", label: "Мастер спорта" },
-    { key: "candidateMaster", label: "Кандидат в мастера спорта" },
-];
+type UserFormData = z.infer<typeof userSchema>;
+interface RegionOption {
+    id: string;
+    name: string;
+}
 
 export default function UserSignupForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
+    const [regions, setRegions] = useState<RegionOption[]>([]);
+    const [formError, setFormError] = useState<string | null>(null);
+    const router = useRouter();
+    useEffect(() => {
+        const fetchRegions = async () => {
+            try {
+                const res = await fetch("/api/regions");
+                const data = (await res.json()) as RegionOption[];
+                setRegions(data);
+            } catch (err) {
+                console.error("Ошибка загрузки регионов:", err);
+            }
+        };
+
+        void fetchRegions();
+    }, []);
 
     const {
         control,
         register,
         handleSubmit,
+        setError,
         formState: { errors },
-    } = useForm({
+    } = useForm<UserFormData>({
         resolver: zodResolver(userSchema),
     });
 
-    const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = async (data) => {
-        setIsLoading(true);
+    const onSubmit: SubmitHandler<UserFormData> = async (data) => {
         try {
-            console.log("Form data:", data);
-            await new Promise((resolve) => setTimeout(resolve, 100)); // Имитация загрузки
+            setIsLoading(true);
+            setFormError(null);
+
+            const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...data,
+                    sportCategory: data.sportCategory as SportsCategory,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData: ErrorResponse = (await response.json()) as ErrorResponse;
+                throw new Error(errorData.error || "Ошибка регистрации");
+            }
+
+            const signInResult = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+            });
+            if (signInResult?.error) {
+                throw new Error(signInResult.error);
+            }
+            router.push("/");
+            router.refresh();
         } catch (error) {
-            console.error("Error:", error);
+            if (error instanceof Error) {
+                if (error.message.includes("email") || error.message.includes("phoneNumber")) {
+                    setError("root", { message: error.message });
+                    setFormError(error.message);
+                } else {
+                    setFormError(error.message);
+                }
+            }
         } finally {
             setIsLoading(false);
         }
@@ -146,7 +213,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     render={({ field }) => (
                         <Autocomplete
                             label="Регион"
-                            defaultItems={regions}
+                            defaultItems={regions.map((r) => ({ key: r.id, label: r.name }))}
                             selectedKey={field.value}
                             onSelectionChange={field.onChange}
                             isInvalid={!!errors.region}
@@ -171,7 +238,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     render={({ field }) => (
                         <Autocomplete
                             label="Спортивный разряд"
-                            defaultItems={categories}
+                            defaultItems={sportsCategoryOptions}
                             selectedKey={field.value}
                             onSelectionChange={field.onChange}
                             isInvalid={!!errors.sportCategory}
@@ -190,6 +257,14 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.email}
                     errorMessage={errors.email?.message}
                 />
+                <Input
+                    label="Номер телефона"
+                    type="tel"
+                    variant="bordered"
+                    {...register("phoneNumber")}
+                    isInvalid={!!errors.phoneNumber}
+                    errorMessage={errors.phoneNumber?.message}
+                />
                 <PasswordInput
                     {...register("password")}
                     isInvalid={!!errors.password}
@@ -201,6 +276,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.passwordRepeat}
                     errorMessage={errors.passwordRepeat?.message}
                 />
+                {formError && <div className="text-danger-500 text-sm text-center">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
                     Регистрация
                 </Button>

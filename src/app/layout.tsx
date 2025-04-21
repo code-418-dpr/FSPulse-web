@@ -1,9 +1,11 @@
 import React, { Suspense } from "react";
 
 import type { Metadata } from "next";
+import { getServerSession } from "next-auth";
 import { Inter } from "next/font/google";
 
 import Loading from "@/app/loading";
+import AuthProvider from "@/components/auth-provider";
 import { Providers } from "@/components/providres";
 import siteMetadata from "@/conf/site-metadata";
 
@@ -19,17 +21,17 @@ export const metadata: Metadata = {
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
-export default function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    const session = await getServerSession();
+
     return (
         <html lang="ru" suppressHydrationWarning>
             <body className={inter.className}>
-                <Suspense fallback={<Loading />}>
-                    <Providers>{children}</Providers>
-                </Suspense>
+                <AuthProvider session={session}>
+                    <Suspense fallback={<Loading />}>
+                        <Providers>{children}</Providers>
+                    </Suspense>
+                </AuthProvider>
             </body>
         </html>
     );

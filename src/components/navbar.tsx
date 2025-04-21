@@ -5,11 +5,13 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
-import { Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, PressEvent } from "@heroui/react";
+import { Button, Image, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, PressEvent, Spinner } from "@heroui/react";
 
 import { ThemeSwitcher } from "./theme-switcher";
-
+import { useAuth } from "@/hooks/useAuth";
+import { signOut } from "next-auth/react";
 const NavbarElement = ({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) => {
+    const { user, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -26,6 +28,12 @@ const NavbarElement = ({ activeTab, setActiveTab }: { activeTab: string; setActi
             setActiveTab(tab);
         }
     }, [searchParams, setActiveTab]);
+
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        router.push("/");
+        router.refresh();
+      };
 
     return (
         <Navbar maxWidth="xl" isBordered>
@@ -75,7 +83,24 @@ const NavbarElement = ({ activeTab, setActiveTab }: { activeTab: string; setActi
 
             <NavbarContent justify="end">
                 <NavbarItem>
-                    <AuthDialogOrDrawer />
+                {isLoading ? (
+            <Spinner size="sm" />
+          ) : isAuthenticated ? (
+            <div className="flex items-center gap-4">
+              <span className="hidden sm:block">{user?.name}</span>
+              <Button 
+                color="danger" 
+                onPress={() => { 
+                    handleLogout().catch(console.error);
+                }}
+                variant="flat"
+              >
+                Выход
+              </Button>
+            </div>
+          ) : (
+            <AuthDialogOrDrawer />
+          )}
                 </NavbarItem>
                 <NavbarItem>
                     <ThemeSwitcher />

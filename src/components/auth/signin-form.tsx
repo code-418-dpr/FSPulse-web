@@ -2,8 +2,12 @@
 
 import { z } from "zod";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+
+import { useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import PasswordInput from "@/components/password-input";
 import { Button, Input, cn } from "@heroui/react";
@@ -24,6 +28,14 @@ const formSchema = z.object({
 
 export default function SignInForm({ className }: SignInFormProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    const { data: session } = useSession();
+    const [error, setError] = useState<string | null>(null);
+    useEffect(() => {
+        if (session) {
+            router.push("/");
+        }
+    }, [session, router]);
 
     const {
         register,
@@ -33,13 +45,24 @@ export default function SignInForm({ className }: SignInFormProps) {
         resolver: zodResolver(formSchema),
     });
 
-    const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
+    const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (data) => {
         try {
             setIsLoading(true);
-            console.log(data);
-            // await new Promise((resolve) => setTimeout(resolve, 100));
+            setError(null);
+
+            const result = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                throw new Error(result.error);
+            }
+            router.push("/");
         } catch (error) {
-            console.error(error);
+            console.error("Login error:", error);
+            setError(error instanceof Error ? error.message : "Произошла ошибка при входе");
         } finally {
             setIsLoading(false);
         }
@@ -66,6 +89,7 @@ export default function SignInForm({ className }: SignInFormProps) {
                     isInvalid={!!errors.password}
                     errorMessage={errors.password?.message}
                 />
+                {error && <div className="text-sm text-red-500">{error}</div>}
                 <Button type="submit" color="success" isLoading={isLoading}>
                     Вход
                 </Button>
