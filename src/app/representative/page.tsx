@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+import CompetitionCards from "@/app/representative/_components/competition-cards";
+import EventCards from "@/app/representative/_components/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
-import { Card, CardBody, Chip, Image, Pagination } from "@heroui/react";
+import { Pagination } from "@heroui/react";
 
 // Заглушка данных (13 элементов для демонстрации пагинации)
 const competitions = Array(13).fill({
@@ -19,46 +23,66 @@ const competitions = Array(13).fill({
     image: "https://heroui.com/images/hero-card-complete.jpeg",
 }) as Record<string, string>[];
 
+// Заглушка данных (13 элементов для демонстрации пагинации)
+const events = Array(13).fill({
+    title: "Кубок НР",
+    region: "ДНР",
+    startDate: "23.05.2025",
+    endDate: "25.05.2025",
+    format: "Онлайн",
+    discipline: "Продуктовое программирование",
+    image: "https://heroui.com/images/hero-card-complete.jpeg",
+}) as Record<string, string>[];
+
 export default function RequestsPage() {
     const [page, setPage] = useState(1);
+    const [activeTab, setActiveTab] = useState("requests");
     const itemsPerPage = 12;
 
-    const paginatedData = competitions.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // При монтировании проверяем URL и устанавливаем активную вкладку
+    useEffect(() => {
+        if (!pathname.startsWith("/representative")) {
+            router.push("/representative?tab=events");
+            return;
+        }
+
+        const tab = searchParams.get("tab");
+        if (tab && ["requests", "events", "team"].includes(tab)) {
+            setActiveTab(tab);
+        } else {
+            // Если параметр tab отсутствует, устанавливаем по умолчанию "events"
+            router.replace(`/representative?tab=events`);
+            setActiveTab("events");
+        }
+    }, [pathname, router, searchParams]);
+
+    const data = activeTab === "requests" ? competitions : events;
+
+    const paginatedData = data.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
     return (
         <>
-            <NavbarElement />
+            <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
             <div className="flex min-h-[100vh] w-full flex-col">
                 <div className="container mx-auto w-[70%] flex-1 px-4 py-8">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {paginatedData.map((competition, index) => (
-                            <Card key={index} className="transition-shadow hover:shadow-lg">
-                                <CardBody className="space-y-4">
-                                    <Image
-                                        alt={competition.title}
-                                        className="w-full rounded-xl object-cover"
-                                        src={competition.image}
-                                    />
-                                    <div className="space-y-2">
-                                        <h3 className="text-2xl font-bold">{competition.title}</h3>
-                                        <div className="grid grid-cols-2 pt-2">
-                                            <Chip color="warning" variant="solid">
-                                                {competition.status}
-                                            </Chip>
-                                            <p className="pt-1 text-right text-sm">{competition.applicationDate}</p>
-                                        </div>
-                                    </div>
-                                </CardBody>
-                            </Card>
-                        ))}
+                        {activeTab === "requests" ? (
+                            <CompetitionCards paginatedData={paginatedData} />
+                        ) : (
+                            <EventCards paginatedData={paginatedData} />
+                        )}
                     </div>
 
-                    {competitions.length > itemsPerPage && (
+                    {data.length > itemsPerPage && (
                         <div className="mt-8 flex justify-center">
                             <Pagination
                                 showControls
                                 page={page}
-                                total={Math.ceil(competitions.length / itemsPerPage)}
+                                total={Math.ceil(data.length / itemsPerPage)}
                                 onChange={setPage}
                             />
                         </div>
