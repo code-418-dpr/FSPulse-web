@@ -38,7 +38,7 @@ function AuthDialog({ isOpen, onOpen, onOpenChange }: Props) {
             >
                 Login
             </Button>
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal backdrop="blur" scrollBehavior="outside" isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     <ModalHeader className="text-center text-2xl">Авторизация</ModalHeader>
                     <ModalBody className="p-5">
