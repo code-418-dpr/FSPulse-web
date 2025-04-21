@@ -1,44 +1,20 @@
-// import { Prisma, PrismaClient } from "../src/app/generated/prisma";
-//
-// const prisma = new PrismaClient();
-//
-// const userData: Prisma.UserCreateInput[] = [
-//     {
-//         name: "Alice",
-//         email: "alice@prisma.io",
-//         posts: {
-//             create: [
-//                 {
-//                     title: "Join the Prisma Discord",
-//                     content: "https://pris.ly/discord",
-//                     published: true,
-//                 },
-//                 {
-//                     title: "Prisma on YouTube",
-//                     content: "https://pris.ly/youtube",
-//                 },
-//             ],
-//         },
-//     },
-//     {
-//         name: "Bob",
-//         email: "bob@prisma.io",
-//         posts: {
-//             create: [
-//                 {
-//                     title: "Follow Prisma on Twitter",
-//                     content: "https://www.twitter.com/prisma",
-//                     published: true,
-//                 },
-//             ],
-//         },
-//     },
-// ];
-//
-// export async function main() {
-//     for (const u of userData) {
-//         await prisma.user.create({ data: u });
-//     }
-// }
-//
-// main();
+import { Prisma, PrismaClient } from "@/app/generated/prisma";
+
+import disciplines from "./data/disciplines";
+import regions from "./data/regions";
+
+const prisma = new PrismaClient();
+
+const regionsData: Prisma.RegionCreateInput[] = regions.map((region) => ({ name: region }));
+const disciplinesData: Prisma.DisciplineCreateInput[] = disciplines.map((discipline) => ({ name: discipline }));
+
+export async function main() {
+    for (const region of regionsData) {
+        await prisma.region.create({ data: region });
+    }
+    for (const discipline of disciplinesData) {
+        await prisma.discipline.create({ data: discipline });
+    }
+}
+
+void main();
