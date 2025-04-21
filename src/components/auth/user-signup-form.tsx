@@ -37,7 +37,14 @@ const userSchema = z
             .refine((val) => regions.some((r) => r.key === val), {
                 message: "Выберите регион из списка",
             }),
-        sportCategory: z.string(),
+        sportCategory: z
+            .string({
+                required_error: "Выберите спортивный разряд",
+            })
+            .min(1, "Спортивный разряд обязателен")
+            .refine((val) => categories.some((r) => r.key === val), {
+                message: "Выберите спортивный разряд из списка",
+            }),
         email: z.string().min(1, "Email обязателен").email("Некорректный email"),
         password: z
             .string()
