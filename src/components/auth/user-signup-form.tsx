@@ -75,8 +75,8 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<z.infer<typeof userSchema>>({
-        resolver: zodResolver<z.infer<typeof userSchema>>(userSchema),
+    } = useForm({
+        resolver: zodResolver(userSchema),
     });
 
     const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = async (data) => {
