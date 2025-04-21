@@ -3,7 +3,7 @@ import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import Loading from "@/app/representative/loading";
+import Loading from "@/app/loading";
 import { Providers } from "@/components/providres";
 import siteMetadata from "@/conf/site-metadata";
 
