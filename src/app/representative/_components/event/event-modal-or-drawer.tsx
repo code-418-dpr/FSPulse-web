@@ -33,7 +33,7 @@ function EventDialog({ isOpen, onOpenChange, event }: Props) {
 
 function EventDrawer({ isOpen, onOpenChange, event }: Props) {
     return (
-        <Drawer placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Drawer size="full" placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
             <DrawerContent className="p-4">
                 <DrawerBody>
                     <EventDetails event={event} />

@@ -35,7 +35,7 @@ function CompetitionDialog({ isOpen, onOpenChange, competition }: Props) {
 
 function CompetitionDrawer({ isOpen, onOpenChange, competition }: Props) {
     return (
-        <Drawer placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Drawer size="full" placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
             <DrawerContent className="p-4">
                 <DrawerBody>
                     <CompetitionDetails competition={competition} />
