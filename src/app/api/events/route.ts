@@ -1,7 +1,9 @@
-// src/app/api/events/route.ts
 import { NextResponse } from "next/server";
 
 import { getEventSummaries } from "@/data/event";
+
+// src/app/api/events/route.ts
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
     const url = new URL(request.url);
