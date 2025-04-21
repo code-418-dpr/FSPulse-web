@@ -4,49 +4,52 @@ import { z } from "zod";
 
 import type React from "react";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import PasswordInput from "@/components/password-input";
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const baseSchema = z.object({
-    lastname: z
-        .string()
-        .min(1, "Фамилия обязательна")
-        .min(3, "Фамилия должна содержать минимум 3 символа")
-        .regex(/^[а-яА-ЯёЁ\s]+$/, "Фамилия должна содержать только кириллические буквы"),
-    firstname: z
-        .string()
-        .min(1, "Имя обязательно")
-        .min(3, "Имя должно содержать минимум 3 символа")
-        .regex(/^[а-яА-ЯёЁ\s]+$/, "Имя должно содержать только кириллические буквы"),
-    middlename: z.string().nullable(),
-    birthDate: z.date(),
-    address: z
-        .string()
-        .min(1, "Адрес обязателен")
-        .min(3, "Адрес должен содержать минимум 3 символа")
-        .regex(/^[а-яА-ЯёЁ\s]+$/, "Адрес должен содержать только кириллические буквы"),
-    region: z
-        .string()
-        .min(1, "Регион обязателен")
-        .min(3, "Регион должен содержать минимум 3 символа")
-        .regex(/^[а-яА-ЯёЁ\s]+$/, "Регион должен содержать только кириллические буквы"),
-    sportCategory: z.string(),
-    email: z.string().min(1, "Email обязателен").email("Некорректный email"),
-    password: z
-        .string()
-        .min(6, "Пароль должен содержать минимум 6 символов")
-        .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
-        .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
-    passwordRepeat: z.string(),
-});
-
-const userSchema = baseSchema.refine((data) => data.password === data.passwordRepeat, {
-    message: "Пароли не совпадают",
-    path: ["passwordRepeat"],
-});
+const userSchema = z
+    .object({
+        lastname: z
+            .string()
+            .min(1, "Фамилия обязательна")
+            .min(3, "Фамилия должна содержать минимум 3 символа")
+            .regex(/^[а-яА-ЯёЁ\s]+$/, "Фамилия должна содержать только кириллические буквы"),
+        firstname: z
+            .string()
+            .min(1, "Имя обязательно")
+            .min(3, "Имя должно содержать минимум 3 символа")
+            .regex(/^[а-яА-ЯёЁ\s]+$/, "Имя должно содержать только кириллические буквы"),
+        middlename: z.string().nullable(),
+        birthDate: z.date(),
+        address: z
+            .string()
+            .min(1, "Адрес обязателен")
+            .min(3, "Адрес должен содержать минимум 3 символа")
+            .regex(/^[а-яА-ЯёЁ\s]+$/, "Адрес должен содержать только кириллические буквы"),
+        region: z
+            .string({
+                required_error: "Выберите регион",
+            })
+            .min(1, "Регион обязателен")
+            .refine((val) => regions.some((r) => r.key === val), {
+                message: "Выберите регион из списка",
+            }),
+        sportCategory: z.string(),
+        email: z.string().min(1, "Email обязателен").email("Некорректный email"),
+        password: z
+            .string()
+            .min(6, "Пароль должен содержать минимум 6 символов")
+            .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
+            .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
+        passwordRepeat: z.string(),
+    })
+    .refine((data) => data.password === data.passwordRepeat, {
+        message: "Пароли не совпадают",
+        path: ["passwordRepeat"],
+    });
 
 const regions = [
     { key: "DPR", label: "Донецкая Народная Республика" },
@@ -64,6 +67,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
     const [isLoading, setIsLoading] = useState(false);
 
     const {
+        control,
         register,
         handleSubmit,
         formState: { errors },
@@ -122,16 +126,23 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.birthDate}
                     errorMessage={errors.birthDate?.message}
                 />
-                <Autocomplete
-                    label="Регион"
-                    {...register("region")}
-                    isInvalid={!!errors.region}
-                    errorMessage={errors.region?.message}
-                >
-                    {regions.map((region) => (
-                        <AutocompleteItem key={region.key}>{region.label}</AutocompleteItem>
-                    ))}
-                </Autocomplete>
+                <Controller
+                    name="region"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            label="Регион"
+                            defaultItems={regions}
+                            selectedKey={field.value}
+                            onSelectionChange={field.onChange}
+                            isInvalid={!!errors.region}
+                            errorMessage={errors.region?.message}
+                            allowsCustomValue={false}
+                        >
+                            {(region) => <AutocompleteItem key={region.key}>{region.label}</AutocompleteItem>}
+                        </Autocomplete>
+                    )}
+                />
                 <Input
                     label="Адрес"
                     type="text"
@@ -140,16 +151,23 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.middlename}
                     errorMessage={errors.middlename?.message}
                 />
-                <Autocomplete
-                    label="Спортивный разряд"
-                    {...register("sportCategory")}
-                    isInvalid={!!errors.sportCategory}
-                    errorMessage={errors.sportCategory?.message}
-                >
-                    {categories.map((category) => (
-                        <AutocompleteItem key={category.key}>{category.label}</AutocompleteItem>
-                    ))}
-                </Autocomplete>
+                <Controller
+                    name="sportCategory"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            label="Спортивный разряд"
+                            defaultItems={categories}
+                            selectedKey={field.value}
+                            onSelectionChange={field.onChange}
+                            isInvalid={!!errors.sportCategory}
+                            errorMessage={errors.sportCategory?.message}
+                            allowsCustomValue={false}
+                        >
+                            {(category) => <AutocompleteItem key={category.key}>{category.label}</AutocompleteItem>}
+                        </Autocomplete>
+                    )}
+                />
                 <Input
                     label="Email"
                     type="email"
