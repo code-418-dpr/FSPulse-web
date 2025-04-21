@@ -5,7 +5,8 @@ import { Inter } from "next/font/google";
 
 import { Providers } from "@/components/providres";
 import siteMetadata from "@/conf/site-metadata";
-import "@/globals.css";
+
+import "../globals.css";
 
 export const metadata: Metadata = {
     title: { default: siteMetadata.name, template: `%s | ${siteMetadata.name}` },
