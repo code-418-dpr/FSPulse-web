@@ -94,9 +94,11 @@ model Event {
   name            String
   description     String
   cover           Bytes       @db.ByteA
-  applicationTime DateTime
+  applicationTime DateTime    @default(now())
   start           DateTime
   end             DateTime
+  minAge          Int         @db.SmallInt
+  maxAge          Int         @db.SmallInt
   disciplineId    String
   isOnline        Boolean
   address         String?
