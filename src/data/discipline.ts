@@ -3,7 +3,7 @@
 import { Prisma } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
-import DisciplineCreateManyInput = Prisma.DisciplineCreateManyInput;
+import DisciplineCreateInput = Prisma.DisciplineCreateInput;
 
 export const getDisciplines = async () => {
     return prisma.discipline.findMany({
@@ -12,6 +12,6 @@ export const getDisciplines = async () => {
     });
 };
 
-export const createDisciplines = async (disciplines: DisciplineCreateManyInput) => {
+export const createDisciplines = async (disciplines: DisciplineCreateInput[]) => {
     return prisma.discipline.createManyAndReturn({ data: disciplines, skipDuplicates: true });
 };
