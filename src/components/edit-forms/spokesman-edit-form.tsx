@@ -6,10 +6,8 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { registerUser } from "@/data/auth";
 import { getRegions } from "@/data/region";
 import { baseSpokesmanSchema } from "@/schemas/base-spokesman-schema";
 import { RegionOption } from "@/types/region";
@@ -52,6 +50,12 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
             setIsLoading(true);
             setFormError(null);
 
+            // моки чтоб не удалять data и async
+            console.log(data);
+            await new Promise((resolve) => {
+                setTimeout(resolve, 100);
+            });
+            /*
             const result = await registerUser({
                 ...data,
                 role: "representative",
@@ -67,6 +71,7 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
             if (signInResult?.error) {
                 throw new Error(signInResult.error);
             }
+             */
 
             router.push("/");
             router.refresh();
