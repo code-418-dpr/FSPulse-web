@@ -7,7 +7,9 @@ import CompetitionDetails from "@/app/representative/_components/competition/com
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { CompetitionItem } from "@/types";
 import { RepresentativeRequestItem } from "@/types/search";
-import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
+import { Badge, Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
+
+// src/app/representative/_components/competition/competition-cards.tsx
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
@@ -49,11 +51,35 @@ export default function CompetitionCards({ paginatedData }: Props) {
                         />
                         <div className="space-y-2">
                             <h3 className="text-2xl font-bold">{c.name}</h3>
-                            <div className="grid grid-cols-2 pt-2">
-                                <Chip color="warning" variant="solid">
-                                    {c.requestStatus}
+                            <div className="flex items-center justify-between pt-2">
+                                <h4 className="text-md text-foreground/50 font-bold"> {c.discipline.name}</h4>
+
+                                <Chip color="secondary" variant="flat">
+                                    {c.level == "FEDERAL"
+                                        ? "Всероссийский"
+                                        : c.level == "OPEN"
+                                          ? "Открытый"
+                                          : "Региональный"}
                                 </Chip>
-                                <p className="pt-1 text-right text-sm">{c.applicationTime.toLocaleDateString()}</p>
+                            </div>
+                            <div className="flex items-center justify-between pt-2">
+                                <p className="pt-1 text-left text-sm">{c.applicationTime.toLocaleDateString()}</p>
+                                <Chip
+                                    color={
+                                        c.requestStatus == "APPROVED"
+                                            ? "success"
+                                            : c.requestStatus == "DECLINED"
+                                              ? "danger"
+                                              : "warning"
+                                    }
+                                    variant="solid"
+                                >
+                                    {c.requestStatus == "APPROVED"
+                                        ? "Одобрено"
+                                        : c.requestStatus == "DECLINED"
+                                          ? "Отклонено"
+                                          : "На рассмотрении"}
+                                </Chip>
                             </div>
                         </div>
                     </CardBody>

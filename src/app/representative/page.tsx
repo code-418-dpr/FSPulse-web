@@ -23,6 +23,8 @@ import { RequestStatus } from "../generated/prisma";
 
 // src/app/representative/page.tsx
 
+// src/app/representative/page.tsx
+
 interface Paged<T> {
     items: T[];
     pagination: {
