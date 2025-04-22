@@ -39,6 +39,10 @@ import { ThemeSwitcher } from "./theme-switcher";
 
 // src/components/navbar.tsx
 
+// src/components/navbar.tsx
+
+// src/components/navbar.tsx
+
 interface NavbarProps {
     activeTab: Tab;
     setActiveTab: React.Dispatch<React.SetStateAction<Tab>>;
@@ -70,7 +74,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
         <Navbar maxWidth="xl" isBordered>
             <NavbarBrand>
                 <Image src="/images/FSPLogo.svg" alt="FSPulse Logo" className="h-8 w-8" />
-                <p className="ml-2 text-2xl font-bold">FSPulse</p>
+                <p className="ml-2 text-2xl font-bold">ФСПульс</p>
             </NavbarBrand>
             {isAuthenticated && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
