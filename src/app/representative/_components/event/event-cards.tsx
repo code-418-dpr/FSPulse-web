@@ -3,10 +3,12 @@
 
 import { useState } from "react";
 
+import EventDetails from "@/app/representative/_components/event/event-details";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import { EventItem } from "@/types";
-import { Card, CardBody, Image } from "@heroui/react";
+import { Card, CardBody, Image, useDisclosure } from "@heroui/react";
 
-import EventDialogOrDrawer from "./event-modal-or-drawer";
+// src/app/representative/_components/event/event-cards.tsx
 
 // src/app/representative/_components/event/event-cards.tsx
 
@@ -44,16 +46,20 @@ interface Props {
 
 export default function EventCards({ paginatedData }: Props) {
     const [selected, setSelected] = useState<EventItem | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const handleClick = (e: EventItem) => {
         setSelected(e);
-        setIsOpen(true);
+        onOpen(true);
     };
 
     return (
         <>
-            {selected && <EventDialogOrDrawer isOpen={isOpen} onOpenChange={setIsOpen} event={selected} />}
+            {selected && (
+                <ModalOrDrawer isOpen={isOpen} onOpenChange={onOpenChange}>
+                    <EventDetails event={selected} />
+                </ModalOrDrawer>
+            )}
             {paginatedData.map((e) => (
                 <Card
                     key={e.id}
