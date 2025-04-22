@@ -16,52 +16,10 @@ import NavbarElement from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, CompetitionItem, EventItem, Tab, TeamItem } from "@/types";
 import { CircularProgress } from "@heroui/react";
+import { RequestStatus } from "../generated/prisma";
+import { searchRepresentativeRequests } from "@/data/event";
+import { SearchParams } from "@/types/search";
 
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
 
 interface Paged<T> {
     items: T[];
@@ -74,6 +32,14 @@ interface Paged<T> {
 }
 
 export default function RequestsPage() {
+    const { isAuthenticated, isLoading, user } = useAuth();
+    const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
+        disciplineIds: [],
+        levels: [],
+        statuses: [RequestStatus.PENDING],
+      });
+      const [requestsData, setRequestsData] = useState<Paged<CompetitionItem> | null>(null);
+      const [isRequestsLoading, setIsRequestsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [activeTab, setActiveTab] = useState<Tab>("requests");
     const [competitionsData, setCompetitionsData] = useState<Paged<CompetitionItem> | null>(null);
@@ -84,7 +50,6 @@ export default function RequestsPage() {
     const [isTeamLoading, setIsTeamLoading] = useState(false);
     const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
     const [isAchievementLoading, setIsAchievementLoading] = useState(false);
-    const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -108,17 +73,43 @@ export default function RequestsPage() {
 
     // load competitions when on "requests"
     useEffect(() => {
-        if (activeTab !== "requests") return;
-        setIsCompLoading(true);
-        void fetch(`/api/competitions?page=${page}&pageSize=${perPage}`)
-            .then((r) => r.json())
-            .then((json: Paged<CompetitionItem>) => {
-                setCompetitionsData(json);
-            })
-            .finally(() => {
-                setIsCompLoading(false);
+        if (activeTab !== "requests" || !user?.id) return;
+        
+        const loadRequests = async () => {
+          setIsRequestsLoading(true);
+          try {
+            const params = {
+              ...searchParamsState,
+              representativeId: user.id,
+              page,
+              pageSize: perPage,
+            };
+            
+            const result = await searchRepresentativeRequests(params);
+            setRequestsData({
+              items: result.results,
+              pagination: {
+                page,
+                pageSize: perPage,
+                totalItems: result.totalItems,
+                totalPages: result.totalPages,
+              }
             });
-    }, [activeTab, page]);
+          } catch (error) {
+            console.error("Error loading requests:", error);
+          } finally {
+            setIsRequestsLoading(false);
+          }
+        };
+    
+        loadRequests();
+      }, [activeTab, page, searchParamsState, user?.id]);
+    
+      // Обработчик поиска
+      const handleSearch = (params: SearchParams) => {
+        setSearchParamsState(params);
+        setPage(1); // Сброс на первую страницу при новом поиске
+      };
 
     // load events when on "events"
     useEffect(() => {
@@ -190,15 +181,15 @@ export default function RequestsPage() {
 
                 {/* Main */}
                 {activeTab === "requests" && (
-                    <MainCards<CompetitionItem>
-                        isLoading={isCompLoading}
-                        pageItems={compPageItems}
-                        totalPages={totalCompPages}
-                        page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <CompetitionCards paginatedData={items} />}
-                    />
-                )}
+          <MainCards<CompetitionItem>
+            isLoading={isRequestsLoading}
+            pageItems={requestsData?.items || []}
+            totalPages={requestsData?.pagination.totalPages || 1}
+            page={page}
+            setPage={setPage}
+            renderCards={(items) => <CompetitionCards paginatedData={items} />}
+          />
+        )}
 
                 {activeTab === "events" && (
                     <MainCards<EventItem>

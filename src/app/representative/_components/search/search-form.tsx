@@ -16,13 +16,30 @@ import {
 } from "@heroui/react";
 import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { SearchRepresentativeRequestsParams } from "@/types/search";
 
-export function SearchForm() {
+export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentativeRequestsParams) => void }) {
     const [selectedStatus, setSelectedStatus] = React.useState<Set<string>>(new Set([RequestStatus.PENDING]));
     const [selectedDiscipline, setSelectedDiscipline] = React.useState<Set<string>>(new Set());
     const [selectedLevel, setSelectedLevel] = React.useState<Set<string>>(new Set());
     const [disciplines, setDisciplines] = React.useState<{ id: string; name: string }[]>([]);
     const [levels] = React.useState(Object.values(EventLevel));
+
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      
+      const searchParams: SearchParams = {
+        query: "", // добавьте состояние для input
+        disciplineIds: Array.from(selectedDiscipline),
+        levels: Array.from(selectedLevel) as EventLevel[],
+        statuses: Array.from(selectedStatus) as RequestStatus[],
+        minDate: selectedDateRange.start?.toDate(getLocalTimeZone()),
+        maxDate: selectedDateRange.end?.toDate(getLocalTimeZone()),
+      };
+  
+      onSubmit(searchParams);
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -159,6 +176,10 @@ export function SearchForm() {
 
             <div className="flex justify-end gap-2">
                 <Button variant="flat">Сбросить</Button>
+                <Button type="submit" isLoading={isLoading}>
+          Поиск
+        </Button>
+
             </div>
         </Form>
     );
