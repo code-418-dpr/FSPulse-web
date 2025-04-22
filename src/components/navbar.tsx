@@ -140,7 +140,8 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                             <User
                                                 avatarProps={{
                                                     size: "sm",
-                                                    src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+                                                    className:
+                                                        "bg-gradient-to-br from-[#FFB457] to-[#FF705B] text-black",
                                                 }}
                                                 classNames={{
                                                     name: "font-bold",
@@ -170,7 +171,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                         <>
                             <Button
                                 onPress={() => {
-                                    onOpen(true);
+                                    onOpen();
                                 }}
                                 color="primary"
                                 variant="flat"
