@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
+import { getDisciplines } from "@/data/discipline";
 import {
     Button,
     DateRangePicker,
@@ -10,139 +12,153 @@ import {
     DropdownMenu,
     DropdownTrigger,
     Form,
-    Switch,
+    Input,
 } from "@heroui/react";
 import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 export function SearchForm() {
-    const [isSelected, setIsSelected] = React.useState(true);
-    const [selectedStatusKeys, setSelectedStatusKeys] = React.useState<Set<string>>(new Set(["На рассмотрении"]));
-    const [selectedDisciplineKeys, setSelectedDisciplineKeys] = React.useState<Set<string>>(
-        new Set(["Продуктовое программирование"]),
-    );
+    const [selectedStatus, setSelectedStatus] = React.useState<Set<string>>(new Set([RequestStatus.PENDING]));
+    const [selectedDiscipline, setSelectedDiscipline] = React.useState<Set<string>>(new Set());
+    const [selectedLevel, setSelectedLevel] = React.useState<Set<string>>(new Set());
+    const [disciplines, setDisciplines] = React.useState<{ id: string; name: string }[]>([]);
+    const [levels] = React.useState(Object.values(EventLevel));
 
-    const selectedStatusValue = React.useMemo(
-        () => Array.from(selectedStatusKeys).join(", ").replace(/_/g, ""),
-        [selectedStatusKeys],
-    );
+    useEffect(() => {
+        const loadData = async () => {
+            const data = await getDisciplines();
+            setDisciplines(data);
+        };
+        void loadData();
+    }, []);
 
-    const selectedDisciplineValue = React.useMemo(
-        () => Array.from(selectedDisciplineKeys).join(", ").replace(/_/g, ""),
-        [selectedDisciplineKeys],
-    );
-
-    const handleSelectionStatusChange = (keys: Selection) => {
-        if (keys === "all") {
-            setSelectedStatusKeys(new Set(["На рассмотрении", "Принята", "Отклонена"]));
-            return;
-        }
-
-        const stringKeys = new Set<string>();
-        keys.forEach((key) => {
-            if (typeof key === "string") {
-                stringKeys.add(key);
-            }
-        });
-        setSelectedStatusKeys(stringKeys);
+    const getLevelName = (level: EventLevel) => {
+        const names: Record<EventLevel, string> = {
+            [EventLevel.OPEN]: "Открытый",
+            [EventLevel.REGIONAL]: "Региональный",
+            [EventLevel.FEDERAL]: "Федеральный",
+        };
+        return names[level];
     };
 
-    const handleSelectionDisciplineChange = (keys: Selection) => {
-        if (keys === "all") {
-            setSelectedDisciplineKeys(
-                new Set([
-                    "Продуктовое программирование",
-                    "Алгоритмическое программирование",
-                    "Программирование БПЛА",
-                    "Робототехника",
-                ]),
-            );
-            return;
-        }
+    const getStatusName = (status: RequestStatus) => {
+        const names: Record<RequestStatus, string> = {
+            [RequestStatus.PENDING]: "На рассмотрении",
+            [RequestStatus.APPROVED]: "Одобрено",
+            [RequestStatus.DECLINED]: "Отклонено",
+        };
+        return names[status];
+    };
 
-        const stringKeys = new Set<string>();
-        keys.forEach((key) => {
-            if (typeof key === "string") {
-                stringKeys.add(key);
-            }
-        });
-        setSelectedDisciplineKeys(stringKeys);
+    const renderDropdown = (
+        label: string,
+        items: { key: string; name: string }[],
+        selectedKeys: Set<string>,
+        onSelectionChange: (keys: Selection) => void,
+        allowEmpty = false,
+    ) => {
+        const selectedNames = Array.from(selectedKeys)
+            .map((key) => items.find((item) => item.key === key)?.name ?? key)
+            .join(", ");
+
+        return (
+            <div className="mb-4">
+                <label className="mb-2 block text-sm font-medium">{label}</label>
+                <Dropdown className="w-full">
+                    <DropdownTrigger>
+                        <Button variant="bordered" className="w-full justify-between text-left">
+                            {selectedNames || "Выберите..."}
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                        disallowEmptySelection={!allowEmpty}
+                        selectionMode="single"
+                        selectedKeys={selectedKeys}
+                        onSelectionChange={onSelectionChange}
+                    >
+                        {items.map((item) => (
+                            <DropdownItem key={item.key}>{item.name}</DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </Dropdown>
+            </div>
+        );
+    };
+
+    const handleSelectionChange = (
+        keys: Selection,
+        allKeys: string[],
+        setter: React.Dispatch<React.SetStateAction<Set<string>>>,
+    ) => {
+        if (keys === "all") {
+            setter(new Set(allKeys));
+        } else {
+            setter(new Set(keys as Iterable<string>));
+        }
     };
 
     return (
         <Form>
-            <div></div>
-
-            <div>
-                <p>Статус:</p>
-                <div className="m-2">
-                    <Dropdown>
-                        <DropdownTrigger>
-                            <Button className="capitalize" variant="bordered">
-                                {selectedStatusValue}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            disallowEmptySelection
-                            aria-label="Status selection"
-                            selectedKeys={selectedStatusKeys}
-                            selectionMode="single"
-                            variant="flat"
-                            onSelectionChange={handleSelectionStatusChange}
-                        >
-                            <DropdownItem key="На рассмотрении">На рассмотрении</DropdownItem>
-                            <DropdownItem key="Принята">Принята</DropdownItem>
-                            <DropdownItem key="Отклонена">Отклонена</DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
+            <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-full">
+                    <Input label="Поиск по описанию" variant="bordered" fullWidth />
                 </div>
-            </div>
 
-            <div className="flex flex-col gap-2">
-                <p>Формат:</p>
-                <Switch isSelected={isSelected} onValueChange={setIsSelected}>
-                    {isSelected ? "Онлайн" : "Офлайн"}
-                </Switch>
-            </div>
+                {renderDropdown(
+                    "Дисциплина",
+                    disciplines.map((d) => ({ key: d.id, name: d.name })),
+                    selectedDiscipline,
+                    (keys) => {
+                        handleSelectionChange(
+                            keys,
+                            disciplines.map((d) => d.id),
+                            setSelectedDiscipline,
+                        );
+                    },
+                    true,
+                )}
 
-            <div>
-                <div>
+                <div className="mb-4">
+                    <label className="mb-2 block text-sm font-medium">Даты проведения</label>
                     <DateRangePicker
-                        label="Даты проведения:"
+                        className="w-full"
                         defaultValue={{
                             start: today(getLocalTimeZone()).subtract({ days: 7 }),
                             end: today(getLocalTimeZone()),
                         }}
                     />
                 </div>
+
+                {renderDropdown(
+                    "Уровень события",
+                    levels.map((l) => ({ key: l, name: getLevelName(l) })),
+                    selectedLevel,
+                    (keys) => {
+                        handleSelectionChange(
+                            keys,
+                            levels.map((l) => l),
+                            setSelectedLevel,
+                        );
+                    },
+                    true,
+                )}
+
+                {renderDropdown(
+                    "Статус",
+                    Object.values(RequestStatus).map((s) => ({
+                        key: s,
+                        name: getStatusName(s),
+                    })),
+                    selectedStatus,
+                    (keys) => {
+                        handleSelectionChange(keys, Object.values(RequestStatus), setSelectedStatus);
+                    },
+                    true,
+                )}
             </div>
 
-            <div>
-                <p>Дисциплина:</p>
-                <div className="m-2">
-                    <Dropdown>
-                        <DropdownTrigger>
-                            <Button className="capitalize" variant="bordered">
-                                {selectedDisciplineValue}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            disallowEmptySelection
-                            aria-label="Discipline selection"
-                            selectedKeys={selectedDisciplineKeys}
-                            selectionMode="single"
-                            variant="flat"
-                            onSelectionChange={handleSelectionDisciplineChange}
-                        >
-                            <DropdownItem key="Продуктовое программирование">Продуктовое программирование</DropdownItem>
-                            <DropdownItem key="Алгоритмическое программирование">
-                                Алгоритмическое программирование
-                            </DropdownItem>
-                            <DropdownItem key="Программирование БПЛА">Программирование БПЛА</DropdownItem>
-                            <DropdownItem key="Робототехника">Робототехника</DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                </div>
+            <div className="flex justify-end gap-2">
+                <Button variant="flat">Сбросить</Button>
             </div>
         </Form>
     );
