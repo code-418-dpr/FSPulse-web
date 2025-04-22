@@ -2,15 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
 
-interface Params {
-    params: {
-        id: string;
-    };
-}
-
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
     const authHeader = req.headers.get("authorization");
 
     // Проверка заголовка Authorization
