@@ -6,7 +6,9 @@ import { useState } from "react";
 import CompetitionDetails from "@/app/representative/_components/competition/competition-details";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { CompetitionItem } from "@/types";
-import { Card, CardBody, Chip, Image } from "@heroui/react";
+import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
+
+// src/app/representative/_components/competition/competition-cards.tsx
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
@@ -28,17 +30,17 @@ interface Props {
 
 export default function CompetitionCards({ paginatedData }: Props) {
     const [selected, setSelected] = useState<CompetitionItem | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const handleClick = (c: CompetitionItem) => {
         setSelected(c);
-        setIsOpen(true);
+        onOpen(true);
     };
 
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChange={setIsOpen}>
+                <ModalOrDrawer isOpen={isOpen} onOpenChange={onOpenChange}>
                     <CompetitionDetails competition={selected} />
                 </ModalOrDrawer>
             )}
