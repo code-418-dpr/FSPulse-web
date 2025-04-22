@@ -1,4 +1,4 @@
-const skills = [
+const skillNames = [
     "Docker",
     "Next.js",
     "JS",
@@ -21,4 +21,4 @@ const skills = [
     "Svelte",
 ];
 
-export default skills;
+export default skillNames;

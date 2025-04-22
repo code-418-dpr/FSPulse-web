@@ -26,7 +26,7 @@ export async function getEventSummaries(page: number, pageSize: number): Promise
         prisma.event.findMany({
             skip,
             take: pageSize,
-            select: { id: true, name: true, start: true, status: true, cover: true },
+            select: { id: true, name: true, start: true, requestStatus: true, cover: true },
         }),
     ]);
 

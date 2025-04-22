@@ -1,4 +1,4 @@
-const regions = [
+const regionNames = [
     "Республика Адыгея",
     "Республика Алтай",
     "Республика Башкортостан",
@@ -90,4 +90,4 @@ const regions = [
     "Ямало-Ненецкий автономный округ",
 ];
 
-export default regions;
+export default regionNames;

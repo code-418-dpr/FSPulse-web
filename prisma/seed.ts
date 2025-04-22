@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 
@@ -6,15 +5,17 @@ import { createAgeGroups } from "@/data/age-group";
 import { createDisciplines } from "@/data/discipline";
 import { createRegions } from "@/data/region";
 import { createSkills } from "@/data/skill";
+import { createUsers } from "@/data/user";
 import prisma from "@/lib/prisma";
 
-import ageGroups from "./data/age-groups";
-import disciplines from "./data/disciplines";
+import ageGroups from "./data/age-group";
+import disciplineNamesAndMinAges from "./data/age-group-of-discipline";
+import disciplines from "./data/discipline";
 import eventRepresentatives from "./data/eventRepresentatives";
 import events from "./data/events";
-import regionNames from "./data/regions";
-import representatives from "./data/representatives";
-import skillNames from "./data/skills";
+import regionNames from "./data/region";
+import skillNames from "./data/skill";
+import users from "./data/user";
 
 export async function main() {
     console.log("Seeding regions...");
@@ -29,56 +30,25 @@ export async function main() {
     console.log("Mapping age groups to disciplines...");
     const disciplinesMap = Object.fromEntries(createdDisciplines.map((d) => [d.name, d.id]));
     const ageGroupsMap = Object.fromEntries(createdAgeGroups.map((ag) => [ag.minAge, ag.id]));
-    const relations = [
-        ["Программирование продуктовое", [14, 17, 16]],
-        ["Программирование алгоритмическое", [12, 15, 17, 16]],
-        ["Программирование робототехники", [12, 15, 17, 16]],
-        ["Программирование систем информационной безопасности", [14, 17, 16]],
-        ["Программирование беспилотных авиационных систем", [14, 17, 16]],
-    ].flatMap(([discipline, ages]) =>
+    const mappedData = disciplineNamesAndMinAges.flatMap(([discipline, ages]) =>
         (ages as number[]).map((age) => {
             const disciplineId = disciplinesMap[discipline as string];
             const ageGroupId = ageGroupsMap[age];
-            return disciplineId && ageGroupId
-                ? {
-                      disciplineId,
-                      ageGroupId,
-                  }
-                : undefined;
+            if (disciplineId && ageGroupId) {
+                return {
+                    disciplineId,
+                    ageGroupId,
+                };
+            }
         }),
     );
     await prisma.ageGroupOfDiscipline.createMany({
-        data: relations.filter((relation) => relation !== undefined),
+        data: mappedData.filter((relation) => relation !== undefined),
         skipDuplicates: true,
     });
 
-    console.log("Seeding Representatives...");
-    for (const rep of representatives) {
-        try {
-            const region = await prisma.region.findUnique({ where: { name: rep.regionName } });
-            if (!region) throw new Error(`Region "${rep.regionName}" not found`);
-
-            await prisma.representative.create({
-                data: {
-                    lastname: rep.lastname,
-                    firstname: rep.firstname,
-                    middlename: rep.middlename,
-                    phoneNumber: rep.phoneNumber,
-                    email: rep.email,
-                    password: await bcrypt.hash(rep.password, 10),
-                    tg: rep.tg,
-                    region: { connect: { id: region.id } },
-                    requestStatus: "APPROVED",
-                    requestComment: null,
-                },
-            });
-            console.log(`  ✔ Representative "${rep.email}"`);
-        } catch (error: unknown) {
-            const e = error as { code?: string; message?: string };
-            if (e.code === "P2002") console.log(`  • Rep "${rep.email}" exists, skip`);
-            else console.warn(`  ! Rep "${rep.email}" skipped: ${e.message}`);
-        }
-    }
+    console.log("Seeding users, athletes, representatives...");
+    await createUsers(users);
 
     console.log("Seeding Events...");
     for (const raw of events) {

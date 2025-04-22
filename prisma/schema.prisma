@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id          String  @id
+  id          String  @id @default(uuid())
   lastname    String
   firstname   String
   middlename  String?
@@ -72,7 +72,7 @@ model AgeGroup {
   minAge Int    @db.SmallInt
   maxAge Int?   @db.SmallInt
 
-  disciplines AgeGroupOfDiscipline[]
+  discipline AgeGroupOfDiscipline[]
 
   @@unique([name, minAge, maxAge])
 }
@@ -95,15 +95,15 @@ model SkillOfAthlete {
 }
 
 model Athlete {
-  id              String          @id @default(uuid())
-  birthDate       DateTime        @db.Date()
-  address         String
-  sportCategoryId SportsCategory?
-  github          String?         @unique
+  id            String          @id
+  birthDate     DateTime        @db.Date()
+  address       String
+  sportCategory SportsCategory?
+  github        String?         @unique
 
-  user   User             @relation(fields: [id], references: [id])
-  teams  AthleteOfTeam[]
-  skills SkillOfAthlete[]
+  user  User             @relation(fields: [id], references: [id])
+  teams AthleteOfTeam[]
+  skill SkillOfAthlete[]
 }
 
 enum TeamRole {
@@ -172,10 +172,10 @@ model Event {
   requestStatus            RequestStatus @default(PENDING)
   requestComment           String?
 
-  discipline      Discipline              @relation(fields: [disciplineId], references: [id])
-  representatives EventOfRepresentative[]
-  files           File[]
-  teams           Team[]
+  discipline     Discipline              @relation(fields: [disciplineId], references: [id])
+  representative EventOfRepresentative[]
+  files          File[]
+  teams          Team[]
 }
 
 model EventOfRepresentative {
@@ -198,7 +198,7 @@ model File {
 }
 
 model Representative {
-  id             String        @id @default(uuid())
+  id             String        @id
   requestStatus  RequestStatus @default(PENDING)
   requestComment String?
 
