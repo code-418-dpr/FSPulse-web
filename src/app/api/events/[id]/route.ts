@@ -4,25 +4,32 @@ import prisma from "@/lib/prisma";
 
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     const authHeader = request.headers.get("authorization");
-    const { params } = context;
 
-    // Проверка заголовка Authorization
     if (!authHeader?.startsWith("Bearer ")) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 
     const token = authHeader.split(" ")[1];
 
     if (token !== EXPECTED_TOKEN) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 
     const eventId = params.id;
 
     if (!eventId) {
-        return NextResponse.json({ error: "Event ID is required" }, { status: 400 });
+        return new NextResponse(JSON.stringify({ error: "Event ID is required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 
     try {
@@ -38,12 +45,21 @@ export async function GET(request: NextRequest, context: { params: { id: string 
         });
 
         if (!event) {
-            return NextResponse.json({ error: "Event not found" }, { status: 404 });
+            return new NextResponse(JSON.stringify({ error: "Event not found" }), {
+                status: 404,
+                headers: { "Content-Type": "application/json" },
+            });
         }
 
-        return NextResponse.json(event);
+        return new NextResponse(JSON.stringify(event), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
     } catch (error) {
-        console.error("❌ Ошибка при получении события по ID:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error("Error fetching event:", error);
+        return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 }
