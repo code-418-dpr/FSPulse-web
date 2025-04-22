@@ -63,6 +63,8 @@ import { CircularProgress } from "@heroui/react";
 
 // src/app/representative/page.tsx
 
+// src/app/representative/page.tsx
+
 interface Paged<T> {
     items: T[];
     pagination: {
@@ -182,7 +184,7 @@ export default function RequestsPage() {
 
     return (
         <>
-            <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
+            <NavbarElement activeTab={activeTab} setActiveTabAction={setActiveTab} />
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
@@ -195,8 +197,8 @@ export default function RequestsPage() {
                         pageItems={compPageItems}
                         totalPages={totalCompPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <CompetitionCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
                     />
                 )}
 
@@ -206,8 +208,8 @@ export default function RequestsPage() {
                         pageItems={evtPageItems}
                         totalPages={totalEvtPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <EventCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <EventCards paginatedData={items} />}
                     />
                 )}
 
@@ -217,8 +219,8 @@ export default function RequestsPage() {
                         pageItems={teamPageItems}
                         totalPages={totalTeamPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <TeamCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <TeamCards paginatedData={items} />}
                     />
                 )}
 
@@ -228,8 +230,8 @@ export default function RequestsPage() {
                         pageItems={achievementPageItems}
                         totalPages={totalAchievementPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <AchievementCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <AchievementCards paginatedData={items} />}
                     />
                 )}
             </div>
