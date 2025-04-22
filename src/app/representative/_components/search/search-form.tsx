@@ -31,22 +31,20 @@ export function SearchForm() {
         [selectedDisciplineKeys],
     );
 
-    const handleSelectionStatusChange = (keys: Selection) => {
-        if (keys === "all" || (keys instanceof Set && keys.size === 0)) {
+    const handleSelectionStatusChange = (keys: Set<string> | "all") => {
+        if (keys === "all") {
             setSelectedStatusKeys(new Set(["На рассмотрении", "Принята", "Отклонена"]));
-        } else if (keys instanceof Set) {
+        } else {
             const stringKeys = new Set<string>();
             keys.forEach((key) => {
-                if (typeof key === "string") {
-                    stringKeys.add(key);
-                }
+                stringKeys.add(key);
             });
             setSelectedStatusKeys(stringKeys);
         }
     };
 
-    const handleSelectionDisciplineChange = (keys: Selection) => {
-        if (keys === "all" || (keys instanceof Set && keys.size === 0)) {
+    const handleSelectionDisciplineChange = (keys: Set<string> | "all") => {
+        if (keys === "all") {
             setSelectedDisciplineKeys(
                 new Set([
                     "Продуктовое программирование",
@@ -55,12 +53,10 @@ export function SearchForm() {
                     "Робототехника",
                 ]),
             );
-        } else if (keys instanceof Set) {
+        } else {
             const stringKeys = new Set<string>();
             keys.forEach((key) => {
-                if (typeof key === "string") {
-                    stringKeys.add(key);
-                }
+                stringKeys.add(key);
             });
             setSelectedDisciplineKeys(stringKeys);
         }
