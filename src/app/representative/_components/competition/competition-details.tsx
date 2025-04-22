@@ -56,8 +56,8 @@ export default function CompetitionDetails({ eventId }: Props) {
                     {competition.level == "FEDERAL"
                         ? "Всероссийский"
                         : competition.level == "OPEN"
-                          ? "Открытый"
-                          : "Региональный"}
+                            ? "Открытый"
+                            : "Региональный"}
                 </Chip>
             </div>
             <div className="grid grid-cols-2">
@@ -108,16 +108,16 @@ export default function CompetitionDetails({ eventId }: Props) {
                             competition.requestStatus == "APPROVED"
                                 ? "success"
                                 : competition.requestStatus == "DECLINED"
-                                  ? "danger"
-                                  : "warning"
+                                    ? "danger"
+                                    : "warning"
                         }
                         variant="solid"
                     >
                         {competition.requestStatus == "APPROVED"
                             ? "Одобрено"
                             : competition.requestStatus == "DECLINED"
-                              ? "Отклонено"
-                              : "На рассмотрении"}
+                                ? "Отклонено"
+                                : "На рассмотрении"}
                     </Chip>
                 </div>
                 {/* Application date */}
