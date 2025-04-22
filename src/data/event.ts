@@ -1,4 +1,45 @@
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
+
+interface SearchRepresentativeRequestsParams {
+    query?: string;
+    disciplineId?: string;
+    minApplicationTime?: Date;
+    maxApplicationTime?: Date;
+    level?: EventLevel;
+    requestStatus?: RequestStatus;
+}
+
+// eslint-disable-next-line
+async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
+    const { query, disciplineId, minApplicationTime, maxApplicationTime, level, requestStatus } = params;
+    return prisma.event.findMany({
+        where: {
+            AND: [
+                query
+                    ? {
+                          OR: [
+                              { name: { contains: query, mode: "insensitive" } },
+                              { description: { contains: query, mode: "insensitive" } },
+                          ],
+                      }
+                    : {},
+                disciplineId ? { disciplineId } : {},
+                minApplicationTime || maxApplicationTime
+                    ? {
+                          applicationTime: {
+                              gte: minApplicationTime,
+                              lte: maxApplicationTime,
+                          },
+                      }
+                    : {},
+                level ? { level } : {},
+                requestStatus ? { requestStatus } : {},
+            ],
+        },
+        select: { id: true, name: true, cover: true, requestStatus: true, level: true, applicationTime: true },
+    });
+}
 
 export interface EventSummary {
     id: string;
