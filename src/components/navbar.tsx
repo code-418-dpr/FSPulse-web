@@ -1,7 +1,6 @@
-// src/components/navbar.tsx
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -68,7 +67,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
         <Navbar maxWidth="xl" isBordered>
             <NavbarBrand>
                 <Image src="/images/FSPLogo.svg" alt="FSPulse Logo" className="h-8 w-8" />
-                <p className="ml-2 text-2xl font-bold">FSPulse</p>
+                <p className="ml-2 text-2xl font-bold">ФСПульс</p>
             </NavbarBrand>
             {isAuthenticated && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">

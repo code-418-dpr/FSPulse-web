@@ -3,16 +3,7 @@ import bcrypt from "bcrypt";
 import { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { PrismaClient } from "@/app/generated/prisma";
-
-declare global {
-    // eslint-disable-next-line no-var
-    var prisma: PrismaClient | undefined;
-}
-
-const prisma: PrismaClient = globalThis.prisma ?? new PrismaClient();
-
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;
+import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
     providers: [
