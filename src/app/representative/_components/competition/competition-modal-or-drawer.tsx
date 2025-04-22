@@ -1,27 +1,27 @@
 "use client";
 
-import React from "react";
-
-import CompetitionDetails from "@/app/representative/_components/competition/competition-details";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { Modal, ModalBody, ModalContent } from "@heroui/react";
-import { Drawer, DrawerBody, DrawerContent } from "@heroui/react";
+import { CompetitionItem } from "@/types";
+import { Drawer, DrawerBody, DrawerContent, Modal, ModalBody, ModalContent } from "@heroui/react";
+
+import CompetitionDetails from "./competition-details";
 
 interface Props {
     isOpen: boolean;
     onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
-    competition: Record<string, string>;
+    competition: CompetitionItem;
 }
 
 export default function CompetitionDialogOrDrawer({ isOpen, onOpenChange, competition }: Props) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
-
-    return isDesktop
-        ? CompetitionDialog({ isOpen, onOpenChange, competition })
-        : CompetitionDrawer({ isOpen, onOpenChange, competition });
+    return isDesktop ? (
+        <ModalBackdrop {...{ isOpen, onOpenChange, competition }} />
+    ) : (
+        <DrawerBackdrop {...{ isOpen, onOpenChange, competition }} />
+    );
 }
 
-function CompetitionDialog({ isOpen, onOpenChange, competition }: Props) {
+function ModalBackdrop({ isOpen, onOpenChange, competition }: Props) {
     return (
         <Modal backdrop="blur" scrollBehavior="outside" isOpen={isOpen} onOpenChange={onOpenChange}>
             <ModalContent>
@@ -33,9 +33,9 @@ function CompetitionDialog({ isOpen, onOpenChange, competition }: Props) {
     );
 }
 
-function CompetitionDrawer({ isOpen, onOpenChange, competition }: Props) {
+function DrawerBackdrop({ isOpen, onOpenChange, competition }: Props) {
     return (
-        <Drawer placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Drawer size="full" placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
             <DrawerContent className="p-4">
                 <DrawerBody>
                     <CompetitionDetails competition={competition} />

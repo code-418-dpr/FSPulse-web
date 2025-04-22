@@ -1,3 +1,4 @@
+// src/app/representative/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,88 +9,123 @@ import CompetitionCards from "@/app/representative/_components/competition/compe
 import EventCards from "@/app/representative/_components/event/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
-import { Pagination } from "@heroui/react";
+import { CompetitionItem, EventItem, Tab } from "@/types";
+import { Card, CardBody, CardHeader, Pagination } from "@heroui/react";
 
-// Заглушка данных (13 элементов для демонстрации пагинации)
-const competitions = Array(13).fill({
-    title: "Кубок НР",
-    region: "ДНР",
-    startDate: "23.05.2025",
-    endDate: "25.05.2025",
-    applicationDate: "17.04.2025",
-    status: "На рассмотрении",
-    format: "Онлайн",
-    discipline: "Продуктовое программирование",
-    image: "https://heroui.com/images/hero-card-complete.jpeg",
-}) as Record<string, string>[];
+// src/app/representative/page.tsx
 
-// Заглушка данных (13 элементов для демонстрации пагинации)
-const events = Array(13).fill({
-    title: "Кубок НР",
-    region: "ДНР",
-    startDate: "23.05.2025",
-    endDate: "25.05.2025",
-    format: "Онлайн",
-    discipline: "Продуктовое программирование",
-    image: "https://heroui.com/images/hero-card-complete.jpeg",
-}) as Record<string, string>[];
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+interface Paged<T> {
+    items: T[];
+    pagination: {
+        page: number;
+        pageSize: number;
+        totalItems: number;
+        totalPages: number;
+    };
+}
+
+// Stub‑данные для requests
+const competitionsStub: CompetitionItem[] = Array.from(
+    { length: 13 },
+    (): CompetitionItem => ({
+        title: "Кубок НР",
+        region: "ДНР",
+        startDate: "23.05.2025",
+        endDate: "25.05.2025",
+        applicationDate: "17.04.2025",
+        status: "На рассмотрении",
+        format: "Онлайн",
+        discipline: "Продуктовое программирование",
+        image: "https://heroui.com/images/hero-card-complete.jpeg",
+    }),
+);
 
 export default function RequestsPage() {
     const [page, setPage] = useState(1);
-    const [activeTab, setActiveTab] = useState("requests");
-    const itemsPerPage = 12;
+    const [activeTab, setActiveTab] = useState<Tab>("requests");
+    const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const perPage = 12;
 
-    // При монтировании проверяем URL и устанавливаем активную вкладку
     useEffect(() => {
-        if (!pathname.startsWith("/representative")) {
-            router.push("/representative?tab=events");
-            return;
-        }
-
-        const tab = searchParams.get("tab");
+        const tab = searchParams.get("tab") as Tab | null;
         if (tab && ["requests", "events", "team"].includes(tab)) {
             setActiveTab(tab);
         } else {
-            // Если параметр tab отсутствует, устанавливаем по умолчанию "events"
-            router.replace(`/representative?tab=events`);
-            setActiveTab("events");
+            router.replace("/representative?tab=requests");
+            setActiveTab("requests");
         }
     }, [pathname, router, searchParams]);
 
-    const data = activeTab === "requests" ? competitions : events;
+    useEffect(() => {
+        if (activeTab !== "events") return;
+        setIsLoading(true);
+        void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
+            .then((r) => r.json())
+            .then((json: Paged<EventItem>) => {
+                setEventsData(json);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, [activeTab, page]);
 
-    const paginatedData = data.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    const compPage = competitionsStub.slice((page - 1) * perPage, page * perPage);
+    const evtPage = eventsData?.items ?? [];
+
+    const totalCompPages = Math.ceil(competitionsStub.length / perPage);
+    const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
 
     return (
         <>
             <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
-            <div className="flex min-h-[100vh] w-full flex-col">
-                <div className="container mx-auto w-[70%] flex-1 px-4 py-8">
+
+            <div className="flex min-h-[100vh] w-full">
+                {/* Sidebar */}
+                <div className="w-full p-4 sm:w-1/4">
+                    <Card className="sticky top-4">
+                        <CardHeader>Поиск</CardHeader>
+                        <CardBody>
+                            <p>Параметры поиска</p>
+                        </CardBody>
+                    </Card>
+                </div>
+
+                {/* Main */}
+                <div className="container mx-auto w-full flex-1 px-4 py-8 sm:w-3/4">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {activeTab === "requests" ? (
-                            <CompetitionCards paginatedData={paginatedData} />
+                            <CompetitionCards paginatedData={compPage} />
+                        ) : isLoading ? (
+                            <p>Загрузка...</p>
                         ) : (
-                            <EventCards paginatedData={paginatedData} />
+                            <EventCards paginatedData={evtPage} />
                         )}
                     </div>
 
-                    {data.length > itemsPerPage && (
-                        <div className="mt-8 flex justify-center">
-                            <Pagination
-                                showControls
-                                page={page}
-                                total={Math.ceil(data.length / itemsPerPage)}
-                                onChange={setPage}
-                            />
-                        </div>
+                    {activeTab === "requests" && totalCompPages > 1 && (
+                        <Pagination showControls page={page} total={totalCompPages} onChange={setPage} />
+                    )}
+                    {activeTab === "events" && totalEvtPages > 1 && (
+                        <Pagination
+                            showControls
+                            page={eventsData!.pagination.page}
+                            total={totalEvtPages}
+                            onChange={setPage}
+                        />
                     )}
                 </div>
-                <FooterElement />
             </div>
+
+            <FooterElement />
         </>
     );
 }

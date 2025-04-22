@@ -1,47 +1,56 @@
+// src/app/representative/_components/event/event-cards.tsx
 "use client";
 
 import { useState } from "react";
 
-import EventDialogOrDrawer from "@/app/representative/_components/event/event-modal-or-drawer";
-import { Card, CardBody, Chip, Image } from "@heroui/react";
+import { EventItem } from "@/types";
+import { Card, CardBody, Image } from "@heroui/react";
 
-export default function EventCards({ paginatedData }: { paginatedData: Record<string, string>[] }) {
-    const [selectedEvent, setSelectedEvent] = useState<Record<string, string> | null>(null);
+import EventDialogOrDrawer from "./event-modal-or-drawer";
+
+// src/app/representative/_components/event/event-cards.tsx
+
+// src/app/representative/_components/event/event-cards.tsx
+
+// src/app/representative/_components/event/event-cards.tsx
+
+interface Props {
+    paginatedData: EventItem[];
+}
+
+export default function EventCards({ paginatedData }: Props) {
+    const [selected, setSelected] = useState<EventItem | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleCardClick = (event: Record<string, string>) => {
-        setSelectedEvent(event);
+    const handleClick = (e: EventItem) => {
+        setSelected(e);
         setIsOpen(true);
     };
 
     return (
         <>
-            {selectedEvent && <EventDialogOrDrawer isOpen={isOpen} onOpenChange={setIsOpen} event={selectedEvent} />}
-            {paginatedData.map((event, index) => (
-                <div
-                    key={index}
-                    className="cursor-pointer"
-                    onClick={() => {
-                        handleCardClick(event);
-                    }}
+            {selected && <EventDialogOrDrawer isOpen={isOpen} onOpenChange={setIsOpen} event={selected} />}
+            {paginatedData.map((e) => (
+                <Card
+                    key={e.id}
+                    className="cursor-pointer transition-shadow hover:shadow-lg"
+                    onPress={() => {
+                        handleClick(e);
+                    }} // switched to onPress
                 >
-                    <Card className="transition-shadow hover:shadow-lg">
-                        <CardBody className="space-y-4">
-                            <Image alt={event.title} className="w-full rounded-xl object-cover" src={event.image} />
-                            <div className="space-y-2">
-                                <h3 className="text-2xl font-bold">{event.title}</h3>
-                                <div className="grid grid-cols-3 pt-2">
-                                    <Chip color="success" variant="solid">
-                                        {event.format}
-                                    </Chip>
-                                    <p className="col-span-2 pt-1 text-right text-sm">
-                                        {event.startDate} - {event.endDate}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardBody>
-                    </Card>
-                </div>
+                    <CardBody className="space-y-4">
+                        <Image
+                            alt={e.name}
+                            src={`data:image/jpeg;base64,${e.imageBase64}`}
+                            className="w-full rounded-xl object-cover"
+                        />
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-bold">{e.name}</h3>
+                            <p>Начало: {new Date(e.start).toLocaleDateString()}</p>
+                            <p>Статус: {e.status}</p>
+                        </div>
+                    </CardBody>
+                </Card>
             ))}
         </>
     );
