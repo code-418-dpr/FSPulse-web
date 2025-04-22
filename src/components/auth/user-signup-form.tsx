@@ -61,7 +61,7 @@ const userSchema = z
             .nativeEnum(SportsCategory, {
                 errorMap: () => ({ message: "Выберите спортивный разряд из списка" }),
             })
-            .nullable()
+            .nullish()
             .default(null),
         email: z.string().min(1, "Email обязателен").email("Некорректный email"),
         phoneNumber: z
