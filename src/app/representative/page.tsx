@@ -7,10 +7,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import CompetitionCards from "@/app/representative/_components/competition/competition-cards";
 import EventCards from "@/app/representative/_components/event/event-cards";
+import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { CompetitionItem, EventItem, Tab } from "@/types";
-import { Card, CardBody, CardHeader, Pagination } from "@heroui/react";
+import { Pagination } from "@heroui/react";
+
+// src/app/representative/page.tsx
 
 // src/app/representative/page.tsx
 
@@ -94,14 +97,7 @@ export default function RequestsPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <div className="w-full p-4 sm:w-1/4">
-                    <Card className="sticky top-4">
-                        <CardHeader>Поиск</CardHeader>
-                        <CardBody>
-                            <p>Параметры поиска</p>
-                        </CardBody>
-                    </Card>
-                </div>
+                <SearchCardOrDrawer />
 
                 {/* Main */}
                 <div className="container mx-auto w-full flex-1 px-4 py-8 sm:w-3/4">
