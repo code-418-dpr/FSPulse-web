@@ -117,10 +117,11 @@ model AthleteOfTeam {
 }
 
 model Team {
-  id      String @id @default(uuid())
+  id      String  @id @default(uuid())
   name    String
   eventId String
   score   Int?
+  isReady Boolean @default(false)
 
   event    Event           @relation(fields: [eventId], references: [id])
   athletes AthleteOfTeam[]

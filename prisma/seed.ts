@@ -16,14 +16,18 @@ import representatives from "./data/representatives";
 import skillNames from "./data/skills";
 
 export async function main() {
-    await createRegions(regionNames);
+    console.log("Seeding regions...");
+    const allRegions = await createRegions(regionNames);
+    console.log("Seeding skills...");
     await createSkills(skillNames);
+    console.log("Seeding disciplines...");
     const allDisciplines = await createDisciplines(disciplines);
+    console.log("Seeding age groups...");
     const allAgeGroups = await createAgeGroups(ageGroups);
 
+    console.log("Mapping age groups to disciplines...");
     const disciplinesMap = Object.fromEntries(allDisciplines.map((d) => [d.name, d.id]));
     const ageGroupsMap = Object.fromEntries(allAgeGroups.map((ag) => [ag.minAge, ag.id]));
-
     const relations = [
         ["Программирование продуктовое", [14, 17, 16]],
         ["Программирование алгоритмическое", [12, 15, 17, 16]],
@@ -31,21 +35,26 @@ export async function main() {
         ["Программирование систем информационной безопасности", [14, 17, 16]],
         ["Программирование беспилотных авиационных систем", [14, 17, 16]],
     ].flatMap(([discipline, ages]) =>
-        (ages as number[]).map((age) => ({
-            disciplineId: disciplinesMap[discipline as string],
-            ageGroupId: ageGroupsMap[age],
-        })),
+        (ages as number[]).map((age) => {
+            const disciplineId = disciplinesMap[discipline as string];
+            const ageGroupId = ageGroupsMap[age];
+            return disciplineId && ageGroupId
+                ? {
+                      disciplineId,
+                      ageGroupId,
+                  }
+                : undefined;
+        }),
     );
-
     await prisma.ageGroupOfDiscipline.createMany({
-        data: relations,
+        data: relations.filter((relation) => relation !== undefined),
         skipDuplicates: true,
     });
 
     console.log("Seeding Representatives...");
     for (const rep of representatives) {
         try {
-            const region = await prisma.region.findUnique({ where: { name: rep.regionName } });
+            const region = allRegions.findLast(({ name }) => name === rep.regionName);
             if (!region) throw new Error(`Region "${rep.regionName}" not found`);
 
             await prisma.representative.create({
@@ -67,6 +76,7 @@ export async function main() {
             else console.warn(`  ! Rep "${rep.email}" skipped: ${e.message}`);
         }
     }
+
     console.log("Seeding Events...");
     for (const raw of events) {
         try {
@@ -76,7 +86,7 @@ export async function main() {
                 continue;
             }
 
-            const discipline = await prisma.discipline.findUnique({ where: { name: raw.disciplineName } });
+            const discipline = allDisciplines.findLast(({ name }) => name === raw.disciplineName);
             if (!discipline) throw new Error(`Discipline "${raw.disciplineName}" not found`);
 
             const cover = fs.readFileSync(path.join(__dirname, raw.coverPath));
