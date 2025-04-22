@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { EventStatus } from "@/app/generated/prisma/client";
 
 interface RawEvent {
     name: string;
@@ -13,7 +13,7 @@ interface RawEvent {
     awards: number[]; // массив наград
     isFederal: boolean;
     isOpen: boolean;
-    status?: Prisma.EventStatus;
+    status?: EventStatus;
 }
 
 const events: RawEvent[] = [
