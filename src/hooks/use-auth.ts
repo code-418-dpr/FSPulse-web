@@ -9,5 +9,6 @@ export const useAuth = () => {
         user: session?.user,
         isLoading: status === "loading",
         isAuthenticated: status === "authenticated",
+        role: session?.user.role,
     };
 };

@@ -88,9 +88,6 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
             try {
                 const data = (await getRegions()) as RegionOption[];
                 setRegions(data);
-                // const res = await fetch("/api/regions");
-                // const data = (await res.json()) as RegionOption[];
-                // setRegions(data);
             } catch (err) {
                 console.error("Ошибка загрузки регионов:", err);
             }

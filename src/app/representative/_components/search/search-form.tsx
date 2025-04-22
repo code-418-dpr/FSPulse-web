@@ -75,25 +75,27 @@ export function SearchForm() {
 
             <div>
                 <p>Статус:</p>
-                <Dropdown>
-                    <DropdownTrigger>
-                        <Button className="capitalize" variant="bordered">
-                            {selectedStatusValue}
-                        </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        disallowEmptySelection
-                        aria-label="Status selection"
-                        selectedKeys={selectedStatusKeys}
-                        selectionMode="single"
-                        variant="flat"
-                        onSelectionChange={handleSelectionStatusChange}
-                    >
-                        <DropdownItem key="На рассмотрении">На рассмотрении</DropdownItem>
-                        <DropdownItem key="Принята">Принята</DropdownItem>
-                        <DropdownItem key="Отклонена">Отклонена</DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
+                <div className="m-2">
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button className="capitalize" variant="bordered">
+                                {selectedStatusValue}
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            disallowEmptySelection
+                            aria-label="Status selection"
+                            selectedKeys={selectedStatusKeys}
+                            selectionMode="single"
+                            variant="flat"
+                            onSelectionChange={handleSelectionStatusChange}
+                        >
+                            <DropdownItem key="На рассмотрении">На рассмотрении</DropdownItem>
+                            <DropdownItem key="Принята">Принята</DropdownItem>
+                            <DropdownItem key="Отклонена">Отклонена</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -117,28 +119,30 @@ export function SearchForm() {
 
             <div>
                 <p>Дисциплина:</p>
-                <Dropdown>
-                    <DropdownTrigger>
-                        <Button className="capitalize" variant="bordered">
-                            {selectedDisciplineValue}
-                        </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        disallowEmptySelection
-                        aria-label="Discipline selection"
-                        selectedKeys={selectedDisciplineKeys}
-                        selectionMode="single"
-                        variant="flat"
-                        onSelectionChange={handleSelectionDisciplineChange}
-                    >
-                        <DropdownItem key="Продуктовое программирование">Продуктовое программирование</DropdownItem>
-                        <DropdownItem key="Алгоритмическое программирование">
-                            Алгоритмическое программирование
-                        </DropdownItem>
-                        <DropdownItem key="Программирование БПЛА">Программирование БПЛА</DropdownItem>
-                        <DropdownItem key="Робототехника">Робототехника</DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
+                <div className="m-2">
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button className="capitalize" variant="bordered">
+                                {selectedDisciplineValue}
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            disallowEmptySelection
+                            aria-label="Discipline selection"
+                            selectedKeys={selectedDisciplineKeys}
+                            selectionMode="single"
+                            variant="flat"
+                            onSelectionChange={handleSelectionDisciplineChange}
+                        >
+                            <DropdownItem key="Продуктовое программирование">Продуктовое программирование</DropdownItem>
+                            <DropdownItem key="Алгоритмическое программирование">
+                                Алгоритмическое программирование
+                            </DropdownItem>
+                            <DropdownItem key="Программирование БПЛА">Программирование БПЛА</DropdownItem>
+                            <DropdownItem key="Робототехника">Робототехника</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
             </div>
         </Form>
     );

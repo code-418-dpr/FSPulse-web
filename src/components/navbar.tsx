@@ -72,30 +72,30 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                 <Image src="/images/FSPLogo.svg" alt="FSPulse Logo" className="h-8 w-8" />
                 <p className="ml-2 text-2xl font-bold">FSPulse</p>
             </NavbarBrand>
-
-            <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                {(["requests", "events", "team"] as Tab[]).map((tab) => (
-                    <NavbarItem key={tab}>
-                        <Link
-                            color="foreground"
-                            href="#"
-                            onPress={(e) => {
-                                handleNavigation(e, tab);
-                            }}
-                            className={activeTab === tab ? "font-bold" : ""}
-                        >
-                            {
+            {isAuthenticated && (
+                <NavbarContent className="hidden gap-4 sm:flex" justify="center">
+                    {(["requests", "events", "team"] as Tab[]).map((tab) => (
+                        <NavbarItem key={tab}>
+                            <Link
+                                color="foreground"
+                                href="#"
+                                onPress={(e) => {
+                                    handleNavigation(e, tab);
+                                }}
+                                className={activeTab === tab ? "font-bold" : ""}
+                            >
                                 {
-                                    requests: "Заявки",
-                                    events: "Соревнования",
-                                    team: "Сборная",
-                                }[tab]
-                            }
-                        </Link>
-                    </NavbarItem>
-                ))}
-            </NavbarContent>
-
+                                    {
+                                        requests: "Заявки",
+                                        events: "Соревнования",
+                                        team: "Сборная",
+                                    }[tab]
+                                }
+                            </Link>
+                        </NavbarItem>
+                    ))}
+                </NavbarContent>
+            )}
             <NavbarContent justify="end">
                 <NavbarItem>
                     {isLoading ? (

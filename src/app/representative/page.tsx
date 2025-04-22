@@ -10,10 +10,9 @@ import EventCards from "@/app/representative/_components/event/event-cards";
 import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
+import { useAuth } from "@/hooks/use-auth";
 import { CompetitionItem, EventItem, Tab } from "@/types";
 import { Pagination } from "@heroui/react";
-
-// src/app/representative/page.tsx
 
 // src/app/representative/page.tsx
 
@@ -44,7 +43,7 @@ export default function RequestsPage() {
     const [isCompLoading, setIsCompLoading] = useState(false);
     const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
     const [isEventLoading, setIsEventLoading] = useState(false);
-
+    const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -60,6 +59,11 @@ export default function RequestsPage() {
             setActiveTab("requests");
         }
     }, [pathname, router, searchParams]);
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push("/");
+        }
+    }, [isAuthenticated, isLoading, router]);
 
     // load competitions when on "requests"
     useEffect(() => {
@@ -94,6 +98,14 @@ export default function RequestsPage() {
 
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!isAuthenticated) {
+        return null;
+    }
 
     return (
         <>
