@@ -42,6 +42,8 @@ import { Card, CardBody, Image, useDisclosure } from "@heroui/react";
 
 // src/app/representative/_components/event/event-cards.tsx
 
+// src/app/representative/_components/event/event-cards.tsx
+
 interface Props {
     paginatedData: EventItem[];
 }
@@ -52,7 +54,7 @@ export default function EventCards({ paginatedData }: Props) {
 
     const handleClick = (e: EventItem) => {
         setSelected(e);
-        onOpen(true);
+        onOpen();
     };
 
     return (

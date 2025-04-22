@@ -177,7 +177,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                 variant="flat"
                                 startContent={<Icon icon="lucide:user" />}
                             >
-                                Login
+                                Вход
                             </Button>
                             <ModalOrDrawer isOpen={isOpen} onOpenChange={onOpenChange}>
                                 <AuthForm />
