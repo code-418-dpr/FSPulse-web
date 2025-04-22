@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 
@@ -64,7 +65,7 @@ export async function main() {
                     middlename: rep.middlename,
                     phoneNumber: rep.phoneNumber,
                     email: rep.email,
-                    password: rep.password,
+                    password: await bcrypt.hash(rep.password, 10),
                     tg: rep.tg,
                     region: { connect: { id: region.id } },
                     requestStatus: "APPROVED",
