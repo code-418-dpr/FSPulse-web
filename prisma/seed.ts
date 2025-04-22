@@ -67,6 +67,8 @@ export async function main() {
                     password: rep.password,
                     tg: rep.tg,
                     region: { connect: { id: region.id } },
+                    requestStatus: "APPROVED",
+                    requestComment: null,
                 },
             });
             console.log(`  ✔ Representative "${rep.email}"`);
@@ -103,15 +105,18 @@ export async function main() {
                     end: new Date(raw.end),
                     minAge: raw.minAge,
                     maxAge: raw.maxAge,
+                    minTeamParticipantsCount: 0,
+                    maxTeamParticipantsCount: 0,
                     maxParticipantsCount: raw.maxParticipantsCount,
                     discipline: { connect: { id: discipline.id } },
                     isOnline: raw.isOnline,
                     address: raw.address,
                     awards: raw.awards,
                     level: raw.level,
-                    status: raw.status,
                     duration: raw.duration,
                     isPersonalFormatAllowed: raw.isPersonalFormatAllowed,
+                    requestStatus: raw.status,
+                    requestComment: null,
                 },
             });
             console.log(`  ✔ Event "${raw.name}"`);

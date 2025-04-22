@@ -29,11 +29,13 @@ model Region {
 }
 
 model Discipline {
-  id                      String  @id @default(uuid())
-  name                    String  @unique
-  durationLimits          Int[]   @db.SmallInt
-  teamParticipantsLimits  Int[]   @db.SmallInt
-  isPersonalFormatAllowed Boolean
+  id                       String  @id @default(uuid())
+  name                     String  @unique
+  minDuration              Int     @db.SmallInt
+  maxDuration              Int     @db.SmallInt
+  minTeamParticipantsCount Int     @db.SmallInt
+  maxTeamParticipantsCount Int     @db.SmallInt
+  isPersonalFormatAllowed  Boolean
 
   events    Event[]
   ageGroups AgeGroupOfDiscipline[]
@@ -127,7 +129,7 @@ model Team {
   athletes AthleteOfTeam[]
 }
 
-enum EventStatus {
+enum RequestStatus {
   PENDING
   DECLINED
   APPROVED
@@ -140,27 +142,29 @@ enum EventLevel {
 }
 
 model Event {
-  id                      String      @id @default(uuid())
-  name                    String
-  description             String
-  cover                   Bytes       @db.ByteA
-  applicationTime         DateTime    @default(now())
-  startRegistration       DateTime
-  endRegistration         DateTime
-  start                   DateTime
-  end                     DateTime
-  minAge                  Int         @db.SmallInt
-  maxAge                  Int         @db.SmallInt
-  duration                Int         @db.SmallInt
-  teamParticipantsLimits  Int[]       @db.SmallInt
-  isPersonalFormatAllowed Boolean
-  maxParticipantsCount    Int         @db.SmallInt
-  disciplineId            String
-  isOnline                Boolean
-  address                 String?
-  awards                  Int[]       @db.SmallInt
-  level                   EventLevel
-  status                  EventStatus @default(PENDING)
+  id                       String        @id @default(uuid())
+  name                     String
+  description              String
+  cover                    Bytes         @db.ByteA
+  applicationTime          DateTime      @default(now())
+  startRegistration        DateTime
+  endRegistration          DateTime
+  start                    DateTime
+  end                      DateTime
+  minAge                   Int           @db.SmallInt
+  maxAge                   Int           @db.SmallInt
+  duration                 Int           @db.SmallInt
+  minTeamParticipantsCount Int           @db.SmallInt
+  maxTeamParticipantsCount Int           @db.SmallInt
+  isPersonalFormatAllowed  Boolean
+  maxParticipantsCount     Int           @db.SmallInt
+  disciplineId             String
+  isOnline                 Boolean
+  address                  String?
+  awards                   Int[]         @db.SmallInt
+  level                    EventLevel
+  requestStatus            RequestStatus @default(PENDING)
+  requestComment           String?
 
   discipline      Discipline              @relation(fields: [disciplineId], references: [id])
   representatives EventOfRepresentative[]
@@ -188,16 +192,17 @@ model File {
 }
 
 model Representative {
-  id         String  @id @default(uuid())
-  lastname   String
-  firstname  String
-  middlename String?
-  regionId   String
-
-  phoneNumber String  @unique
-  email       String  @unique
-  password    String
-  tg          String? @unique
+  id             String        @id @default(uuid())
+  lastname       String
+  firstname      String
+  middlename     String?
+  regionId       String
+  phoneNumber    String        @unique
+  email          String        @unique
+  password       String
+  tg             String?       @unique
+  requestStatus  RequestStatus @default(PENDING)
+  requestComment String?
 
   region Region                  @relation(fields: [regionId], references: [id])
   events EventOfRepresentative[]
