@@ -2,13 +2,9 @@ import { type NextRequest } from "next/server";
 
 import prisma from "@/lib/prisma";
 
-interface RouteParams {
-    params: Record<string, string>; // Use Record<string, string>
-}
-
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
@@ -21,7 +17,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const eventId = params.id;
+    const eventId = (await params).id;
 
     if (!eventId) {
         return Response.json({ error: "Event ID is required" }, { status: 400 });
