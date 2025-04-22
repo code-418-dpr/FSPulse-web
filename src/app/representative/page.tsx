@@ -50,6 +50,8 @@ import { CircularProgress } from "@heroui/react";
 
 // src/app/representative/page.tsx
 
+// src/app/representative/page.tsx
+
 interface Paged<T> {
     items: T[];
     pagination: {
@@ -181,7 +183,7 @@ export default function RequestsPage() {
                 )}
 
                 {activeTab === "team" && (
-                    <MainCards<EventItem>
+                    <MainCards<TeamItem>
                         isLoading={isTeamLoading}
                         pageItems={teamPageItems}
                         totalPages={totalTeamPages}
