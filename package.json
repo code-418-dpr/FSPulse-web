@@ -38,6 +38,7 @@
     "dependencies": {
         "@heroui/react": "^2.8.0-beta.2",
         "@hookform/resolvers": "^5.0.1",
+        "@internationalized/date": "3.8.0",
         "@prisma/client": "^6.6.0",
         "@prisma/extension-accelerate": "^1.3.0",
         "next": "~15.3.1",

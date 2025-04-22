@@ -91,7 +91,7 @@ export default function RequestsPage() {
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
                 <div className="w-full p-4 sm:w-1/4">
-                    <Card className="sticky top-4">
+                    <Card className="sticky top-20">
                         <CardHeader>Поиск</CardHeader>
                         <CardBody>
                             <p>Параметры поиска</p>
