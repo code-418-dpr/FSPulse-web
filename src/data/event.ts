@@ -1,4 +1,53 @@
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
+
+interface SearchRepresentativeRequestsParams {
+    page: number;
+    pageSize: number;
+    query?: string;
+    disciplineId?: string;
+    minApplicationTime?: Date;
+    maxApplicationTime?: Date;
+    level?: EventLevel;
+    requestStatus?: RequestStatus;
+}
+
+// eslint-disable-next-line
+async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
+    const { page, pageSize, query, disciplineId, minApplicationTime, maxApplicationTime, level, requestStatus } =
+        params;
+    const results = await prisma.event.findMany({
+        where: {
+            AND: [
+                query
+                    ? {
+                          OR: [
+                              { name: { contains: query, mode: "insensitive" } },
+                              { description: { contains: query, mode: "insensitive" } },
+                          ],
+                      }
+                    : {},
+                disciplineId ? { disciplineId } : {},
+                minApplicationTime || maxApplicationTime
+                    ? {
+                          applicationTime: {
+                              gte: minApplicationTime,
+                              lte: maxApplicationTime,
+                          },
+                      }
+                    : {},
+                level ? { level } : {},
+                requestStatus ? { requestStatus } : {},
+            ],
+        },
+        select: { id: true, name: true, cover: true, requestStatus: true, level: true, applicationTime: true },
+        skip: pageSize * (page - 1),
+        take: pageSize,
+        orderBy: { applicationTime: "desc" },
+    });
+    const totalItems = await prisma.event.count();
+    return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
+}
 
 export interface EventSummary {
     id: string;

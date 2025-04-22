@@ -18,6 +18,7 @@ model User {
   email       String  @unique
   password    String
   tg          String? @unique
+  tgId        String? @unique
 
   region         Region           @relation(fields: [regionId], references: [id])
   athlete        Athlete[]
@@ -159,7 +160,6 @@ model Event {
   end                      DateTime
   minAge                   Int           @db.SmallInt
   maxAge                   Int           @db.SmallInt
-  duration                 Int           @db.SmallInt
   minTeamParticipantsCount Int           @db.SmallInt
   maxTeamParticipantsCount Int           @db.SmallInt
   isPersonalFormatAllowed  Boolean

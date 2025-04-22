@@ -1,33 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest } from "next/server";
 
 import prisma from "@/lib/prisma";
 
-interface Params {
-    params: {
-        id: string;
-    };
-}
-
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
-export async function GET(req: NextRequest, { params }: Params) {
-    const authHeader = req.headers.get("authorization");
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const authHeader = request.headers.get("authorization");
 
-    // Проверка заголовка Authorization
     if (!authHeader?.startsWith("Bearer ")) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const token = authHeader.split(" ")[1];
 
     if (token !== EXPECTED_TOKEN) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const eventId = params.id;
+    const eventId = (await params).id;
 
     if (!eventId) {
-        return NextResponse.json({ error: "Event ID is required" }, { status: 400 });
+        return Response.json({ error: "Event ID is required" }, { status: 400 });
     }
 
     try {
@@ -43,12 +36,12 @@ export async function GET(req: NextRequest, { params }: Params) {
         });
 
         if (!event) {
-            return NextResponse.json({ error: "Event not found" }, { status: 404 });
+            return Response.json({ error: "Event not found" }, { status: 404 });
         }
 
-        return NextResponse.json(event);
+        return Response.json(event);
     } catch (error) {
-        console.error("❌ Ошибка при получении события по ID:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error("Error fetching event:", error);
+        return Response.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
