@@ -6,8 +6,8 @@ import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AuthForm from "@/components/auth/auth-form";
+import UserEditForm from "@/components/edit-forms/user-edit-form";
 import ModalOrDrawer from "@/components/modal-or-drawer";
-import UserEditForm from "@/components/user-edit-form";
 import { useAuth } from "@/hooks/use-auth";
 import { Tab } from "@/types";
 import {
