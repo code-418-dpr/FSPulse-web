@@ -12,6 +12,7 @@ import {
     Form,
     Switch,
 } from "@heroui/react";
+import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 export function SearchForm() {
@@ -31,19 +32,22 @@ export function SearchForm() {
         [selectedDisciplineKeys],
     );
 
-    const handleSelectionStatusChange = (keys: Set<string> | "all") => {
+    const handleSelectionStatusChange = (keys: Selection) => {
         if (keys === "all") {
             setSelectedStatusKeys(new Set(["На рассмотрении", "Принята", "Отклонена"]));
-        } else {
-            const stringKeys = new Set<string>();
-            keys.forEach((key) => {
-                stringKeys.add(key);
-            });
-            setSelectedStatusKeys(stringKeys);
+            return;
         }
+
+        const stringKeys = new Set<string>();
+        keys.forEach((key) => {
+            if (typeof key === "string") {
+                stringKeys.add(key);
+            }
+        });
+        setSelectedStatusKeys(stringKeys);
     };
 
-    const handleSelectionDisciplineChange = (keys: Set<string> | "all") => {
+    const handleSelectionDisciplineChange = (keys: Selection) => {
         if (keys === "all") {
             setSelectedDisciplineKeys(
                 new Set([
@@ -53,13 +57,16 @@ export function SearchForm() {
                     "Робототехника",
                 ]),
             );
-        } else {
-            const stringKeys = new Set<string>();
-            keys.forEach((key) => {
-                stringKeys.add(key);
-            });
-            setSelectedDisciplineKeys(stringKeys);
+            return;
         }
+
+        const stringKeys = new Set<string>();
+        keys.forEach((key) => {
+            if (typeof key === "string") {
+                stringKeys.add(key);
+            }
+        });
+        setSelectedDisciplineKeys(stringKeys);
     };
 
     return (
