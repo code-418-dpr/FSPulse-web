@@ -87,7 +87,6 @@ export async function main() {
                     address: raw.address,
                     awards: raw.awards,
                     level: raw.level,
-                    duration: raw.duration,
                     isPersonalFormatAllowed: raw.isPersonalFormatAllowed,
                     requestStatus: raw.status,
                     requestComment: null,

@@ -9,16 +9,23 @@ interface MainCardsProps<T> {
     pageItems: T[];
     totalPages: number;
     page: number;
-    setPage: (page: number) => void;
-    renderCards: (items: T[]) => React.ReactNode;
+    setPageAction: (page: number) => void;
+    renderCardsAction: (items: T[]) => React.ReactNode;
 }
 
-export function MainCards<T>({ isLoading, pageItems, totalPages, page, setPage, renderCards }: MainCardsProps<T>) {
+export function MainCards<T>({
+    isLoading,
+    pageItems,
+    totalPages,
+    page,
+    setPageAction,
+    renderCardsAction,
+}: MainCardsProps<T>) {
     return (
         <div className="container mx-auto w-full flex-1 px-4 py-8 sm:w-3/4">
             {pageItems.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {isLoading ? <CircularProgress aria-label="Loading..." size="lg" /> : renderCards(pageItems)}
+                    {isLoading ? <CircularProgress aria-label="Loading..." size="lg" /> : renderCardsAction(pageItems)}
                 </div>
             ) : (
                 <div className="content-center justify-center">
@@ -27,7 +34,7 @@ export function MainCards<T>({ isLoading, pageItems, totalPages, page, setPage, 
             )}
             {totalPages > 1 && (
                 <div className="mt-8 flex justify-center">
-                    <Pagination showControls page={page} total={totalPages} onChange={setPage} />
+                    <Pagination showControls page={page} total={totalPages} onChange={setPageAction} />
                 </div>
             )}
         </div>

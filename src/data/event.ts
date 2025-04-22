@@ -1,4 +1,90 @@
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
+
+interface SearchRepresentativeRequestsParams {
+    page: number;
+    pageSize: number;
+    representativeId: string;
+    query?: string;
+    disciplineId?: string;
+    minApplicationTime?: Date;
+    maxApplicationTime?: Date;
+    level?: EventLevel;
+    requestStatus?: RequestStatus;
+}
+
+export async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
+    const {
+        page,
+        pageSize,
+        representativeId,
+        query,
+        disciplineId,
+        minApplicationTime,
+        maxApplicationTime,
+        level,
+        requestStatus,
+    } = params;
+    const requiredWhere = {
+        representative: {
+            some: { representativeId },
+        },
+    };
+    const results = await prisma.event.findMany({
+        where: {
+            AND: [
+                requiredWhere,
+                query
+                    ? {
+                          OR: [
+                              { name: { contains: query, mode: "insensitive" } },
+                              { description: { contains: query, mode: "insensitive" } },
+                          ],
+                      }
+                    : {},
+                disciplineId ? { disciplineId } : {},
+                minApplicationTime || maxApplicationTime
+                    ? {
+                          applicationTime: {
+                              gte: minApplicationTime,
+                              lte: maxApplicationTime,
+                          },
+                      }
+                    : {},
+                level ? { level } : {},
+                requestStatus ? { requestStatus } : {},
+            ],
+        },
+        select: { id: true, name: true, cover: true, requestStatus: true, level: true, applicationTime: true },
+        skip: pageSize * (page - 1),
+        take: pageSize,
+        orderBy: { applicationTime: "desc" },
+    });
+    const totalItems = await prisma.event.count({ where: requiredWhere });
+    return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
+}
+
+export async function getRepresentativeRequestById(id: string) {
+    return prisma.event.findUnique({
+        where: { id },
+        include: {
+            representative: {
+                include: {
+                    representative: {
+                        include: {
+                            user: {
+                                include: {
+                                    region: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            discipline: true,
+        },
+    });
+}
 
 export interface EventSummary {
     id: string;

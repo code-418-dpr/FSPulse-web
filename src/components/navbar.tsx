@@ -34,10 +34,10 @@ import { ThemeSwitcher } from "./theme-switcher";
 
 interface NavbarProps {
     activeTab: Tab;
-    setActiveTab: React.Dispatch<React.SetStateAction<Tab>>;
+    setActiveTabAction: React.Dispatch<React.SetStateAction<Tab>>;
 }
 
-export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) {
+export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isLoading, isAuthenticated } = useAuth();
@@ -45,15 +45,15 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
 
     const handleNavigation = (e: PressEvent, tab: Tab) => {
         router.push(`/representative?tab=${tab}`);
-        setActiveTab(tab);
+        setActiveTabAction(tab);
     };
 
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
         if (tab && ["requests", "events", "team"].includes(tab)) {
-            setActiveTab(tab);
+            setActiveTabAction(tab);
         }
-    }, [searchParams, setActiveTab]);
+    }, [searchParams, setActiveTabAction]);
 
     const handleLogout = async () => {
         await signOut({ redirect: false });
@@ -84,6 +84,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                         requests: "Заявки",
                                         events: "Соревнования",
                                         team: "Сборная",
+                                        achievement: "Достижения",
                                     }[tab]
                                 }
                             </Link>
@@ -179,7 +180,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                             >
                                 Вход
                             </Button>
-                            <ModalOrDrawer isOpen={isOpen} onOpenChange={onOpenChange}>
+                            <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                                 <AuthForm />
                             </ModalOrDrawer>
                         </>
