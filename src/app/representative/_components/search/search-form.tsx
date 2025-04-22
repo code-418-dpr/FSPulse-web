@@ -14,7 +14,7 @@ import {
 } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
-export default function SearchForm() {
+export function SearchForm() {
     const [isSelected, setIsSelected] = React.useState(true);
     const [selectedStatusKeys, setSelectedStatusKeys] = React.useState<Set<string>>(new Set(["На рассмотрении"]));
     const [selectedDisciplineKeys, setSelectedDisciplineKeys] = React.useState<Set<string>>(
@@ -32,11 +32,11 @@ export default function SearchForm() {
     );
 
     const handleSelectionStatusChange = (keys: Selection) => {
-        if (keys === "all") {
+        if (keys === "all" || (keys instanceof Set && keys.size === 0)) {
             setSelectedStatusKeys(new Set(["На рассмотрении", "Принята", "Отклонена"]));
-        } else {
+        } else if (keys instanceof Set) {
             const stringKeys = new Set<string>();
-            (keys as Set<string>).forEach((key) => {
+            keys.forEach((key) => {
                 if (typeof key === "string") {
                     stringKeys.add(key);
                 }
@@ -46,7 +46,7 @@ export default function SearchForm() {
     };
 
     const handleSelectionDisciplineChange = (keys: Selection) => {
-        if (keys === "all") {
+        if (keys === "all" || (keys instanceof Set && keys.size === 0)) {
             setSelectedDisciplineKeys(
                 new Set([
                     "Продуктовое программирование",
@@ -55,9 +55,9 @@ export default function SearchForm() {
                     "Робототехника",
                 ]),
             );
-        } else {
+        } else if (keys instanceof Set) {
             const stringKeys = new Set<string>();
-            (keys as Set<string>).forEach((key) => {
+            keys.forEach((key) => {
                 if (typeof key === "string") {
                     stringKeys.add(key);
                 }
