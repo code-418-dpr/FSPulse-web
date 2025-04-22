@@ -47,7 +47,7 @@ export const registerUser = async (data: RegistrationData) => {
                         id: user.id,
                         birthDate: athleteData.birthDate,
                         address: athleteData.address,
-                        sportCategoryId: athleteData.sportCategoryId,
+                        sportCategory: athleteData.sportCategory,
                         github: athleteData.github,
                     },
                 });

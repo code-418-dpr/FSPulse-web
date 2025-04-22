@@ -15,7 +15,7 @@ export interface AthleteSpecificData {
     role: "athlete";
     birthDate: Date;
     address: string;
-    sportCategoryId?: SportsCategory;
+    sportCategory?: SportsCategory;
     github?: string;
 }
 

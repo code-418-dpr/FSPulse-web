@@ -9,6 +9,6 @@ export interface AthleteData {
     birthDate: Date;
     regionId: string;
     address: string;
-    sportCategoryId: SportsCategory;
+    sportCategory: SportsCategory;
     phoneNumber: string;
 }

@@ -20,10 +20,13 @@ import users from "./data/user";
 export async function main() {
     console.log("Seeding regions...");
     await createRegions(regionNames);
+
     console.log("Seeding skills...");
     await createSkills(skillNames);
+
     console.log("Seeding disciplines...");
     const createdDisciplines = await createDisciplines(disciplines);
+
     console.log("Seeding age groups...");
     const createdAgeGroups = await createAgeGroups(ageGroups);
 
@@ -100,7 +103,10 @@ export async function main() {
     console.log("Seeding EventOfRepresentative...");
     for (const { representativeEmail, eventName } of eventRepresentatives) {
         try {
-            const rep = await prisma.representative.findUnique({ where: { email: representativeEmail } });
+            const rep = await prisma.representative.findFirst({
+                include: { user: true },
+                where: { user: { email: representativeEmail } },
+            });
             const evt = await prisma.event.findFirst({ where: { name: eventName } });
 
             if (!rep || !evt) {
