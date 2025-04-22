@@ -84,6 +84,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                         requests: "Заявки",
                                         events: "Соревнования",
                                         team: "Сборная",
+                                        achievement: "Достижения",
                                     }[tab]
                                 }
                             </Link>
