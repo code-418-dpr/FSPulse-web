@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 interface SearchRepresentativeRequestsParams {
     page: number;
     pageSize: number;
+    representativeId: string;
     query?: string;
     disciplineId?: string;
     minApplicationTime?: Date;
@@ -12,13 +13,27 @@ interface SearchRepresentativeRequestsParams {
     requestStatus?: RequestStatus;
 }
 
-// eslint-disable-next-line
-async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
-    const { page, pageSize, query, disciplineId, minApplicationTime, maxApplicationTime, level, requestStatus } =
-        params;
+export async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
+    const {
+        page,
+        pageSize,
+        representativeId,
+        query,
+        disciplineId,
+        minApplicationTime,
+        maxApplicationTime,
+        level,
+        requestStatus,
+    } = params;
+    const requiredWhere = {
+        representative: {
+            some: { representativeId },
+        },
+    };
     const results = await prisma.event.findMany({
         where: {
             AND: [
+                requiredWhere,
                 query
                     ? {
                           OR: [
@@ -45,8 +60,30 @@ async function searchRepresentativeRequests(params: SearchRepresentativeRequests
         take: pageSize,
         orderBy: { applicationTime: "desc" },
     });
-    const totalItems = await prisma.event.count();
+    const totalItems = await prisma.event.count({ where: requiredWhere });
     return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
+}
+
+export async function getRepresentativeRequestById(id: string) {
+    return prisma.event.findUnique({
+        where: { id },
+        include: {
+            representative: {
+                include: {
+                    representative: {
+                        include: {
+                            user: {
+                                include: {
+                                    region: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            discipline: true,
+        },
+    });
 }
 
 export interface EventSummary {
