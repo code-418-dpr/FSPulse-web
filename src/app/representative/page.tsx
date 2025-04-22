@@ -1,7 +1,7 @@
 // src/app/representative/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -13,6 +13,9 @@ import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { CompetitionItem, EventItem, Tab } from "@/types";
+import { CircularProgress } from "@heroui/react";
+
+// src/app/representative/page.tsx
 
 // src/app/representative/page.tsx
 
@@ -116,7 +119,7 @@ export default function RequestsPage() {
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <CircularProgress aria-label="Loading..." size="lg" />;
     }
 
     if (!isAuthenticated) {
