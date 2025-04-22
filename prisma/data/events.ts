@@ -16,6 +16,8 @@ export interface RawEvent {
     awards: number[];
     level: "OPEN" | "REGIONAL" | "FEDERAL";
     status: "PENDING" | "DECLINED" | "APPROVED";
+    duration: number;
+    isPersonalFormatAllowed: boolean;
 }
 
 const events: RawEvent[] = [
@@ -37,6 +39,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "PENDING",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "РобоБаттл: Лига инженеров",
@@ -56,6 +60,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "PENDING",
+        duration: 1,
+        isPersonalFormatAllowed: false,
     },
     {
         name: "Хакатон цифровых решений",
@@ -75,6 +81,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Весенний кодинг-марафон",
@@ -94,6 +102,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "AI Challenge: Искусственный интеллект в деле",
@@ -113,6 +123,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Соревнование по кибербезопасности SecureCode",
@@ -132,6 +144,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "FEDERAL",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Frontend Fest: React & Design",
@@ -151,6 +165,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Backend Brawl: API Edition",
@@ -170,6 +186,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "DevOps Days: Автоматизация и CI/CD",
@@ -189,6 +207,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "FEDERAL",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Quantum Hack: Квантовые вычисления",
@@ -208,6 +228,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Autonomous Air: Дроны и миссии",
@@ -227,6 +249,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "ML Battle: Обучение с подкреплением",
@@ -246,6 +270,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Game Jam: Создай свою игру за 48 часов",
@@ -265,6 +291,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "FEDERAL",
         status: "PENDING",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Cloud Clash: Работа с AWS и GCP",
@@ -284,6 +312,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Mobile Dev Cup: Android & iOS",
@@ -303,6 +333,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Арена ИИ: Генеративные сети",
@@ -322,6 +354,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Green Tech Hack: Устойчивое будущее",
@@ -341,6 +375,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Code & Coffee: Онлайн кодинг ночь",
@@ -360,6 +396,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "APPROVED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
     {
         name: "Data Science Штурм",
@@ -379,6 +417,8 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "DECLINED",
+        duration: 1,
+        isPersonalFormatAllowed: true,
     },
 ];
 

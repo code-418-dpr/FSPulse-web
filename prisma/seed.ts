@@ -17,17 +17,17 @@ import skillNames from "./data/skills";
 
 export async function main() {
     console.log("Seeding regions...");
-    const allRegions = await createRegions(regionNames);
+    await createRegions(regionNames);
     console.log("Seeding skills...");
     await createSkills(skillNames);
     console.log("Seeding disciplines...");
-    const allDisciplines = await createDisciplines(disciplines);
+    const createdDisciplines = await createDisciplines(disciplines);
     console.log("Seeding age groups...");
-    const allAgeGroups = await createAgeGroups(ageGroups);
+    const createdAgeGroups = await createAgeGroups(ageGroups);
 
     console.log("Mapping age groups to disciplines...");
-    const disciplinesMap = Object.fromEntries(allDisciplines.map((d) => [d.name, d.id]));
-    const ageGroupsMap = Object.fromEntries(allAgeGroups.map((ag) => [ag.minAge, ag.id]));
+    const disciplinesMap = Object.fromEntries(createdDisciplines.map((d) => [d.name, d.id]));
+    const ageGroupsMap = Object.fromEntries(createdAgeGroups.map((ag) => [ag.minAge, ag.id]));
     const relations = [
         ["Программирование продуктовое", [14, 17, 16]],
         ["Программирование алгоритмическое", [12, 15, 17, 16]],
@@ -54,7 +54,7 @@ export async function main() {
     console.log("Seeding Representatives...");
     for (const rep of representatives) {
         try {
-            const region = allRegions.findLast(({ name }) => name === rep.regionName);
+            const region = await prisma.region.findUnique({ where: { name: rep.regionName } });
             if (!region) throw new Error(`Region "${rep.regionName}" not found`);
 
             await prisma.representative.create({
@@ -86,7 +86,7 @@ export async function main() {
                 continue;
             }
 
-            const discipline = allDisciplines.findLast(({ name }) => name === raw.disciplineName);
+            const discipline = await prisma.discipline.findUnique({ where: { name: raw.disciplineName } });
             if (!discipline) throw new Error(`Discipline "${raw.disciplineName}" not found`);
 
             const cover = fs.readFileSync(path.join(__dirname, raw.coverPath));
@@ -110,6 +110,8 @@ export async function main() {
                     awards: raw.awards,
                     level: raw.level,
                     status: raw.status,
+                    duration: raw.duration,
+                    isPersonalFormatAllowed: raw.isPersonalFormatAllowed,
                 },
             });
             console.log(`  ✔ Event "${raw.name}"`);
