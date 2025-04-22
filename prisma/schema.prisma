@@ -9,15 +9,15 @@ datasource db {
 }
 
 enum SportsCategory {
-  HMS
-  MS
-  CMS
-  A
-  B
-  C
-  Ay
-  By
-  Cy
+  HMS // Заслуженный мастер спорта
+  MS // Мастер спорта
+  CMS // Кандидат в мастера спорта
+  A // 1 разряд
+  B // 2 разряд
+  C // 3 разряд
+  Ay // 1 юношеский разряд
+  By // 2 юношеский разряд
+  Cy // 3 юношеский разряд
 }
 
 model Region {
@@ -29,10 +29,52 @@ model Region {
 }
 
 model Discipline {
+  id                      String  @id @default(uuid())
+  name                    String  @unique
+  durationLimits          Int[]   @db.SmallInt
+  teamParticipantsLimits  Int[]   @db.SmallInt
+  isPersonalFormatAllowed Boolean
+
+  events    Event[]
+  ageGroups AgeGroupOfDiscipline[]
+}
+
+model AgeGroupOfDiscipline {
+  disciplineId String
+  ageGroupId   String
+
+  discipline Discipline @relation(fields: [disciplineId], references: [id])
+  ageGroup   AgeGroup   @relation(fields: [ageGroupId], references: [id])
+
+  @@unique([disciplineId, ageGroupId])
+}
+
+model AgeGroup {
+  id     String @id @default(uuid())
+  name   String
+  minAge Int    @db.SmallInt
+  maxAge Int?   @db.SmallInt
+
+  disciplines AgeGroupOfDiscipline[]
+
+  @@unique([name, minAge, maxAge])
+}
+
+model Skill {
   id   String @id @default(uuid())
   name String @unique
 
-  events Event[]
+  athletes SkillOfAthlete[]
+}
+
+model SkillOfAthlete {
+  athleteId String
+  skillId   String
+
+  skill   Skill   @relation(fields: [skillId], references: [id])
+  athlete Athlete @relation(fields: [athleteId], references: [id])
+
+  @@unique([athleteId, skillId])
 }
 
 model Athlete {
@@ -51,8 +93,9 @@ model Athlete {
   tg          String? @unique
   github      String? @unique
 
-  region Region          @relation(fields: [regionId], references: [id])
+  region Region           @relation(fields: [regionId], references: [id])
   teams  AthleteOfTeam[]
+  skills SkillOfAthlete[]
 }
 
 enum TeamRole {
@@ -62,7 +105,6 @@ enum TeamRole {
 }
 
 model AthleteOfTeam {
-  id        String   @id @default(uuid())
   teamId    String
   athleteId String
   role      TeamRole @default(MEMBER)
@@ -71,6 +113,7 @@ model AthleteOfTeam {
   athlete Athlete @relation(fields: [athleteId], references: [id])
 
   @@unique([teamId, athleteId])
+  @@unique([teamId, athleteId, role])
 }
 
 model Team {
@@ -89,23 +132,31 @@ enum EventStatus {
   APPROVED
 }
 
+enum EventLevel {
+  OPEN
+  REGIONAL
+  FEDERAL
+}
+
 model Event {
-  id              String      @id @default(uuid())
-  name            String
-  description     String
-  cover           Bytes       @db.ByteA
-  applicationTime DateTime    @default(now())
-  start           DateTime
-  end             DateTime
-  minAge          Int         @db.SmallInt
-  maxAge          Int         @db.SmallInt
-  disciplineId    String
-  isOnline        Boolean
-  address         String?
-  awards          Int[]       @db.SmallInt
-  isFederal       Boolean
-  isOpen          Boolean
-  status          EventStatus @default(PENDING)
+  id                   String      @id @default(uuid())
+  name                 String
+  description          String
+  cover                Bytes       @db.ByteA
+  applicationTime      DateTime    @default(now())
+  startRegistration    DateTime
+  endRegistration      DateTime
+  start                DateTime
+  end                  DateTime
+  minAge               Int         @db.SmallInt
+  maxAge               Int         @db.SmallInt
+  maxParticipantsCount Int         @db.SmallInt
+  disciplineId         String
+  isOnline             Boolean
+  address              String?
+  awards               Int[]       @db.SmallInt
+  level                EventLevel
+  status               EventStatus @default(PENDING)
 
   discipline      Discipline              @relation(fields: [disciplineId], references: [id])
   representatives EventOfRepresentative[]
@@ -114,12 +165,13 @@ model Event {
 }
 
 model EventOfRepresentative {
-  id               String @id @default(uuid())
   representativeId String
   eventId          String
 
   event          Event          @relation(fields: [eventId], references: [id])
   representative Representative @relation(fields: [representativeId], references: [id])
+
+  @@unique([representativeId, eventId])
 }
 
 model File {

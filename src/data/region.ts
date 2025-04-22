@@ -7,5 +7,5 @@ export const getRegions = async () => {
 };
 
 export const createRegions = async (regions: string[]) => {
-    return prisma.region.createMany({ data: regions.map((name) => ({ name })) });
+    return prisma.region.createManyAndReturn({ data: regions.map((name) => ({ name })), skipDuplicates: true });
 };
