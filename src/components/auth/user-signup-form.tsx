@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 
 import { SportsCategory } from "@/app/generated/prisma";
 import PasswordInput from "@/components/password-input";
+import { registerAthlete } from "@/data/athlete";
+import { getRegions } from "@/data/region";
+import { RegionOption } from "@/types/region";
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getLocalTimeZone, today } from "@internationalized/date";
@@ -19,17 +22,14 @@ const sportsCategoryOptions = Object.values(SportsCategory).map((key) => ({
     key,
     label: getCategoryLabel(key),
 }));
-interface ErrorResponse {
-    error: string;
-}
 function getCategoryLabel(key: SportsCategory): string {
     const map: Record<SportsCategory, string> = {
-        HMS: "Мастер спорта международного класса",
+        HMS: "Заслуженный мастер спорта",
         MS: "Мастер спорта",
         CMS: "Кандидат в мастера спорта",
-        A: "1 взрослый разряд",
-        B: "2 взрослый разряд",
-        C: "3 взрослый разряд",
+        A: "1 разряд",
+        B: "2 разряд",
+        C: "3 разряд",
         Ay: "1 юношеский разряд",
         By: "2 юношеский разряд",
         Cy: "3 юношеский разряд",
@@ -63,9 +63,8 @@ const userSchema = z
         email: z.string().min(1, "Email обязателен").email("Некорректный email"),
         phoneNumber: z
             .string()
-            .min(11, "Номер телефона должен содержать минимум 11 цифр")
-            .max(15, "Номер телефона должен содержать максимум 15 цифр")
-            .regex(/^\+?[0-9]+$/, "Некорректный формат номера телефона"),
+            .min(1, "Телефон обязателен")
+            .regex(/^7\d{10}$/, "Введите корректный российский номер (7XXXXXXXXXX)"),
         password: z
             .string()
             .min(6, "Пароль должен содержать минимум 6 символов")
@@ -79,11 +78,6 @@ const userSchema = z
     });
 
 type UserFormData = z.infer<typeof userSchema>;
-interface RegionOption {
-    id: string;
-    name: string;
-}
-
 export default function UserSignupForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
     const [regions, setRegions] = useState<RegionOption[]>([]);
@@ -92,9 +86,11 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
     useEffect(() => {
         const fetchRegions = async () => {
             try {
-                const res = await fetch("/api/regions");
-                const data = (await res.json()) as RegionOption[];
+                const data = (await getRegions()) as RegionOption[];
                 setRegions(data);
+                // const res = await fetch("/api/regions");
+                // const data = (await res.json()) as RegionOption[];
+                // setRegions(data);
             } catch (err) {
                 console.error("Ошибка загрузки регионов:", err);
             }
@@ -118,24 +114,15 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
             setIsLoading(true);
             setFormError(null);
 
-            const response = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    ...data,
-                    sportCategory: data.sportCategory as SportsCategory,
-                }),
+            const athlete = await registerAthlete({
+                ...data,
+                birthDate: new Date(data.birthDate),
+                regionId: data.region,
+                sportCategoryId: data.sportCategory,
             });
 
-            if (!response.ok) {
-                const errorData: ErrorResponse = (await response.json()) as ErrorResponse;
-                throw new Error(errorData.error || "Ошибка регистрации");
-            }
-
             const signInResult = await signIn("credentials", {
-                email: data.email,
+                email: athlete.email,
                 password: data.password,
                 redirect: false,
             });

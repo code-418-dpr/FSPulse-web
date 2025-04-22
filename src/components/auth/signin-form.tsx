@@ -22,7 +22,6 @@ const formSchema = z.object({
     password: z
         .string()
         .min(6, "Пароль должен содержать минимум 6 символов")
-        .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
         .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
 });
 
@@ -57,7 +56,8 @@ export default function SignInForm({ className }: SignInFormProps) {
             });
 
             if (result?.error) {
-                throw new Error(result.error);
+                setError("Неверный email или пароль");
+                return;
             }
             router.push("/");
         } catch (error) {
