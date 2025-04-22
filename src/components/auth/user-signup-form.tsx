@@ -57,9 +57,12 @@ const userSchema = z
                 required_error: "Выберите регион",
             })
             .min(1, "Регион обязателен"),
-        sportCategory: z.nativeEnum(SportsCategory, {
-            errorMap: () => ({ message: "Выберите спортивный разряд из списка" }),
-        }),
+        sportCategory: z
+            .nativeEnum(SportsCategory, {
+                errorMap: () => ({ message: "Выберите спортивный разряд из списка" }),
+            })
+            .nullable()
+            .default(null),
         email: z.string().min(1, "Email обязателен").email("Некорректный email"),
         phoneNumber: z
             .string()
@@ -152,7 +155,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
         <form className={cn("grid items-start gap-4", className)} onSubmit={handleFormSubmit}>
             <div className="flex flex-col gap-4">
                 <Input
-                    label="ФИО"
+                    label="Фамилия"
                     type="text"
                     variant="bordered"
                     {...register("lastname")}
