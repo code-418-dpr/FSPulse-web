@@ -28,14 +28,6 @@ import {
 
 import { ThemeSwitcher } from "./theme-switcher";
 
-// src/components/navbar.tsx
-
-// src/components/navbar.tsx
-
-// src/components/navbar.tsx
-
-// src/components/navbar.tsx
-
 interface NavbarProps {
     activeTab: Tab;
     setActiveTab: React.Dispatch<React.SetStateAction<Tab>>;

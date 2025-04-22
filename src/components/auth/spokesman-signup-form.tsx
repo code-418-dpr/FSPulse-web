@@ -10,8 +10,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import PasswordInput from "@/components/password-input";
+import { registerUser } from "@/data/auth";
 import { getRegions } from "@/data/region";
-import { registerRepresentative } from "@/data/representative";
 import { RegionOption } from "@/types/region";
 import { Autocomplete, AutocompleteItem, Button, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +34,7 @@ const userSchema = z
                 required_error: "Выберите регион",
             })
             .min(1, "Регион обязателен"),
-        phone: z
+        phoneNumber: z
             .string()
             .min(1, "Телефон обязателен")
             .regex(/^7\d{10}$/, "Введите корректный российский номер (7XXXXXXXXXX)"),
@@ -85,13 +85,14 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
             setIsLoading(true);
             setFormError(null);
 
-            const result = await registerRepresentative({
+            const result = await registerUser({
                 ...data,
+                role: "representative",
                 regionId: data.region,
             });
 
             const signInResult = await signIn("credentials", {
-                email: result.email,
+                email: result?.email,
                 password: data.password,
                 redirect: false,
             });
@@ -170,9 +171,9 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                     type="number"
                     variant="bordered"
                     inputMode="tel"
-                    {...register("phone")}
-                    isInvalid={!!errors.phone}
-                    errorMessage={errors.phone?.message}
+                    {...register("phoneNumber")}
+                    isInvalid={!!errors.phoneNumber}
+                    errorMessage={errors.phoneNumber?.message}
                 />
                 <Input
                     label="Email"

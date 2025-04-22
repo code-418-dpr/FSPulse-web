@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 import { SportsCategory } from "@/app/generated/prisma";
 import PasswordInput from "@/components/password-input";
-import { registerAthlete } from "@/data/athlete";
+import { registerUser } from "@/data/auth";
 import { getRegions } from "@/data/region";
 import { RegionOption } from "@/types/region";
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
@@ -111,15 +111,16 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
             setIsLoading(true);
             setFormError(null);
 
-            const athlete = await registerAthlete({
+            const athlete = await registerUser({
                 ...data,
+                role: "athlete",
                 birthDate: new Date(data.birthDate),
                 regionId: data.region,
                 sportCategoryId: data.sportCategory,
             });
 
             const signInResult = await signIn("credentials", {
-                email: athlete.email,
+                email: athlete?.email,
                 password: data.password,
                 redirect: false,
             });

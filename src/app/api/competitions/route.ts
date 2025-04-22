@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
+import { CompetitionItem } from "@/types";
 
 export async function GET(req: NextRequest) {
     const url = new URL(req.url);
@@ -26,14 +27,14 @@ export async function GET(req: NextRequest) {
         }),
     ]);
 
-    const items = entries.map(({ event }) => ({
+    const items: CompetitionItem[] = entries.map(({ event }) => ({
         id: event.id,
         title: event.name,
         region: event.address ?? "—",
         startDate: event.start.toISOString().split("T")[0],
         endDate: event.end.toISOString().split("T")[0],
         applicationDate: event.applicationTime.toISOString().split("T")[0],
-        status: event.status,
+        status: event.requestStatus,
         format: event.isOnline ? "Онлайн" : "Очно",
         discipline: event.discipline.name,
         image: "https://heroui.com/images/hero-card-complete.jpeg", // или использовать event.cover, если преобразован
