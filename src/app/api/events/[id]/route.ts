@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest } from "next/server";
 
 import prisma from "@/lib/prisma";
 
@@ -8,28 +8,19 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
-        return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-        });
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const token = authHeader.split(" ")[1];
 
     if (token !== EXPECTED_TOKEN) {
-        return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-            status: 403,
-            headers: { "Content-Type": "application/json" },
-        });
+        return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const eventId = params.id;
 
     if (!eventId) {
-        return new NextResponse(JSON.stringify({ error: "Event ID is required" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-        });
+        return Response.json({ error: "Event ID is required" }, { status: 400 });
     }
 
     try {
@@ -45,21 +36,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         });
 
         if (!event) {
-            return new NextResponse(JSON.stringify({ error: "Event not found" }), {
-                status: 404,
-                headers: { "Content-Type": "application/json" },
-            });
+            return Response.json({ error: "Event not found" }, { status: 404 });
         }
 
-        return new NextResponse(JSON.stringify(event), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(event);
     } catch (error) {
         console.error("Error fetching event:", error);
-        return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
+        return Response.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
