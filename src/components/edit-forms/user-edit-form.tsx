@@ -6,11 +6,9 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { SportsCategory } from "@/app/generated/prisma";
-import { registerUser } from "@/data/auth";
 import { getCategoryLabel } from "@/data/get-category-label";
 import { getRegions } from "@/data/region";
 import { baseUserSchema } from "@/schemas/base-user-schema";
@@ -60,6 +58,12 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
             setIsLoading(true);
             setFormError(null);
 
+            // моки чтоб не удалять data и async
+            console.log(data);
+            await new Promise((resolve) => {
+                setTimeout(resolve, 100);
+            });
+            /*
             const athlete = await registerUser({
                 ...data,
                 role: "athlete",
@@ -76,6 +80,8 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
             if (signInResult?.error) {
                 throw new Error(signInResult.error);
             }
+             */
+
             router.push("/");
             router.refresh();
         } catch (error) {
