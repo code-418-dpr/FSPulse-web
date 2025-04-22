@@ -96,9 +96,9 @@ model SkillOfAthlete {
 }
 
 enum Membership {
-  MAIN
-  RESERVE
-  EX
+  MAIN // Основной состав
+  RESERVE // Резервный состав
+  NONE // Не член сборной
 }
 
 model Athlete {
@@ -106,7 +106,7 @@ model Athlete {
   birthDate     DateTime        @db.Date()
   address       String
   sportCategory SportsCategory?
-  membership    Membership      @default(EX)
+  membership    Membership      @default(NONE)
   github        String?         @unique
 
   user  User             @relation(fields: [id], references: [id])
@@ -115,9 +115,9 @@ model Athlete {
 }
 
 enum TeamRole {
-  MEMBER
-  LEADER
-  COACH
+  MEMBER // Член команды
+  LEADER // Лидер
+  COACH // Тренер
 }
 
 model AthleteOfTeam {
@@ -144,15 +144,15 @@ model Team {
 }
 
 enum RequestStatus {
-  PENDING
-  DECLINED
-  APPROVED
+  PENDING // На рассмотрении
+  DECLINED // Отклонено
+  APPROVED // Одобрено
 }
 
 enum EventLevel {
-  OPEN
-  REGIONAL
-  FEDERAL
+  OPEN // Открытый
+  REGIONAL // Региональный
+  FEDERAL // Всероссийский
 }
 
 model Event {
