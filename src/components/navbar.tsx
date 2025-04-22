@@ -170,7 +170,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                         <>
                             <Button
                                 onPress={() => {
-                                    onOpen(true);
+                                    onOpen();
                                 }}
                                 color="primary"
                                 variant="flat"

@@ -32,6 +32,8 @@ import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
+// src/app/representative/_components/competition/competition-cards.tsx
+
 interface Props {
     paginatedData: CompetitionItem[];
 }
@@ -42,7 +44,7 @@ export default function CompetitionCards({ paginatedData }: Props) {
 
     const handleClick = (c: CompetitionItem) => {
         setSelected(c);
-        onOpen(true);
+        onOpen();
     };
 
     return (
