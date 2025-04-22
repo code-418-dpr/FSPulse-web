@@ -7,12 +7,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import CompetitionCards from "@/app/representative/_components/competition/competition-cards";
 import EventCards from "@/app/representative/_components/event/event-cards";
+import { MainCards } from "@/app/representative/_components/main-cards";
 import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { CompetitionItem, EventItem, Tab } from "@/types";
-import { Pagination } from "@heroui/react";
+
+// src/app/representative/page.tsx
 
 // src/app/representative/page.tsx
 
@@ -130,39 +132,27 @@ export default function RequestsPage() {
                 <SearchCardOrDrawer />
 
                 {/* Main */}
-                <div className="container mx-auto w-full flex-1 px-4 py-8 sm:w-3/4">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {activeTab === "requests" ? (
-                            isCompLoading ? (
-                                <p>Загрузка заявок...</p>
-                            ) : (
-                                <CompetitionCards paginatedData={compPageItems} />
-                            )
-                        ) : activeTab === "events" ? (
-                            isEventLoading ? (
-                                <p>Загрузка событий...</p>
-                            ) : (
-                                <EventCards paginatedData={evtPageItems} />
-                            )
-                        ) : null}
-                    </div>
+                {activeTab === "requests" && (
+                    <MainCards<CompetitionItem>
+                        isLoading={isCompLoading}
+                        pageItems={compPageItems}
+                        totalPages={totalCompPages}
+                        page={page}
+                        setPage={setPage}
+                        renderCards={(items) => <CompetitionCards paginatedData={items} />}
+                    />
+                )}
 
-                    {activeTab === "requests" && totalCompPages > 1 && (
-                        <div className="mt-8 flex justify-center">
-                            <Pagination showControls page={page} total={totalCompPages} onChange={setPage} />
-                        </div>
-                    )}
-                    {activeTab === "events" && totalEvtPages > 1 && (
-                        <div className="mt-8 flex justify-center">
-                            <Pagination
-                                showControls
-                                page={eventsData!.pagination.page}
-                                total={totalEvtPages}
-                                onChange={setPage}
-                            />
-                        </div>
-                    )}
-                </div>
+                {activeTab === "events" && (
+                    <MainCards<EventItem>
+                        isLoading={isEventLoading}
+                        pageItems={evtPageItems}
+                        totalPages={totalEvtPages}
+                        page={page}
+                        setPage={setPage}
+                        renderCards={(items) => <EventCards paginatedData={items} />}
+                    />
+                )}
             </div>
 
             <FooterElement />
