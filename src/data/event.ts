@@ -1,4 +1,3 @@
-// src/data/event.ts
 import prisma from "@/lib/prisma";
 
 export interface EventSummary {
@@ -35,7 +34,7 @@ export async function getEventSummaries(page: number, pageSize: number): Promise
         id: e.id,
         name: e.name,
         start: e.start.toISOString(),
-        status: e.status,
+        status: e.requestStatus,
         imageBase64: Buffer.from(e.cover).toString("base64"),
     }));
 

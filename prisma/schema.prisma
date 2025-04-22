@@ -8,6 +8,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id          String  @id
+  lastname    String
+  firstname   String
+  middlename  String?
+  regionId    String
+  address     String
+  phoneNumber String  @unique
+  email       String  @unique
+  password    String
+  tg          String? @unique
+
+  region         Region           @relation(fields: [regionId], references: [id])
+  athlete        Athlete[]
+  representative Representative[]
+}
+
 enum SportsCategory {
   HMS // Заслуженный мастер спорта
   MS // Мастер спорта
@@ -24,8 +41,7 @@ model Region {
   id   String @id @default(uuid())
   name String @unique
 
-  athletes        Athlete[]
-  representatives Representative[]
+  users User[]
 }
 
 model Discipline {
@@ -74,19 +90,14 @@ model SkillOfAthlete {
   skillId   String
 
   skill   Skill   @relation(fields: [skillId], references: [id])
-  athlete Athlete @relation(fields: [athleteId], references: [id])
+  athlete Athlete @relation(fields: [athleteId], references: [userId])
 
   @@unique([athleteId, skillId])
 }
 
 model Athlete {
   id              String          @id @default(uuid())
-  lastname        String
-  firstname       String
-  middlename      String?
   birthDate       DateTime        @db.Date()
-  regionId        String
-  address         String
   sportCategoryId SportsCategory?
 
   phoneNumber String  @unique
@@ -95,7 +106,7 @@ model Athlete {
   tg          String? @unique
   github      String? @unique
 
-  region Region           @relation(fields: [regionId], references: [id])
+  user   User             @relation(fields: [id], references: [id])
   teams  AthleteOfTeam[]
   skills SkillOfAthlete[]
 }
@@ -112,7 +123,7 @@ model AthleteOfTeam {
   role      TeamRole @default(MEMBER)
 
   team    Team    @relation(fields: [teamId], references: [id])
-  athlete Athlete @relation(fields: [athleteId], references: [id])
+  athlete Athlete @relation(fields: [athleteId], references: [userId])
 
   @@unique([teamId, athleteId])
   @@unique([teamId, athleteId, role])
@@ -176,8 +187,8 @@ model EventOfRepresentative {
   representativeId String
   eventId          String
 
+  representative Representative @relation(fields: [representativeId], references: [userId])
   event          Event          @relation(fields: [eventId], references: [id])
-  representative Representative @relation(fields: [representativeId], references: [id])
 
   @@unique([representativeId, eventId])
 }
@@ -192,18 +203,11 @@ model File {
 }
 
 model Representative {
-  id             String        @id @default(uuid())
-  lastname       String
-  firstname      String
-  middlename     String?
-  regionId       String
-  phoneNumber    String        @unique
-  email          String        @unique
-  password       String
-  tg             String?       @unique
+  id String @id @default(uuid())
+
   requestStatus  RequestStatus @default(PENDING)
   requestComment String?
 
-  region Region                  @relation(fields: [regionId], references: [id])
+  user   User                    @relation(fields: [id], references: [id])
   events EventOfRepresentative[]
 }
