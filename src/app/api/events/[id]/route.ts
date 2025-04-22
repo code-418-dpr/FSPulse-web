@@ -3,15 +3,12 @@ import { type NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 
 interface RouteParams {
-    params: {
-        id: string;
-    };
+    params: Record<string, string>; // Use Record<string, string>
 }
 
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
-    // Correct type
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
