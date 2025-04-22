@@ -24,6 +24,10 @@ import EventDialogOrDrawer from "./event-modal-or-drawer";
 
 // src/app/representative/_components/event/event-cards.tsx
 
+// src/app/representative/_components/event/event-cards.tsx
+
+// src/app/representative/_components/event/event-cards.tsx
+
 interface Props {
     paginatedData: EventItem[];
 }
