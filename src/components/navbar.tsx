@@ -5,7 +5,8 @@ import React, { useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
+import AuthForm from "@/components/auth/auth-form";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import { Tab } from "@/types";
 import {
@@ -169,7 +170,9 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                             </Dropdown>
                         </div>
                     ) : (
-                        <AuthDialogOrDrawer />
+                        <ModalOrDrawer>
+                            <AuthForm />
+                        </ModalOrDrawer>
                     )}
                 </NavbarItem>
                 <NavbarItem>
