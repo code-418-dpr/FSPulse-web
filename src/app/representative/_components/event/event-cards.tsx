@@ -54,6 +54,8 @@ import { Card, CardBody, Image, useDisclosure } from "@heroui/react";
 
 // src/app/representative/_components/event/event-cards.tsx
 
+// src/app/representative/_components/event/event-cards.tsx
+
 interface Props {
     paginatedData: EventItem[];
 }
@@ -70,7 +72,7 @@ export default function EventCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer label="Соревнование" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                     <EventDetails event={selected} />
                 </ModalOrDrawer>
             )}

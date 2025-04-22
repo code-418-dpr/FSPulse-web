@@ -46,6 +46,8 @@ import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
+// src/app/representative/_components/competition/competition-cards.tsx
+
 interface Props {
     paginatedData: TeamItem[];
 }
@@ -62,7 +64,7 @@ export default function TeamCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer label="Участник сборной" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                     <TeamDetails team={selected} />
                 </ModalOrDrawer>
             )}

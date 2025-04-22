@@ -48,6 +48,8 @@ import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
+// src/app/representative/_components/competition/competition-cards.tsx
+
 interface Props {
     paginatedData: AchievementItem[];
 }
@@ -64,7 +66,7 @@ export default function AchievementCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer label="Достижение" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                     <AchievementDetails achievement={selected} />
                 </ModalOrDrawer>
             )}

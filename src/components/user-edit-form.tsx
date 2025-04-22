@@ -10,7 +10,6 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { SportsCategory } from "@/app/generated/prisma";
-import PasswordInput from "@/components/password-input";
 import { registerUser } from "@/data/auth";
 import { getCategoryLabel } from "@/data/get-category-label";
 import { getRegions } from "@/data/region";
@@ -24,50 +23,39 @@ const sportsCategoryOptions = Object.values(SportsCategory).map((key) => ({
     label: getCategoryLabel(key),
 }));
 
-const userSchema = z
-    .object({
-        lastname: z
-            .string()
-            .min(1, "Фамилия обязательна")
-            .min(3, "Фамилия должна содержать минимум 3 символа")
-            .regex(/^[а-яА-ЯёЁ\s]+$/, "Фамилия должна содержать только кириллические буквы"),
-        firstname: z
-            .string()
-            .min(1, "Имя обязательно")
-            .min(3, "Имя должно содержать минимум 3 символа")
-            .regex(/^[а-яА-ЯёЁ\s]+$/, "Имя должно содержать только кириллические буквы"),
-        middlename: z.string().nullable(),
-        birthDate: z.string().refine((val) => !isNaN(new Date(val).getTime())),
-        address: z.string().min(1, "Адрес обязателен").min(3, "Адрес должен содержать минимум 3 символа"),
-        region: z
-            .string({
-                required_error: "Выберите регион",
-            })
-            .min(1, "Регион обязателен"),
-        sportCategory: z
-            .nativeEnum(SportsCategory, {
-                errorMap: () => ({ message: "Выберите спортивный разряд из списка" }),
-            })
-            .nullish(),
-        email: z.string().min(1, "Email обязателен").email("Некорректный email"),
-        phoneNumber: z
-            .string()
-            .min(1, "Телефон обязателен")
-            .regex(/^7\d{10}$/, "Введите корректный российский номер (7XXXXXXXXXX)"),
-        password: z
-            .string()
-            .min(6, "Пароль должен содержать минимум 6 символов")
-            .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
-            .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
-        passwordRepeat: z.string(),
-    })
-    .refine((data) => data.password === data.passwordRepeat, {
-        message: "Пароли не совпадают",
-        path: ["passwordRepeat"],
-    });
+const userSchema = z.object({
+    lastname: z
+        .string()
+        .min(1, "Фамилия обязательна")
+        .min(3, "Фамилия должна содержать минимум 3 символа")
+        .regex(/^[а-яА-ЯёЁ\s]+$/, "Фамилия должна содержать только кириллические буквы"),
+    firstname: z
+        .string()
+        .min(1, "Имя обязательно")
+        .min(3, "Имя должно содержать минимум 3 символа")
+        .regex(/^[а-яА-ЯёЁ\s]+$/, "Имя должно содержать только кириллические буквы"),
+    middlename: z.string().nullable(),
+    birthDate: z.string().refine((val) => !isNaN(new Date(val).getTime())),
+    address: z.string().min(1, "Адрес обязателен").min(3, "Адрес должен содержать минимум 3 символа"),
+    region: z
+        .string({
+            required_error: "Выберите регион",
+        })
+        .min(1, "Регион обязателен"),
+    sportCategory: z
+        .nativeEnum(SportsCategory, {
+            errorMap: () => ({ message: "Выберите спортивный разряд из списка" }),
+        })
+        .nullish(),
+    email: z.string().min(1, "Email обязателен").email("Некорректный email"),
+    phoneNumber: z
+        .string()
+        .min(1, "Телефон обязателен")
+        .regex(/^7\d{10}$/, "Введите корректный российский номер (7XXXXXXXXXX)"),
+});
 
 type UserFormData = z.infer<typeof userSchema>;
-export default function UserSignupForm({ className }: React.ComponentProps<"form">) {
+export default function UserEditForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
     const [regions, setRegions] = useState<RegionOption[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
@@ -239,20 +227,9 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.phoneNumber}
                     errorMessage={errors.phoneNumber?.message}
                 />
-                <PasswordInput
-                    {...register("password")}
-                    isInvalid={!!errors.password}
-                    errorMessage={errors.password?.message}
-                />
-                <PasswordInput
-                    label="Повторите пароль"
-                    {...register("passwordRepeat")}
-                    isInvalid={!!errors.passwordRepeat}
-                    errorMessage={errors.passwordRepeat?.message}
-                />
                 {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
-                    Регистрация
+                    Сохранить изменения
                 </Button>
             </div>
         </form>
