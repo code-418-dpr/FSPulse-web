@@ -25,6 +25,10 @@ import { RequestStatus } from "../generated/prisma";
 
 // src/app/representative/page.tsx
 
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
 interface Paged<T> {
     items: T[];
     pagination: {
@@ -178,7 +182,7 @@ export default function RequestsPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <SearchCardOrDrawer onSearch={handleSearch} />
+                <SearchCardOrDrawer onSearch={handleSearch} tabType={activeTab} />
 
                 {/* Main */}
                 {activeTab === "requests" && (

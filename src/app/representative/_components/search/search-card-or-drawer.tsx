@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { SearchForm } from "@/app/representative/_components/search/search-form";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { Tab } from "@/types";
 import type { SearchParams } from "@/types/search";
 import { Card, CardBody, CardHeader, useDisclosure } from "@heroui/react";
 import { Button, Drawer, DrawerBody, DrawerContent, DrawerHeader } from "@heroui/react";
@@ -13,22 +14,27 @@ import { Icon } from "@iconify/react";
 
 interface Props {
     onSearch: (params: SearchParams) => void;
+    tabType: Tab;
 }
 
-export function SearchCardOrDrawer({ onSearch }: Props) {
+export function SearchCardOrDrawer({ onSearch, tabType }: Props) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
-    return isDesktop ? SearchCard({ onSearch }) : SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch });
+    return isDesktop
+        ? SearchCard({ onSearch, tabType })
+        : SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch, tabType });
 }
 
-function SearchCard({ onSearch }: { onSearch: Props["onSearch"] }) {
+function SearchCard({ onSearch, tabType }: { onSearch: Props["onSearch"]; tabType: Tab }) {
     return (
         <div className="w-full p-4 sm:w-1/4">
             <Card className="sticky top-20">
                 <CardHeader className="text-xl">Поиск</CardHeader>
                 <CardBody>
-                    <SearchForm onSubmit={onSearch} />
+                    <div className="max-h-[70vh] overflow-y-auto pr-2">
+                        <SearchForm onSubmit={onSearch} tabType={tabType} />
+                    </div>
                 </CardBody>
             </Card>
         </div>
@@ -39,9 +45,10 @@ interface DrawerProps extends Props {
     isOpen: boolean;
     onOpen: React.Dispatch<React.SetStateAction<boolean>>;
     onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
+    tabType: Tab;
 }
 
-function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch }: DrawerProps) {
+function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch, tabType }: DrawerProps) {
     return (
         <>
             <Button
@@ -59,7 +66,7 @@ function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch }: DrawerProps) {
                 <DrawerContent className="p-4">
                     <DrawerHeader className="text-center text-2xl">Поиск</DrawerHeader>
                     <DrawerBody>
-                        <SearchForm onSubmit={onSearch} />
+                        <SearchForm onSubmit={onSearch} tabType={tabType} />
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>
