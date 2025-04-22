@@ -118,7 +118,7 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                 role: "athlete",
                 birthDate: new Date(data.birthDate),
                 regionId: data.region,
-                sportCategory: data.sportCategory,
+                sportCategory: data.sportCategory ?? undefined,
             });
 
             const signInResult = await signIn("credentials", {
