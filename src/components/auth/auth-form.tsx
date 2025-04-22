@@ -42,7 +42,7 @@ function Register() {
     return (
         <>
             <div className="my-4 flex justify-center">
-                <Dropdown>
+                <Dropdown shouldBlockScroll={false}>
                     <DropdownTrigger>
                         <Button className="capitalize" variant="bordered">
                             {selectedValue}
