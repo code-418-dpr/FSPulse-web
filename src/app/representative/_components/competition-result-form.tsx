@@ -69,7 +69,9 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                         type="number"
                         variant="bordered"
                         value={team.grade.toString()}
-                        onChange={(e) => { handleGradeChange(index, e.target.value); }}
+                        onChange={(e) => {
+                            handleGradeChange(index, e.target.value);
+                        }}
                         min="0"
                         step="1"
                     />

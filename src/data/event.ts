@@ -1,5 +1,6 @@
 "use server";
 
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 import { SearchRepresentativeRequestsParams } from "@/types/search";
 
@@ -45,7 +46,15 @@ export async function searchRepresentativeRequests(params: SearchRepresentativeR
                 requestStatus ? { requestStatus } : {},
             ],
         },
-        select: { id: true, name: true, cover: true, requestStatus: true, level: true, applicationTime: true },
+        select: {
+            id: true,
+            name: true,
+            cover: true,
+            requestStatus: true,
+            level: true,
+            applicationTime: true,
+            discipline: true,
+        },
         skip: pageSize * (page - 1),
         take: pageSize,
         orderBy: { applicationTime: "desc" },

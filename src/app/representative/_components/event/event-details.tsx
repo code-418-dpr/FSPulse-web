@@ -46,6 +46,8 @@ import { Chip, Image } from "@heroui/react";
 
 // src/app/representative/_components/event/event-details.tsx
 
+// src/app/representative/_components/event/event-details.tsx
+
 interface Props {
     event: EventItem;
 }

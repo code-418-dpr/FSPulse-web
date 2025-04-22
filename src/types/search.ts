@@ -1,4 +1,4 @@
-import { EventLevel, RequestStatus } from "@/app/generated/prisma";
+import { Discipline, EventLevel, RequestStatus } from "@/app/generated/prisma";
 
 export interface SearchParams {
     query?: string;
@@ -36,4 +36,5 @@ export interface RepresentativeRequestItem {
     applicationTime: Date;
     level: EventLevel;
     requestStatus: RequestStatus;
+    discipline: Discipline;
 }
