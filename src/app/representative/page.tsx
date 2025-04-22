@@ -16,10 +16,54 @@ import NavbarElement from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, CompetitionItem, EventItem, Tab, TeamItem } from "@/types";
 import { CircularProgress } from "@heroui/react";
-import { RequestStatus } from "../generated/prisma";
-import { searchRepresentativeRequests } from "@/data/event";
-import { SearchParams } from "@/types/search";
 
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
+
+// src/app/representative/page.tsx
 
 interface Paged<T> {
     items: T[];
@@ -173,7 +217,7 @@ export default function RequestsPage() {
 
     return (
         <>
-            <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
+            <NavbarElement activeTab={activeTab} setActiveTabAction={setActiveTab} />
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
@@ -181,15 +225,15 @@ export default function RequestsPage() {
 
                 {/* Main */}
                 {activeTab === "requests" && (
-          <MainCards<CompetitionItem>
-            isLoading={isRequestsLoading}
-            pageItems={requestsData?.items || []}
-            totalPages={requestsData?.pagination.totalPages || 1}
-            page={page}
-            setPage={setPage}
-            renderCards={(items) => <CompetitionCards paginatedData={items} />}
-          />
-        )}
+                    <MainCards<CompetitionItem>
+                        isLoading={isCompLoading}
+                        pageItems={compPageItems}
+                        totalPages={totalCompPages}
+                        page={page}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
+                    />
+                )}
 
                 {activeTab === "events" && (
                     <MainCards<EventItem>
@@ -197,8 +241,8 @@ export default function RequestsPage() {
                         pageItems={evtPageItems}
                         totalPages={totalEvtPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <EventCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <EventCards paginatedData={items} />}
                     />
                 )}
 
@@ -208,8 +252,8 @@ export default function RequestsPage() {
                         pageItems={teamPageItems}
                         totalPages={totalTeamPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <TeamCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <TeamCards paginatedData={items} />}
                     />
                 )}
 
@@ -219,8 +263,8 @@ export default function RequestsPage() {
                         pageItems={achievementPageItems}
                         totalPages={totalAchievementPages}
                         page={page}
-                        setPage={setPage}
-                        renderCards={(items) => <AchievementCards paginatedData={items} />}
+                        setPageAction={setPage}
+                        renderCardsAction={(items) => <AchievementCards paginatedData={items} />}
                     />
                 )}
             </div>

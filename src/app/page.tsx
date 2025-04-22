@@ -10,7 +10,7 @@ export default function App() {
     const [activeTab, setActiveTab] = useState<Tab>("requests");
     return (
         <>
-            <NavbarElement activeTab={activeTab} setActiveTab={setActiveTab} />
+            <NavbarElement activeTab={activeTab} setActiveTabAction={setActiveTab} />
             <main className="p-4">
                 <div className="h-[100vh] w-full"></div>
             </main>
