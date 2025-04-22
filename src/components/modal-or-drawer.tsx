@@ -31,7 +31,7 @@ function ShowDialog({ isOpen, onOpenChange, children }: Props) {
 
 function ShowDrawer({ isOpen, onOpenChange, children }: Props) {
     return (
-        <Drawer placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Drawer placement="bottom" size="full" isOpen={isOpen} onOpenChange={onOpenChange}>
             <DrawerContent className="p-4">
                 <DrawerHeader className="text-center text-2xl">Авторизация</DrawerHeader>
                 <DrawerBody>{children}</DrawerBody>
