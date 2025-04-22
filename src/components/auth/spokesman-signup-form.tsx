@@ -3,10 +3,16 @@
 import { z } from "zod";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 import PasswordInput from "@/components/password-input";
+import { getRegions } from "@/data/region";
+import { registerRepresentative } from "@/data/representative";
+import { RegionOption } from "@/types/region";
 import { Autocomplete, AutocompleteItem, Button, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -27,10 +33,7 @@ const userSchema = z
             .string({
                 required_error: "Выберите регион",
             })
-            .min(1, "Регион обязателен")
-            .refine((val) => regions.some((r) => r.key === val), {
-                message: "Выберите регион из списка",
-            }),
+            .min(1, "Регион обязателен"),
         phone: z
             .string()
             .min(1, "Телефон обязателен")
@@ -48,32 +51,66 @@ const userSchema = z
         path: ["passwordRepeat"],
     });
 
-const regions = [
-    { key: "DPR", label: "Донецкая Народная Республика" },
-    { key: "LPR", label: "Луганская Народная Республика" },
-    { key: "Moscow", label: "Москва" },
-    { key: "Peter", label: "Санкт-Петербург" },
-];
-
 export default function SpokesmanSignupForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
+    const [regions, setRegions] = useState<RegionOption[]>([]);
+    const [formError, setFormError] = useState<string | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchRegions = async () => {
+            try {
+                const data = (await getRegions()) as RegionOption[];
+                setRegions(data);
+            } catch (err) {
+                console.error("Ошибка загрузки регионов:", err);
+            }
+        };
+
+        void fetchRegions();
+    }, []);
 
     const {
         control,
         register,
         handleSubmit,
+        setError,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(userSchema),
     });
 
-    const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = (data) => {
+    const onSubmit: SubmitHandler<z.infer<typeof userSchema>> = async (data) => {
         try {
             setIsLoading(true);
-            console.log(data);
-            // await new Promise((resolve) => setTimeout(resolve, 100));
+            setFormError(null);
+
+            const result = await registerRepresentative({
+                ...data,
+                regionId: data.region,
+            });
+
+            const signInResult = await signIn("credentials", {
+                email: result.email,
+                password: data.password,
+                redirect: false,
+            });
+
+            if (signInResult?.error) {
+                throw new Error(signInResult.error);
+            }
+
+            router.push("/");
+            router.refresh();
         } catch (error) {
-            console.error(error);
+            if (error instanceof Error) {
+                if (error.message.includes("email") || error.message.includes("phone")) {
+                    setError("root", { message: error.message });
+                    setFormError(error.message);
+                } else {
+                    setFormError(error.message);
+                }
+            }
         } finally {
             setIsLoading(false);
         }
@@ -124,7 +161,7 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                             errorMessage={errors.region?.message}
                             allowsCustomValue={false}
                         >
-                            {(region) => <AutocompleteItem key={region.key}>{region.label}</AutocompleteItem>}
+                            {(region) => <AutocompleteItem key={region.id}>{region.name}</AutocompleteItem>}
                         </Autocomplete>
                     )}
                 />
@@ -156,6 +193,7 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                     isInvalid={!!errors.passwordRepeat}
                     errorMessage={errors.passwordRepeat?.message}
                 />
+                {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
                     Регистрация
                 </Button>
