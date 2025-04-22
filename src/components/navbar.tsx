@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { Tab } from "@/types";
 import {
     Button,
@@ -22,6 +22,10 @@ import {
 } from "@heroui/react";
 
 import { ThemeSwitcher } from "./theme-switcher";
+
+// src/components/navbar.tsx
+
+// src/components/navbar.tsx
 
 // src/components/navbar.tsx
 
