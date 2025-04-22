@@ -1,5 +1,5 @@
 // src/types.ts
-export type Tab = "requests" | "events" | "team";
+export type Tab = "requests" | "events" | "team" | "achievement";
 
 export interface CompetitionItem {
     title: string;
@@ -29,5 +29,15 @@ export interface TeamItem {
     region: string;
     birthday: string;
     status: string;
+    imageBase64: string;
+}
+
+export interface AchievementItem {
+    id: string;
+    eventName: string;
+    spot: string;
+    discipline: string;
+    date: string;
+    region: string;
     imageBase64: string;
 }
