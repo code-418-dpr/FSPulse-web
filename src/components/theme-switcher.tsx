@@ -62,7 +62,7 @@ export const ThemeSwitcher = () => {
     ));
 
     return (
-        <Dropdown>
+        <Dropdown shouldBlockScroll={false}>
             <DropdownTrigger>
                 <Button
                     variant="flat"

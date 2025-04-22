@@ -35,6 +35,8 @@ import { ThemeSwitcher } from "./theme-switcher";
 
 // src/components/navbar.tsx
 
+// src/components/navbar.tsx
+
 interface NavbarProps {
     activeTab: Tab;
     setActiveTab: React.Dispatch<React.SetStateAction<Tab>>;
@@ -127,9 +129,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                     itemClasses={{
                                         base: [
                                             "rounded-md",
-                                            "text-default-500",
                                             "transition-opacity",
-                                            "data-[hover=true]:text-foreground",
                                             "data-[hover=true]:bg-default-100",
                                             "dark:data-[hover=true]:bg-default-50",
                                             "data-[selectable=true]:focus:bg-default-50",
@@ -146,7 +146,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                                     src: "https://avatars.githubusercontent.com/u/30373425?v=4",
                                                 }}
                                                 classNames={{
-                                                    name: "text-default-600",
+                                                    name: "font-bold",
                                                     description: "text-default-500",
                                                 }}
                                                 description={user?.email}
@@ -158,6 +158,7 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                                         <DropdownItem key="settings">Настройки</DropdownItem>
                                         <DropdownItem
                                             key="logout"
+                                            className="text-danger data-[hover=true]:text-danger data-[focus-visible=true]:text-danger"
                                             onPress={() => {
                                                 handleLogout().catch(console.error);
                                             }}
