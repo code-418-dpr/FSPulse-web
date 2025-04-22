@@ -4,8 +4,9 @@ import prisma from "@/lib/prisma";
 
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const authHeader = req.headers.get("authorization");
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+    const authHeader = request.headers.get("authorization");
+    const { params } = context;
 
     // Проверка заголовка Authorization
     if (!authHeader?.startsWith("Bearer ")) {
