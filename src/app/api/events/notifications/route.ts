@@ -1,10 +1,6 @@
-import { addHours } from "date-fns";
-
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
-
-// ✅ удалён isWithinInterval
 
 const EXPECTED_TOKEN = process.env.API_TOKEN;
 
@@ -15,12 +11,16 @@ export async function GET(req: NextRequest) {
     }
 
     const now = new Date();
+    const twentyFourHoursLater = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Добавляем 24 часа в миллисекундах
 
     const events = await prisma.event.findMany({
         where: {
             requestStatus: "APPROVED",
             endRegistration: { gt: now },
-            start: { gt: now, lt: addHours(now, 24) },
+            start: {
+                gt: now,
+                lt: twentyFourHoursLater, // Используем вычисленную дату
+            },
         },
         select: {
             id: true,
@@ -60,25 +60,27 @@ export async function GET(req: NextRequest) {
     });
 
     const result = events.map((event) => {
-        const tgIds: string[] = [];
+        const tgIds = new Set<string>(); // Используем Set для автоматического удаления дубликатов
 
-        for (const team of event.teams) {
-            for (const a of team.athletes) {
-                const tg = a.athlete.user.tg;
-                if (tg) tgIds.push(tg);
+        event.teams.forEach((team) => {
+            team.athletes.forEach((a) => {
+                if (a.athlete.user.tg) {
+                    tgIds.add(a.athlete.user.tg);
+                }
+            });
+        });
+
+        event.representative.forEach((rep) => {
+            if (rep.representative.user.tg) {
+                tgIds.add(rep.representative.user.tg);
             }
-        }
-
-        for (const rep of event.representative) {
-            const tg = rep.representative.user.tg;
-            if (tg) tgIds.push(tg);
-        }
+        });
 
         return {
             id: event.id,
             name: event.name,
             start: event.start,
-            tgIds: Array.from(new Set(tgIds)), // ✅ уникальные ID
+            tgIds: Array.from(tgIds), // Конвертируем Set в массив
         };
     });
 
