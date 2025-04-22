@@ -1,5 +1,3 @@
-import axios from "axios";
-
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/prisma";
@@ -11,6 +9,11 @@ interface User {
 interface LinkTelegramRequest {
     tg: string;
     userId: string;
+}
+
+interface TelegramSendMessageParams {
+    chat_id: string | number;
+    text: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -52,11 +55,16 @@ export async function POST(req: NextRequest) {
         const apiUrl = `https://api.telegram.org/bot${token}/sendMessage`;
         console.log("Calling Telegram API:", apiUrl, "chat_id=", tg);
 
-        await axios.post(apiUrl, {
-            chat_id: tg,
-            text: "✅ Ваш Telegram‑аккаунт успешно привязан!",
+        await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: tg,
+                text: "✅ Ваш Telegram‑аккаунт успешно привязан!",
+            } as TelegramSendMessageParams),
         });
-
         return NextResponse.json({ success: true });
     } catch (error: unknown) {
         // Обрабатываем ошибку
