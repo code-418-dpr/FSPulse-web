@@ -1,3 +1,5 @@
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
+
 export interface RawEvent {
     name: string;
     description: string;
@@ -14,9 +16,8 @@ export interface RawEvent {
     isOnline: boolean;
     address?: string;
     awards: number[];
-    level: "OPEN" | "REGIONAL" | "FEDERAL";
-    status: "PENDING" | "DECLINED" | "APPROVED";
-    duration: number;
+    level: EventLevel;
+    status: RequestStatus;
     isPersonalFormatAllowed: boolean;
 }
 
@@ -39,7 +40,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "PENDING",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -60,7 +60,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "PENDING",
-        duration: 1,
         isPersonalFormatAllowed: false,
     },
     {
@@ -81,7 +80,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -102,7 +100,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -123,7 +120,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -144,7 +140,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "FEDERAL",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -165,7 +160,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -186,7 +180,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -207,7 +200,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "FEDERAL",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -228,7 +220,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -249,7 +240,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -270,7 +260,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -291,7 +280,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "FEDERAL",
         status: "PENDING",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -312,7 +300,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -333,7 +320,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -354,7 +340,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -375,7 +360,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "REGIONAL",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -396,7 +380,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "APPROVED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
     {
@@ -417,7 +400,6 @@ const events: RawEvent[] = [
         awards: [1, 2, 3],
         level: "OPEN",
         status: "DECLINED",
-        duration: 1,
         isPersonalFormatAllowed: true,
     },
 ];

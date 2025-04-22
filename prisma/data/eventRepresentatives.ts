@@ -1,78 +1,74 @@
 const eventRepresentatives = [
     {
-        representativeEmail: "ivanov@example.com",
+        representativeEmail: "stankov@example.com", // Игорь Станков
         eventName: "Алгоритмический турнир Junior Cup",
     },
     {
-        representativeEmail: "petrov@example.com",
+        representativeEmail: "lobanov@example.com", // Святослав Лобанов
         eventName: "РобоБаттл: Лига инженеров",
     },
     {
-        representativeEmail: "sidorov@example.com",
+        representativeEmail: "alexey@example.com", // Алексей Петров
         eventName: "Хакатон цифровых решений",
     },
     {
-        representativeEmail: "volkov@example.com",
+        representativeEmail: "sokolov@example.com", // Михаил Соколов
         eventName: "Весенний кодинг-марафон",
     },
     {
-        representativeEmail: "kuznetsova@example.com",
+        representativeEmail: "morozova@example.com", // Виктория Морозова
         eventName: "AI Challenge: Искусственный интеллект в деле",
     },
     {
-        representativeEmail: "smirnova@example.com",
+        representativeEmail: "kozlov@example.com", // Иван Козлов
         eventName: "Соревнование по кибербезопасности SecureCode",
     },
     {
-        representativeEmail: "leonov@example.com",
+        representativeEmail: "stankov@example.com", // Игорь Станков
         eventName: "Frontend Fest: React & Design",
     },
     {
-        representativeEmail: "egorova@example.com",
+        representativeEmail: "lobanov@example.com", // Святослав Лобанов
         eventName: "Backend Brawl: API Edition",
     },
     {
-        representativeEmail: "nikitin@example.com",
+        representativeEmail: "alexey@example.com", // Алексей Петров
         eventName: "DevOps Days: Автоматизация и CI/CD",
     },
     {
-        representativeEmail: "morozov@example.com",
+        representativeEmail: "sokolov@example.com", // Михаил Соколов
         eventName: "Quantum Hack: Квантовые вычисления",
     },
     {
-        representativeEmail: "frolova@example.com",
+        representativeEmail: "morozova@example.com", // Виктория Морозова
         eventName: "Autonomous Air: Дроны и миссии",
     },
     {
-        representativeEmail: "zakharov@example.com",
+        representativeEmail: "kozlov@example.com", // Иван Козлов
         eventName: "ML Battle: Обучение с подкреплением",
     },
     {
-        representativeEmail: "nikiforova@example.com",
-        eventName: "Game Jam: Создай свою игру за 48 часов",
-    },
-    {
-        representativeEmail: "gusev@example.com",
+        representativeEmail: "stankov@example.com", // Игорь Станков
         eventName: "Cloud Clash: Работа с AWS и GCP",
     },
     {
-        representativeEmail: "vasilyeva@example.com",
-        eventName: "Mobile Dev Cup: Android & iOS",
-    },
-    {
-        representativeEmail: "morozova@example.com",
+        representativeEmail: "stankov@example.com", // Игорь Станков
         eventName: "Арена ИИ: Генеративные сети",
     },
     {
-        representativeEmail: "stepanov@example.com",
+        representativeEmail: "lobanov@example.com", // Святослав Лобанов
+        eventName: "Арена ИИ: Генеративные сети",
+    },
+    {
+        representativeEmail: "morozova@example.com", // Виктория Морозова
+        eventName: "Арена ИИ: Генеративные сети",
+    },
+    {
+        representativeEmail: "kozlov@example.com", // Иван Козлов
         eventName: "Green Tech Hack: Устойчивое будущее",
     },
     {
-        representativeEmail: "volkova@example.com",
-        eventName: "Code & Coffee: Онлайн кодинг ночь",
-    },
-    {
-        representativeEmail: "solovyov@example.com",
+        representativeEmail: "alexey@example.com", // Алексей Петров
         eventName: "Data Science Штурм",
     },
 ];
