@@ -16,7 +16,7 @@ interface SearchRepresentativeRequestsParams {
 async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
     const { page, pageSize, query, disciplineId, minApplicationTime, maxApplicationTime, level, requestStatus } =
         params;
-    return prisma.event.findMany({
+    const results = await prisma.event.findMany({
         where: {
             AND: [
                 query
@@ -45,6 +45,8 @@ async function searchRepresentativeRequests(params: SearchRepresentativeRequests
         take: pageSize,
         orderBy: { applicationTime: "desc" },
     });
+    const totalItems = await prisma.event.count();
+    return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
 }
 
 export interface EventSummary {
