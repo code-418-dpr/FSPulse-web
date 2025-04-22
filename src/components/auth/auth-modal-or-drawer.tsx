@@ -99,9 +99,7 @@ function Register() {
         } else {
             const stringKeys = new Set<string>();
             (keys as Set<string>).forEach((key) => {
-                if (typeof key === "string") {
-                    stringKeys.add(key);
-                }
+                stringKeys.add(key);
             });
             setSelectedKeys(stringKeys);
         }

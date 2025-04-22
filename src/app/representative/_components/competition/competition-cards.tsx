@@ -12,10 +12,6 @@ import CompetitionDialogOrDrawer from "./competition-modal-or-drawer";
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
 interface Props {
     paginatedData: CompetitionItem[];
 }

@@ -12,7 +12,7 @@
         "prepare": "bun run --bun husky",
         "db:gen": "bun run prisma generate",
         "db:push": "bun run prisma db push",
-        "seed:core": "bun prisma/seed.ts",
+        "db:seed": "bun prisma/seed.ts",
         "db:studio": "bun run prisma studio"
     },
     "prisma": {

@@ -117,10 +117,11 @@ model AthleteOfTeam {
 }
 
 model Team {
-  id      String @id @default(uuid())
+  id      String  @id @default(uuid())
   name    String
   eventId String
   score   Int?
+  isReady Boolean @default(false)
 
   event    Event           @relation(fields: [eventId], references: [id])
   athletes AthleteOfTeam[]
@@ -139,24 +140,27 @@ enum EventLevel {
 }
 
 model Event {
-  id                   String      @id @default(uuid())
-  name                 String
-  description          String
-  cover                Bytes       @db.ByteA
-  applicationTime      DateTime    @default(now())
-  startRegistration    DateTime
-  endRegistration      DateTime
-  start                DateTime
-  end                  DateTime
-  minAge               Int         @db.SmallInt
-  maxAge               Int         @db.SmallInt
-  maxParticipantsCount Int         @db.SmallInt
-  disciplineId         String
-  isOnline             Boolean
-  address              String?
-  awards               Int[]       @db.SmallInt
-  level                EventLevel
-  status               EventStatus @default(PENDING)
+  id                      String      @id @default(uuid())
+  name                    String
+  description             String
+  cover                   Bytes       @db.ByteA
+  applicationTime         DateTime    @default(now())
+  startRegistration       DateTime
+  endRegistration         DateTime
+  start                   DateTime
+  end                     DateTime
+  minAge                  Int         @db.SmallInt
+  maxAge                  Int         @db.SmallInt
+  duration                Int         @db.SmallInt
+  teamParticipantsLimits  Int[]       @db.SmallInt
+  isPersonalFormatAllowed Boolean
+  maxParticipantsCount    Int         @db.SmallInt
+  disciplineId            String
+  isOnline                Boolean
+  address                 String?
+  awards                  Int[]       @db.SmallInt
+  level                   EventLevel
+  status                  EventStatus @default(PENDING)
 
   discipline      Discipline              @relation(fields: [disciplineId], references: [id])
   representatives EventOfRepresentative[]
