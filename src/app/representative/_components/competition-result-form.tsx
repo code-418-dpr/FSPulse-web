@@ -21,7 +21,7 @@ const initialTeams: TeamGrade[] = [
     { team: "Код 118", grade: 0 },
 ];
 
-export default function SpokesmanSignupForm({ className }: React.ComponentProps<"form">) {
+export default function CompetitionResultForm({ className }: React.ComponentProps<"form">) {
     const [teams, setTeams] = useState<TeamGrade[]>(initialTeams);
     const [isLoading, setIsLoading] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
@@ -69,7 +69,9 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                         type="number"
                         variant="bordered"
                         value={team.grade.toString()}
-                        onChange={(e) => { handleGradeChange(index, e.target.value); }}
+                        onChange={(e) => {
+                            handleGradeChange(index, e.target.value);
+                        }}
                         min="0"
                         step="1"
                     />
