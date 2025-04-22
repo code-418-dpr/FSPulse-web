@@ -1,12 +1,14 @@
 "use client";
 
-import axios from "axios";
-
 import { useEffect } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAuth } from "@/hooks/use-auth";
+
+interface ErrorResponse {
+    message?: string;
+}
 
 export default function TelegramLinkPage() {
     const searchParams = useSearchParams();
@@ -20,20 +22,28 @@ export default function TelegramLinkPage() {
 
         console.log(user);
 
-        axios
-            .post("/api/link-telegram", {
+        fetch("/api/link-telegram", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
                 tg,
                 userId: user.id,
-            })
-            .then(() => {
+            }),
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    const errorData = (await response.json()) as ErrorResponse;
+                    throw new Error(errorData.message ?? "Ошибка при привязке Telegram");
+                }
                 router.push("/profile");
             })
             .catch((err: unknown) => {
-                // Changed type of 'err' to 'unknown'
                 if (err instanceof Error) {
                     console.error("Ошибка при привязке Telegram:", err.message);
                 } else {
-                    console.error("Неизвестная ошибка:", err);
+                    console.error("Неизвестная ошибка:", String(err));
                 }
             });
     }, [searchParams, user, isAuthenticated, isLoading, router]);
