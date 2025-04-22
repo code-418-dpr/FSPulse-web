@@ -6,12 +6,9 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { SportsCategory } from "@/app/generated/prisma";
-import PasswordInput from "@/components/password-input";
-import { registerUser } from "@/data/auth";
 import { getCategoryLabel } from "@/data/get-category-label";
 import { getRegions } from "@/data/region";
 import { baseUserSchema } from "@/schemas/base-user-schema";
@@ -25,22 +22,10 @@ const sportsCategoryOptions = Object.values(SportsCategory).map((key) => ({
     label: getCategoryLabel(key),
 }));
 
-const userSchema = baseUserSchema
-    .extend({
-        password: z
-            .string()
-            .min(6, "Пароль должен содержать минимум 6 символов")
-            .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
-            .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
-        passwordRepeat: z.string(),
-    })
-    .refine((data) => data.password === data.passwordRepeat, {
-        message: "Пароли не совпадают",
-        path: ["passwordRepeat"],
-    });
+const userSchema = baseUserSchema;
 
 type UserFormData = z.infer<typeof userSchema>;
-export default function UserSignupForm({ className }: React.ComponentProps<"form">) {
+export default function UserEditForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
     const [regions, setRegions] = useState<RegionOption[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
@@ -73,6 +58,12 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
             setIsLoading(true);
             setFormError(null);
 
+            // моки чтоб не удалять data и async
+            console.log(data);
+            await new Promise((resolve) => {
+                setTimeout(resolve, 100);
+            });
+            /*
             const athlete = await registerUser({
                 ...data,
                 role: "athlete",
@@ -89,6 +80,8 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
             if (signInResult?.error) {
                 throw new Error(signInResult.error);
             }
+             */
+
             router.push("/");
             router.refresh();
         } catch (error) {
@@ -212,20 +205,9 @@ export default function UserSignupForm({ className }: React.ComponentProps<"form
                     isInvalid={!!errors.phoneNumber}
                     errorMessage={errors.phoneNumber?.message}
                 />
-                <PasswordInput
-                    {...register("password")}
-                    isInvalid={!!errors.password}
-                    errorMessage={errors.password?.message}
-                />
-                <PasswordInput
-                    label="Повторите пароль"
-                    {...register("passwordRepeat")}
-                    isInvalid={!!errors.passwordRepeat}
-                    errorMessage={errors.passwordRepeat?.message}
-                />
                 {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
-                    Регистрация
+                    Сохранить изменения
                 </Button>
             </div>
         </form>

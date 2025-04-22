@@ -72,7 +72,7 @@ export default function EventCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer label="Соревнование" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                     <EventDetails event={selected} />
                 </ModalOrDrawer>
             )}

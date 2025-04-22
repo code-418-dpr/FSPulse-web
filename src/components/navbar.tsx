@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AuthForm from "@/components/auth/auth-form";
+import UserEditForm from "@/components/edit-forms/user-edit-form";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import { Tab } from "@/types";
@@ -107,7 +108,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                 radius="sm"
                                 shouldBlockScroll={false}
                             >
-                                <DropdownTrigger>
+                                <DropdownTrigger className="cursor-pointer">
                                     <Avatar
                                         showFallback
                                         src="https://images.unsplash.com/broken"
@@ -154,7 +155,14 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                         </DropdownItem>
                                     </DropdownSection>
                                     <DropdownSection aria-label="Settings & Logout">
-                                        <DropdownItem key="settings">Настройки</DropdownItem>
+                                        <DropdownItem
+                                            key="settings"
+                                            onPress={() => {
+                                                onOpen();
+                                            }}
+                                        >
+                                            Настройки
+                                        </DropdownItem>
                                         <DropdownItem
                                             key="logout"
                                             className="text-danger data-[hover=true]:text-danger data-[focus-visible=true]:text-danger"
@@ -167,6 +175,9 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                     </DropdownSection>
                                 </DropdownMenu>
                             </Dropdown>
+                            <ModalOrDrawer label="Редактирование" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                                <UserEditForm />
+                            </ModalOrDrawer>
                         </div>
                     ) : (
                         <>
@@ -180,7 +191,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                             >
                                 Вход
                             </Button>
-                            <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                            <ModalOrDrawer label="Авторизация" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                                 <AuthForm />
                             </ModalOrDrawer>
                         </>

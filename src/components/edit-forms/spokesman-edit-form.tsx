@@ -6,30 +6,15 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import PasswordInput from "@/components/password-input";
-import { registerUser } from "@/data/auth";
 import { getRegions } from "@/data/region";
 import { baseSpokesmanSchema } from "@/schemas/base-spokesman-schema";
 import { RegionOption } from "@/types/region";
 import { Autocomplete, AutocompleteItem, Button, Input, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const userSchema = baseSpokesmanSchema
-    .extend({
-        password: z
-            .string()
-            .min(6, "Пароль должен содержать минимум 6 символов")
-            .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
-            .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
-        passwordRepeat: z.string(),
-    })
-    .refine((data) => data.password === data.passwordRepeat, {
-        message: "Пароли не совпадают",
-        path: ["passwordRepeat"],
-    });
+const userSchema = baseSpokesmanSchema;
 
 export default function SpokesmanSignupForm({ className }: React.ComponentProps<"form">) {
     const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +50,12 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
             setIsLoading(true);
             setFormError(null);
 
+            // моки чтоб не удалять data и async
+            console.log(data);
+            await new Promise((resolve) => {
+                setTimeout(resolve, 100);
+            });
+            /*
             const result = await registerUser({
                 ...data,
                 role: "representative",
@@ -80,6 +71,7 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
             if (signInResult?.error) {
                 throw new Error(signInResult.error);
             }
+             */
 
             router.push("/");
             router.refresh();
@@ -163,20 +155,9 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                     isInvalid={!!errors.email}
                     errorMessage={errors.email?.message}
                 />
-                <PasswordInput
-                    {...register("password")}
-                    isInvalid={!!errors.password}
-                    errorMessage={errors.password?.message}
-                />
-                <PasswordInput
-                    label="Повторите пароль"
-                    {...register("passwordRepeat")}
-                    isInvalid={!!errors.passwordRepeat}
-                    errorMessage={errors.passwordRepeat?.message}
-                />
                 {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
-                    Регистрация
+                    Сохранить изменения
                 </Button>
             </div>
         </form>

@@ -64,7 +64,7 @@ export default function TeamCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer label="Участник сборной" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                     <TeamDetails team={selected} />
                 </ModalOrDrawer>
             )}

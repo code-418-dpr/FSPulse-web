@@ -54,6 +54,97 @@ export async function searchRepresentativeRequests(params: SearchRepresentativeR
     return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
 }
 
+interface SearchRepresentativeEventsParams {
+    page: number;
+    pageSize: number;
+    representativeId: string;
+    query?: string;
+    disciplineId?: string;
+    minStartTime?: Date;
+    maxStartTime?: Date;
+    level?: EventLevel;
+    minAge?: number;
+    maxAge?: number;
+    isOnline?: boolean;
+    isTeamFormatAllowed?: boolean;
+    isPersonalFormatAllowed?: boolean;
+}
+
+export async function searchRepresentativeEvents(params: SearchRepresentativeEventsParams) {
+    const {
+        page,
+        pageSize,
+        representativeId,
+        query,
+        disciplineId,
+        minStartTime,
+        maxStartTime,
+        level,
+        minAge,
+        maxAge,
+        isOnline,
+        isTeamFormatAllowed,
+        isPersonalFormatAllowed,
+    } = params;
+    const requiredWhere = {
+        representative: {
+            some: { representativeId },
+        },
+        requestStatus: RequestStatus.APPROVED,
+    };
+    const results = await prisma.event.findMany({
+        where: {
+            AND: [
+                requiredWhere,
+                query
+                    ? {
+                          OR: [
+                              { name: { contains: query, mode: "insensitive" } },
+                              { description: { contains: query, mode: "insensitive" } },
+                          ],
+                      }
+                    : {},
+                disciplineId ? { disciplineId } : {},
+                minStartTime || maxStartTime
+                    ? {
+                          start: {
+                              gte: minStartTime,
+                          },
+                          end: {
+                              lte: maxStartTime,
+                          },
+                      }
+                    : {},
+                level ? { level } : {},
+                minAge || maxAge
+                    ? {
+                          minAge: {
+                              gte: minAge,
+                          },
+                          maxAge: {
+                              lte: maxAge,
+                          },
+                      }
+                    : {},
+                isOnline ? { isOnline } : {},
+                isTeamFormatAllowed
+                    ? {
+                          minTeamParticipantsCount: { gt: 0 },
+                          maxTeamParticipantsCount: { gt: 0 },
+                      }
+                    : {},
+                isPersonalFormatAllowed ? { isPersonalFormatAllowed } : {},
+            ],
+        },
+        select: { id: true, name: true, cover: true, requestStatus: true, level: true, applicationTime: true },
+        skip: pageSize * (page - 1),
+        take: pageSize,
+        orderBy: { applicationTime: "desc" },
+    });
+    const totalItems = await prisma.event.count({ where: requiredWhere });
+    return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
+}
+
 export async function getRepresentativeRequestById(id: string) {
     return prisma.event.findUnique({
         where: { id },

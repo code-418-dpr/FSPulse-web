@@ -66,7 +66,7 @@ export default function AchievementCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer label="Достижение" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                     <AchievementDetails achievement={selected} />
                 </ModalOrDrawer>
             )}

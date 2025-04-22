@@ -95,11 +95,18 @@ model SkillOfAthlete {
   @@unique([athleteId, skillId])
 }
 
+enum Membership {
+  MAIN
+  RESERVE
+  EX
+}
+
 model Athlete {
   id            String          @id
   birthDate     DateTime        @db.Date()
   address       String
   sportCategory SportsCategory?
+  membership    Membership      @default(EX)
   github        String?         @unique
 
   user  User             @relation(fields: [id], references: [id])
