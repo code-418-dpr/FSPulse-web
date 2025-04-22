@@ -1,14 +1,17 @@
 import { createAgeGroups } from "@/data/age-group";
 import { createDisciplines } from "@/data/discipline";
 import { createRegions } from "@/data/region";
+import { createSkills } from "@/data/skill";
 import prisma from "@/lib/prisma";
 
-import ageGroups from "./data/age-group";
+import ageGroups from "./data/age-groups";
 import disciplines from "./data/disciplines";
 import regionNames from "./data/regions";
+import skillNames from "./data/skills";
 
 export async function main() {
     await createRegions(regionNames);
+    await createSkills(skillNames);
     const allDisciplines = await createDisciplines(disciplines);
     const allAgeGroups = await createAgeGroups(ageGroups);
 
