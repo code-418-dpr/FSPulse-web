@@ -73,6 +73,7 @@ export default function CompetitionResultForm({ className }: React.ComponentProp
                             handleGradeChange(index, e.target.value);
                         }}
                         min="0"
+                        max="300"
                         step="1"
                     />
                 ))}
