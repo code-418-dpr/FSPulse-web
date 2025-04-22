@@ -4,37 +4,44 @@ import * as React from "react";
 
 import { SearchForm } from "@/app/representative/_components/search/search-form";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import type { SearchParams } from "@/types/search";
 import { Card, CardBody, CardHeader, useDisclosure } from "@heroui/react";
 import { Button, Drawer, DrawerBody, DrawerContent, DrawerHeader } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
+// Убедитесь что тип определен
+
 interface Props {
-    isOpen: boolean;
-    onOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
+    onSearch: (params: SearchParams) => void;
 }
 
-export function SearchCardOrDrawer() {
+export function SearchCardOrDrawer({ onSearch }: Props) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
-    return isDesktop ? SearchCard() : SearchDrawer({ isOpen, onOpen, onOpenChange });
+    return isDesktop ? SearchCard({ onSearch }) : SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch });
 }
 
-function SearchCard() {
+function SearchCard({ onSearch }: { onSearch: Props["onSearch"] }) {
     return (
         <div className="w-full p-4 sm:w-1/4">
             <Card className="sticky top-20">
                 <CardHeader className="text-xl">Поиск</CardHeader>
                 <CardBody>
-                    <SearchForm />
+                    <SearchForm onSubmit={onSearch} />
                 </CardBody>
             </Card>
         </div>
     );
 }
 
-function SearchDrawer({ isOpen, onOpen, onOpenChange }: Props) {
+interface DrawerProps extends Props {
+    isOpen: boolean;
+    onOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch }: DrawerProps) {
     return (
         <>
             <Button
@@ -52,7 +59,7 @@ function SearchDrawer({ isOpen, onOpen, onOpenChange }: Props) {
                 <DrawerContent className="p-4">
                     <DrawerHeader className="text-center text-2xl">Поиск</DrawerHeader>
                     <DrawerBody>
-                        <SearchForm />
+                        <SearchForm onSubmit={onSearch} />
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>

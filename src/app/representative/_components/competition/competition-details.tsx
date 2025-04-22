@@ -1,7 +1,11 @@
 "use client";
 
+import React from "react";
+
+import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import { CompetitionItem } from "@/types";
-import { Chip, Image } from "@heroui/react";
+import { Button, Chip, Image, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 interface Props {
@@ -9,6 +13,8 @@ interface Props {
 }
 
 export default function CompetitionDetails({ competition }: Props) {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     return (
         <>
             <h3 className="text-2xl font-bold">{competition.title}</h3>
@@ -61,6 +67,12 @@ export default function CompetitionDetails({ competition }: Props) {
                     <p className="pt-1 text-left text-sm">Дисциплина:</p>
                     <p className="col-span-2 pt-1 text-right text-sm">{competition.discipline}</p>
                 </div>
+
+                <Button onPress={onOpen}>Распределить баллы</Button>
+
+                <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                    <CompetitionResultForm />
+                </ModalOrDrawer>
             </div>
         </>
     );

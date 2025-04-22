@@ -13,55 +13,13 @@ import { SearchCardOrDrawer } from "@/app/representative/_components/search/sear
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
+import { searchRepresentativeRequests } from "@/data/event";
 import { useAuth } from "@/hooks/use-auth";
-import { AchievementItem, CompetitionItem, EventItem, Tab, TeamItem } from "@/types";
+import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
+import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { CircularProgress } from "@heroui/react";
 
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
+import { RequestStatus } from "../generated/prisma";
 
 // src/app/representative/page.tsx
 
@@ -76,17 +34,20 @@ interface Paged<T> {
 }
 
 export default function RequestsPage() {
+    const { isAuthenticated, isLoading, user } = useAuth();
+    const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
+        requestStatus: RequestStatus.PENDING,
+    });
+    const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
+    const [isRequestsLoading, setIsRequestsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [activeTab, setActiveTab] = useState<Tab>("requests");
-    const [competitionsData, setCompetitionsData] = useState<Paged<CompetitionItem> | null>(null);
-    const [isCompLoading, setIsCompLoading] = useState(false);
     const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
     const [isEventLoading, setIsEventLoading] = useState(false);
     const [teamData, setTeamData] = useState<Paged<TeamItem> | null>(null);
     const [isTeamLoading, setIsTeamLoading] = useState(false);
     const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
     const [isAchievementLoading, setIsAchievementLoading] = useState(false);
-    const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -110,17 +71,44 @@ export default function RequestsPage() {
 
     // load competitions when on "requests"
     useEffect(() => {
-        if (activeTab !== "requests") return;
-        setIsCompLoading(true);
-        void fetch(`/api/competitions?page=${page}&pageSize=${perPage}`)
-            .then((r) => r.json())
-            .then((json: Paged<CompetitionItem>) => {
-                setCompetitionsData(json);
-            })
-            .finally(() => {
-                setIsCompLoading(false);
-            });
-    }, [activeTab, page]);
+        if (activeTab !== "requests" || !user?.id) return;
+        console.log(user.id);
+        const loadRequests = async () => {
+            setIsRequestsLoading(true);
+            try {
+                const params = {
+                    ...searchParamsState,
+                    representativeId: user.id,
+                    page,
+                    pageSize: perPage,
+                };
+                console.log("Параметры поиска: ", params);
+                const result = await searchRepresentativeRequests(params);
+                console.log("Результат: ", result);
+                setRequestsData({
+                    items: result.results,
+                    pagination: {
+                        page,
+                        pageSize: perPage,
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading requests:", error);
+            } finally {
+                setIsRequestsLoading(false);
+            }
+        };
+
+        void loadRequests();
+    }, [activeTab, page, searchParamsState, user?.id]);
+
+    // Обработчик поиска
+    const handleSearch = (params: SearchParams) => {
+        setSearchParamsState(params);
+        setPage(1);
+    };
 
     // load events when on "events"
     useEffect(() => {
@@ -162,8 +150,8 @@ export default function RequestsPage() {
             });
     }, [activeTab, page]);
 
-    const compPageItems = competitionsData?.items ?? [];
-    const totalCompPages = competitionsData?.pagination.totalPages ?? 1;
+    const compPageItems = requestsData?.items ?? [];
+    const totalCompPages = requestsData?.pagination.totalPages ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
@@ -188,12 +176,12 @@ export default function RequestsPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <SearchCardOrDrawer />
+                <SearchCardOrDrawer onSearch={handleSearch} />
 
                 {/* Main */}
                 {activeTab === "requests" && (
-                    <MainCards<CompetitionItem>
-                        isLoading={isCompLoading}
+                    <MainCards<RepresentativeRequestItem>
+                        isLoading={isRequestsLoading}
                         pageItems={compPageItems}
                         totalPages={totalCompPages}
                         page={page}
