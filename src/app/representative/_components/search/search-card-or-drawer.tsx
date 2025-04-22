@@ -38,7 +38,7 @@ function SearchDrawer({ isOpen, onOpen, onOpenChange }: Props) {
     return (
         <>
             <Button
-                variant="outline"
+                variant="bordered"
                 className="m-4 h-12 w-12"
                 onPress={() => {
                     onOpen(true);
@@ -48,7 +48,7 @@ function SearchDrawer({ isOpen, onOpen, onOpenChange }: Props) {
                     <Icon icon="iconoir:search" width={18} height={18} className="mr-1" />
                 </span>
             </Button>
-            <Drawer placement="bottom" open={isOpen} onOpenChange={onOpenChange}>
+            <Drawer placement="bottom" isOpen={isOpen} onOpenChange={onOpenChange}>
                 <DrawerContent className="p-4">
                     <DrawerHeader className="text-center text-2xl">Поиск</DrawerHeader>
                     <DrawerBody>
