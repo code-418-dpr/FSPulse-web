@@ -12,6 +12,7 @@ import {
     Form,
     Switch,
 } from "@heroui/react";
+import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 export function SearchForm() {
@@ -32,21 +33,22 @@ export function SearchForm() {
     );
 
     const handleSelectionStatusChange = (keys: Selection) => {
-        if (keys === "all" || (keys instanceof Set && keys.size === 0)) {
+        if (keys === "all") {
             setSelectedStatusKeys(new Set(["На рассмотрении", "Принята", "Отклонена"]));
-        } else if (keys instanceof Set) {
-            const stringKeys = new Set<string>();
-            keys.forEach((key) => {
-                if (typeof key === "string") {
-                    stringKeys.add(key);
-                }
-            });
-            setSelectedStatusKeys(stringKeys);
+            return;
         }
+
+        const stringKeys = new Set<string>();
+        keys.forEach((key) => {
+            if (typeof key === "string") {
+                stringKeys.add(key);
+            }
+        });
+        setSelectedStatusKeys(stringKeys);
     };
 
     const handleSelectionDisciplineChange = (keys: Selection) => {
-        if (keys === "all" || (keys instanceof Set && keys.size === 0)) {
+        if (keys === "all") {
             setSelectedDisciplineKeys(
                 new Set([
                     "Продуктовое программирование",
@@ -55,15 +57,16 @@ export function SearchForm() {
                     "Робототехника",
                 ]),
             );
-        } else if (keys instanceof Set) {
-            const stringKeys = new Set<string>();
-            keys.forEach((key) => {
-                if (typeof key === "string") {
-                    stringKeys.add(key);
-                }
-            });
-            setSelectedDisciplineKeys(stringKeys);
+            return;
         }
+
+        const stringKeys = new Set<string>();
+        keys.forEach((key) => {
+            if (typeof key === "string") {
+                stringKeys.add(key);
+            }
+        });
+        setSelectedDisciplineKeys(stringKeys);
     };
 
     return (
