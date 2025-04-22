@@ -15,42 +15,31 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 try {
-                    const { email, password } = credentials ?? {};
-                    if (!email || !password) {
-                        throw new Error("Пожалуйста, введите email и пароль");
-                    }
+                    if (!credentials?.email || !credentials.password) return null;
 
-                    // 1. Проверка — атлет
-                    const athlete = await prisma.athlete.findUnique({
-                        where: { email },
+                    const user = await prisma.user.findUnique({
+                        where: { email: credentials.email },
+                        include: {
+                            athlete: true,
+                            representative: true,
+                        },
                     });
 
-                    if (athlete && (await bcrypt.compare(password, athlete.password))) {
-                        return {
-                            id: athlete.id,
-                            email: athlete.email,
-                            role: "athlete" as const,
-                            name: `${athlete.firstname} ${athlete.lastname}`,
-                        };
+                    if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+                        throw new Error("Неверный email или пароль");
                     }
 
-                    // 2. Проверка — представитель
-                    const representative = await prisma.representative.findUnique({
-                        where: { email },
-                    });
+                    let role: "athlete" | "representative" = "athlete";
+                    if (user.representative.length > 0) role = "representative";
 
-                    if (representative && (await bcrypt.compare(password, representative.password))) {
-                        return {
-                            id: representative.id,
-                            email: representative.email,
-                            role: "representative" as const,
-                            name: `${representative.firstname} ${representative.lastname}`,
-                        };
-                    }
-
-                    return null;
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: `${user.firstname} ${user.lastname}`,
+                        role,
+                    };
                 } catch (error) {
-                    console.error("Ошибка авторизации:", error);
+                    console.error("Auth error:", error);
                     return null;
                 }
             },

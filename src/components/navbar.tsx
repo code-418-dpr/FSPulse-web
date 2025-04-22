@@ -5,11 +5,13 @@ import React, { useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import AuthDialogOrDrawer from "@/components/auth/auth-modal-or-drawer";
+import AuthForm from "@/components/auth/auth-form";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import { Tab } from "@/types";
 import {
     Avatar,
+    Button,
     Dropdown,
     DropdownItem,
     DropdownMenu,
@@ -24,17 +26,11 @@ import {
     PressEvent,
     Spinner,
     User,
+    useDisclosure,
 } from "@heroui/react";
+import { Icon } from "@iconify/react";
 
 import { ThemeSwitcher } from "./theme-switcher";
-
-// src/components/navbar.tsx
-
-// src/components/navbar.tsx
-
-// src/components/navbar.tsx
-
-// src/components/navbar.tsx
 
 interface NavbarProps {
     activeTab: Tab;
@@ -45,6 +41,8 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isLoading, isAuthenticated } = useAuth();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     const handleNavigation = (e: PressEvent, tab: Tab) => {
         router.push(`/representative?tab=${tab}`);
         setActiveTab(tab);
@@ -169,7 +167,21 @@ export default function NavbarElement({ activeTab, setActiveTab }: NavbarProps) 
                             </Dropdown>
                         </div>
                     ) : (
-                        <AuthDialogOrDrawer />
+                        <>
+                            <Button
+                                onPress={() => {
+                                    onOpen(true);
+                                }}
+                                color="primary"
+                                variant="flat"
+                                startContent={<Icon icon="lucide:user" />}
+                            >
+                                Login
+                            </Button>
+                            <ModalOrDrawer isOpen={isOpen} onOpenChange={onOpenChange}>
+                                <AuthForm />
+                            </ModalOrDrawer>
+                        </>
                     )}
                 </NavbarItem>
                 <NavbarItem>
