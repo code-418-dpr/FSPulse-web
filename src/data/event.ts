@@ -1,17 +1,7 @@
-import { EventLevel, RequestStatus } from "@/app/generated/prisma";
-import prisma from "@/lib/prisma";
+"use server";
 
-interface SearchRepresentativeRequestsParams {
-    page: number;
-    pageSize: number;
-    representativeId: string;
-    query?: string;
-    disciplineId?: string;
-    minApplicationTime?: Date;
-    maxApplicationTime?: Date;
-    level?: EventLevel;
-    requestStatus?: RequestStatus;
-}
+import prisma from "@/lib/prisma";
+import { SearchRepresentativeRequestsParams } from "@/types/search";
 
 export async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
     const {

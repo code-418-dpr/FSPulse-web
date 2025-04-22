@@ -1,31 +1,39 @@
-
 import { EventLevel, RequestStatus } from "@/app/generated/prisma";
-import { DateValue } from "@internationalized/date";
 
-// Базовые параметры поиска (без пагинации и representativeId)
 export interface SearchParams {
-  query?: string;
-  disciplineIds?: string[];
-  levels?: EventLevel[];
-  statuses?: RequestStatus[];
-  dateRange?: {
-    start?: DateValue;
-    end?: DateValue;
-  };
+    query?: string;
+    disciplineId?: string; // Изменили на одиночное значение
+    level?: EventLevel; // Изменили на одиночное значение
+    requestStatus?: RequestStatus; // Изменили на одиночное значение
+    dateRange?: {
+        start?: Date;
+        end?: Date;
+    };
 }
 
-// Полные параметры для функции searchRepresentativeRequests
-export interface SearchRepresentativeRequestsParams extends SearchParams {
-  representativeId: string;
-  page: number;
-  pageSize: number;
-  minApplicationTime?: Date;
-  maxApplicationTime?: Date;
+export interface Paged<T> {
+    results: T[];
+    totalItems: number;
+    totalPages: number;
 }
 
-// Тип для ответа от searchRepresentativeRequests
-export interface SearchRepresentativeRequestsResult<T = unknown> {
-  results: T[];
-  totalItems: number;
-  totalPages: number;
+export interface SearchRepresentativeRequestsParams {
+    page: number;
+    pageSize: number;
+    representativeId: string;
+    query?: string;
+    disciplineId?: string;
+    minApplicationTime?: Date;
+    maxApplicationTime?: Date;
+    level?: EventLevel;
+    requestStatus?: RequestStatus;
+}
+
+export interface RepresentativeRequestItem {
+    id: string;
+    name: string;
+    cover: Uint8Array;
+    applicationTime: Date;
+    level: EventLevel;
+    requestStatus: RequestStatus;
 }

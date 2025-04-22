@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import { getDisciplines } from "@/data/discipline";
+import { SearchParams } from "@/types/search";
 import {
     Button,
     DateRangePicker,
@@ -16,31 +17,48 @@ import {
 } from "@heroui/react";
 import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
-import { SearchRepresentativeRequestsParams } from "@/types/search";
 
-export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentativeRequestsParams) => void }) {
-    const [selectedStatus, setSelectedStatus] = React.useState<Set<string>>(new Set([RequestStatus.PENDING]));
-    const [selectedDiscipline, setSelectedDiscipline] = React.useState<Set<string>>(new Set());
-    const [selectedLevel, setSelectedLevel] = React.useState<Set<string>>(new Set());
+export function SearchForm({ onSubmit }: { onSubmit: (params: SearchParams) => void }) {
+    const [query, setQuery] = useState("");
+    const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.PENDING);
+    const [selectedDiscipline, setSelectedDiscipline] = React.useState<string>();
+    const [selectedLevel, setSelectedLevel] = React.useState<string>();
+    const [selectedDateRange, setSelectedDateRange] = useState<{
+        start?: Date;
+        end?: Date;
+    }>({
+        start: today(getLocalTimeZone()).subtract({ days: 7 }).toDate(getLocalTimeZone()),
+        end: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
+    });
     const [disciplines, setDisciplines] = React.useState<{ id: string; name: string }[]>([]);
     const [levels] = React.useState(Object.values(EventLevel));
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      
-      const searchParams: SearchParams = {
-        query: "", // добавьте состояние для input
-        disciplineIds: Array.from(selectedDiscipline),
-        levels: Array.from(selectedLevel) as EventLevel[],
-        statuses: Array.from(selectedStatus) as RequestStatus[],
-        minDate: selectedDateRange.start?.toDate(getLocalTimeZone()),
-        maxDate: selectedDateRange.end?.toDate(getLocalTimeZone()),
-      };
-  
-      onSubmit(searchParams);
-    };
+        e.preventDefault();
+        setIsLoading(true);
 
+        const searchParams: SearchParams = {
+            query,
+            disciplineId: selectedDiscipline,
+            level: selectedLevel as EventLevel,
+            requestStatus: selectedStatus as RequestStatus,
+            dateRange: selectedDateRange,
+        };
+
+        onSubmit(searchParams);
+        setIsLoading(false);
+    };
+    const handleReset = () => {
+        setQuery("");
+        setSelectedStatus(RequestStatus.PENDING);
+        setSelectedDiscipline(undefined);
+        setSelectedLevel(undefined);
+        setSelectedDateRange({
+            start: today(getLocalTimeZone()).subtract({ days: 7 }).toDate(getLocalTimeZone()),
+            end: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
+        });
+    };
     useEffect(() => {
         const loadData = async () => {
             const data = await getDisciplines();
@@ -70,13 +88,11 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
     const renderDropdown = (
         label: string,
         items: { key: string; name: string }[],
-        selectedKeys: Set<string>,
+        selectedKey: string | undefined,
         onSelectionChange: (keys: Selection) => void,
         allowEmpty = false,
     ) => {
-        const selectedNames = Array.from(selectedKeys)
-            .map((key) => items.find((item) => item.key === key)?.name ?? key)
-            .join(", ");
+        const selectedName = items.find((i) => i.key === selectedKey)?.name ?? "Выберите...";
 
         return (
             <div className="mb-4">
@@ -84,13 +100,13 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
                 <Dropdown className="w-full">
                     <DropdownTrigger>
                         <Button variant="bordered" className="w-full justify-between text-left">
-                            {selectedNames || "Выберите..."}
+                            {selectedName}
                         </Button>
                     </DropdownTrigger>
                     <DropdownMenu
                         disallowEmptySelection={!allowEmpty}
                         selectionMode="single"
-                        selectedKeys={selectedKeys}
+                        selectedKeys={selectedKey ? new Set([selectedKey]) : new Set()}
                         onSelectionChange={onSelectionChange}
                     >
                         {items.map((item) => (
@@ -104,21 +120,25 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
 
     const handleSelectionChange = (
         keys: Selection,
-        allKeys: string[],
-        setter: React.Dispatch<React.SetStateAction<Set<string>>>,
+        setter: React.Dispatch<React.SetStateAction<string | undefined>>,
     ) => {
-        if (keys === "all") {
-            setter(new Set(allKeys));
-        } else {
-            setter(new Set(keys as Iterable<string>));
-        }
+        const value = Array.from(keys as Set<string>)[0];
+        setter(value);
     };
 
     return (
-        <Form>
+        <Form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4">
                 <div className="col-span-full">
-                    <Input label="Поиск по описанию" variant="bordered" fullWidth />
+                    <Input
+                        label="Поиск по описанию"
+                        variant="bordered"
+                        fullWidth
+                        value={query}
+                        onChange={(e) => {
+                            setQuery(e.target.value);
+                        }}
+                    />
                 </div>
 
                 {renderDropdown(
@@ -126,11 +146,7 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
                     disciplines.map((d) => ({ key: d.id, name: d.name })),
                     selectedDiscipline,
                     (keys) => {
-                        handleSelectionChange(
-                            keys,
-                            disciplines.map((d) => d.id),
-                            setSelectedDiscipline,
-                        );
+                        handleSelectionChange(keys, setSelectedDiscipline);
                     },
                     true,
                 )}
@@ -143,6 +159,13 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
                             start: today(getLocalTimeZone()).subtract({ days: 7 }),
                             end: today(getLocalTimeZone()),
                         }}
+                        onChange={(range) => {
+                            const timeZone = getLocalTimeZone();
+                            setSelectedDateRange({
+                                start: range?.start.toDate(timeZone),
+                                end: range?.end.toDate(timeZone),
+                            });
+                        }}
                     />
                 </div>
 
@@ -151,11 +174,7 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
                     levels.map((l) => ({ key: l, name: getLevelName(l) })),
                     selectedLevel,
                     (keys) => {
-                        handleSelectionChange(
-                            keys,
-                            levels.map((l) => l),
-                            setSelectedLevel,
-                        );
+                        handleSelectionChange(keys, setSelectedLevel);
                     },
                     true,
                 )}
@@ -168,18 +187,22 @@ export function SearchForm({ onSubmit }: { onSubmit: (params: SearchRepresentati
                     })),
                     selectedStatus,
                     (keys) => {
-                        handleSelectionChange(keys, Object.values(RequestStatus), setSelectedStatus);
+                        handleSelectionChange(
+                            keys,
+                            setSelectedStatus as React.Dispatch<React.SetStateAction<string | undefined>>,
+                        );
                     },
                     true,
                 )}
             </div>
 
             <div className="flex justify-end gap-2">
-                <Button variant="flat">Сбросить</Button>
+                <Button variant="flat" onPress={handleReset}>
+                    Сбросить
+                </Button>
                 <Button type="submit" isLoading={isLoading}>
-          Поиск
-        </Button>
-
+                    Поиск
+                </Button>
             </div>
         </Form>
     );
