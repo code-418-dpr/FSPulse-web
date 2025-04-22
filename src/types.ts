@@ -20,3 +20,14 @@ export interface EventItem {
     status: string;
     imageBase64: string;
 }
+
+export interface TeamItem {
+    id: string;
+    lastname: string;
+    firstname: string;
+    middlename: string | null;
+    region: string;
+    birthday: string;
+    status: string;
+    imageBase64: string;
+}

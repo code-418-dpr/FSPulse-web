@@ -9,11 +9,14 @@ import CompetitionCards from "@/app/representative/_components/competition/compe
 import EventCards from "@/app/representative/_components/event/event-cards";
 import { MainCards } from "@/app/representative/_components/main-cards";
 import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
+import TeamCards from "@/app/representative/_components/team/team-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
-import { CompetitionItem, EventItem, Tab } from "@/types";
+import { CompetitionItem, EventItem, Tab, TeamItem } from "@/types";
 import { CircularProgress } from "@heroui/react";
+
+// src/app/representative/page.tsx
 
 // src/app/representative/page.tsx
 
@@ -64,6 +67,8 @@ export default function RequestsPage() {
     const [isCompLoading, setIsCompLoading] = useState(false);
     const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
     const [isEventLoading, setIsEventLoading] = useState(false);
+    const [teamData, setTeamData] = useState<Paged<TeamItem> | null>(null);
+    const [isTeamLoading, setIsTeamLoading] = useState(false);
     const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
@@ -114,11 +119,27 @@ export default function RequestsPage() {
             });
     }, [activeTab, page]);
 
+    useEffect(() => {
+        if (activeTab !== "team") return;
+        setIsTeamLoading(true);
+        void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
+            .then((r) => r.json())
+            .then((json: Paged<TeamItem>) => {
+                setTeamData(json);
+            })
+            .finally(() => {
+                setIsTeamLoading(false);
+            });
+    }, [activeTab, page]);
+
     const compPageItems = competitionsData?.items ?? [];
     const totalCompPages = competitionsData?.pagination.totalPages ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
+
+    const teamPageItems = teamData?.items ?? [];
+    const totalTeamPages = teamData?.pagination.totalPages ?? 1;
 
     if (isLoading) {
         return <CircularProgress aria-label="Loading..." size="lg" />;
@@ -156,6 +177,17 @@ export default function RequestsPage() {
                         page={page}
                         setPage={setPage}
                         renderCards={(items) => <EventCards paginatedData={items} />}
+                    />
+                )}
+
+                {activeTab === "team" && (
+                    <MainCards<EventItem>
+                        isLoading={isTeamLoading}
+                        pageItems={teamPageItems}
+                        totalPages={totalTeamPages}
+                        page={page}
+                        setPage={setPage}
+                        renderCards={(items) => <TeamCards paginatedData={items} />}
                     />
                 )}
             </div>
