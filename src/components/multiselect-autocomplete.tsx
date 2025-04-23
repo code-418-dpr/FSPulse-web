@@ -50,7 +50,9 @@ export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) 
                             size="sm"
                             variant="light"
                             className="text-danger-500 ml-2"
-                            onPress={() => { removeRegion(region.key); }}
+                            onPress={() => {
+                                removeRegion(region.key);
+                            }}
                         >
                             ×
                         </Button>
@@ -59,7 +61,7 @@ export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) 
             </div>
 
             <Controller
-                name="regionInput"
+                name="regions"
                 control={control}
                 render={({ field }) => (
                     <Autocomplete
