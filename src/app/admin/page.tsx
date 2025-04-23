@@ -11,17 +11,17 @@ import { SearchCardOrDrawer } from "@/app/admin/_components/search/search-card-o
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
+import { searchRepresentativeRequests } from "@/data/event";
 import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { Button, CircularProgress, useDisclosure } from "@heroui/react";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { RequestStatus } from "../generated/prisma";
-import { RepresentativeTableWithPagination } from "./_components/representative-table";
 import CompetitionCards from "./_components/competition/competition-cards";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { searchRepresentativeRequests } from "@/data/event";
+import { RepresentativeTableWithPagination } from "./_components/representative-table";
 
 interface Paged<T> {
     items: T[];
@@ -148,37 +148,37 @@ export default function AdministratorPage() {
             });
     }, [activeTab, page]);
     useEffect(() => {
-            if (activeTab !== "requests" || !user?.id) return;
-            console.log(user.id);
-            const loadRequests = async () => {
-                setIsRequestsLoading(true);
-                try {
-                    const params = {
-                        ...searchParamsState,
+        if (activeTab !== "requests" || !user?.id) return;
+        console.log(user.id);
+        const loadRequests = async () => {
+            setIsRequestsLoading(true);
+            try {
+                const params = {
+                    ...searchParamsState,
+                    page,
+                    pageSize: perPage,
+                };
+                console.log("Параметры поиска: ", params);
+                const result = await searchRepresentativeRequests(params);
+                console.log("Результат: ", result);
+                setRequestsData({
+                    items: result.results,
+                    pagination: {
                         page,
                         pageSize: perPage,
-                    };
-                    console.log("Параметры поиска: ", params);
-                    const result = await searchRepresentativeRequests(params);
-                    console.log("Результат: ", result);
-                    setRequestsData({
-                        items: result.results,
-                        pagination: {
-                            page,
-                            pageSize: perPage,
-                            totalItems: result.totalItems,
-                            totalPages: result.totalPages,
-                        },
-                    });
-                } catch (error) {
-                    console.error("Error loading requests:", error);
-                } finally {
-                    setIsRequestsLoading(false);
-                }
-            };
-    
-            void loadRequests();
-        }, [activeTab, page, searchParamsState, user?.id]);
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading requests:", error);
+            } finally {
+                setIsRequestsLoading(false);
+            }
+        };
+
+        void loadRequests();
+    }, [activeTab, page, searchParamsState, user?.id]);
 
     const compPageItems = requestsData?.items ?? [];
     const totalCompPages = requestsData?.pagination.totalPages ?? 1;
@@ -220,7 +220,7 @@ export default function AdministratorPage() {
                                     totalPages: representativesData.pagination.totalPages,
                                     currentPage: page,
                                 }}
-                                onPageChange={setPage}
+                                onPageChangeAction={setPage}
                             />
                         ) : (
                             <div className="text-center text-gray-500">Нет данных</div>
@@ -228,22 +228,22 @@ export default function AdministratorPage() {
                     </div>
                 )}
                 {activeTab === "requests" && (
-                                    <>
-                                        <MainCards<RepresentativeRequestItem>
-                                            isLoading={isRequestsLoading}
-                                            pageItems={compPageItems}
-                                            totalPages={totalCompPages}
-                                            page={page}
-                                            setPageAction={setPage}
-                                            renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
-                                        />
-                                        <div className="absolute right-10 bottom-10">
-                                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
-                                                <Icon icon="iconoir:plus" width={25} height={25} />
-                                            </Button>
-                                        </div>
-                                    </>
-                                )}
+                    <>
+                        <MainCards<RepresentativeRequestItem>
+                            isLoading={isRequestsLoading}
+                            pageItems={compPageItems}
+                            totalPages={totalCompPages}
+                            page={page}
+                            setPageAction={setPage}
+                            renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
+                        />
+                        <div className="absolute right-10 bottom-10">
+                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
+                                <Icon icon="iconoir:plus" width={25} height={25} />
+                            </Button>
+                        </div>
+                    </>
+                )}
                 {activeTab === "events" && (
                     <MainCards<EventItem>
                         isLoading={isEventLoading}
