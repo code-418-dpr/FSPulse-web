@@ -2,18 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 
-import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
-import ModalOrDrawer from "@/components/modal-or-drawer";
 import { getRepresentativeRequestById } from "@/data/event";
 import { RepresentativeEventRequest } from "@/types/competitions";
-import { Button, Chip, Image, Spinner, useDisclosure } from "@heroui/react";
+import { Chip, Image, Spinner } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 interface Props {
     eventId: string;
 }
 export default function CompetitionDetails({ eventId }: Props) {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [competition, setCompetition] = useState<RepresentativeEventRequest | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -125,12 +122,6 @@ export default function CompetitionDetails({ eventId }: Props) {
                     <p className="pt-1 text-left text-sm">Зарегистрирован:</p>
                     <p className="pt-1 text-right text-sm">{competition.applicationTime.toLocaleDateString()}</p>
                 </div>
-
-                <Button onPress={onOpen}>Распределить баллы</Button>
-
-                <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
-                    <CompetitionResultForm />
-                </ModalOrDrawer>
             </div>
         </>
     );

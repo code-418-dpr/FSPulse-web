@@ -215,13 +215,21 @@ model Representative {
   events EventOfRepresentative[]
 }
 
+enum NotificationType {
+  INFO // Информационные уведомления
+  WARNING // Предупреждения
+  ERROR // Ошибки
+  SUCCESS // Уведомления о успешных действиях
+}
+
 model Notification {
-  id               String   @id @default(uuid())
+  id               String           @id @default(uuid())
   userId           String
   title            String
-  notificationTime DateTime @default(now())
+  notificationTime DateTime         @default(now())
   content          String
-  isRead           Boolean  @default(false)
+  isRead           Boolean          @default(false)
+  type             NotificationType
 
   user User @relation(fields: [userId], references: [id])
 }
