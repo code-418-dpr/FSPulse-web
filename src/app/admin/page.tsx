@@ -180,7 +180,7 @@ export default function AdministratorPage() {
                                     totalPages: representativesData.pagination.totalPages,
                                     currentPage: page,
                                 }}
-                                onPageChangeAction={setPage}
+                                onPageChange={setPage}
                             />
                         ) : (
                             <div className="text-center text-gray-500">Нет данных</div>
