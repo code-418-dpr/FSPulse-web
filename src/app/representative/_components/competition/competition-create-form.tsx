@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import React, { useEffect, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import {Controller, FormProvider, SubmitHandler, useForm} from "react-hook-form";
 
 import { useRouter } from "next/navigation";
 
@@ -28,14 +28,14 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
     const [formError, setFormError] = useState<string | null>(null);
     const router = useRouter();
     const [preview, setPreview] = useState<string | null>(null);
-    const [selectedKeys, setSelectedKeys] = React.useState<Set<string>>(
-        new Set(
-            regions.map((r) => {
-                return r.name;
-            }),
-        ),
-    );
     const [disciplines, setDisciplines] = React.useState<{ id: string; name: string }[]>([]);
+
+    const methods = useForm<UserFormData>({
+        resolver: zodResolver(userSchema),
+        defaultValues: {
+            regions: [],
+        },
+    });
 
     const {
         control,
@@ -43,9 +43,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
         handleSubmit,
         setValue,
         formState: { errors },
-    } = useForm({
-        resolver: zodResolver(userSchema),
-    });
+    } = methods;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -76,13 +74,11 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Проверка типа файла
         if (!file.type.startsWith("image/")) {
             alert("Пожалуйста, выберите файл изображения");
             return;
         }
 
-        // Создание превью
         const reader = new FileReader();
         reader.onload = () => {
             setPreview(reader.result as string);
@@ -91,11 +87,13 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
     };
 
     const onSubmit: SubmitHandler<UserFormData> = async (data) => {
+        console.log("Отправляемые данные:", data);
         try {
             setIsLoading(true);
             setFormError(null);
+            console.log("Отправляемые данные:", data);
 
-            // Валидация дат
+            // Валидация дат и других полей
             const now = new Date();
             const startReg = new Date(data.startRegistration);
             const endReg = new Date(data.endRegistration);
@@ -114,34 +112,32 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 throw new Error("Регистрация должна заканчиваться до начала соревнования");
             }
 
-            // Валидация возраста
             if (data.minAge >= data.maxAge) {
                 throw new Error("Максимальный возраст должен быть больше минимального");
             }
 
-            // Валидация количества участников
             if (data.minTeamParticipantsCount >= data.maxTeamParticipantsCount) {
                 throw new Error("Максимальное количество участников должно быть больше минимального");
             }
 
-            // Подготовка данных для вывода
             const formData = {
                 ...data,
                 startRegistration: startReg.toISOString(),
                 endRegistration: endReg.toISOString(),
                 start: start.toISOString(),
                 end: end.toISOString(),
-                regions: Array.from(selectedKeys), // Преобразуем Set в массив
                 createdAt: now.toISOString(),
             };
 
-            console.log("Отправляемые данные:", formData);
+            console.log("Отправляемые данные:", formData); // Теперь точно сработает
 
-            // Здесь будет реальный запрос к API
+            // Имитация отправки на сервер
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
+            // Перенаправление только после успешной "отправки"
             router.push("/");
             router.refresh();
+
         } catch (error) {
             if (error instanceof Error) {
                 setFormError(error.message);
@@ -152,13 +148,13 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
         }
     };
 
-    const handleFormSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        handleSubmit(onSubmit)(e).catch(console.error);
-    };
 
     return (
-        <form className={cn("grid items-start gap-4", className)} onSubmit={handleFormSubmit}>
+        <FormProvider {...methods}>
+        <form className={cn("grid items-start gap-4", className)} onSubmit={(e) => {
+            console.log("Форма отправлена");
+            handleSubmit(onSubmit)(e);
+        }}>
             <div className="flex flex-col gap-4">
                 <Controller
                     name="discipline"
@@ -337,24 +333,8 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                     isInvalid={!!errors.maxParticipantsCount}
                     errorMessage={errors.maxParticipantsCount?.message}
                 />
-                <Controller
-                    name="regions"
-                    control={control}
-                    render={({ field }) => {
-                        return (
-                            <MultiSelectAutocomplete
-                                items={regions.map((r) => ({ key: r.id, label: r.name }))}
-                                label="Регионы проведения соревнования"
-                                selectedKeys={new Set(field.value)}
-                                aria-label="Регионы"
-                                onSelectionChange={(keys) => {
-                                    const selected = Array.from(keys);
-                                    field.onChange(selected);
-                                    setSelectedKeys(keys);
-                                }}
-                            />
-                        );
-                    }}
+                <MultiSelectAutocomplete
+                    regions={regions.map(r => ({ key: r.id, label: r.name }))}
                 />
                 <Input
                     label="Адрес"
@@ -380,5 +360,6 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 </Button>
             </div>
         </form>
+        </FormProvider>
     );
 }

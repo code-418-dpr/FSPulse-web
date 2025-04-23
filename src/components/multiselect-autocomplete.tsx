@@ -1,153 +1,80 @@
-import React from "react";
+"use client";
 
-import { Autocomplete, AutocompleteItem, Button, Chip } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import { Controller, useFormContext } from "react-hook-form";
+import { Autocomplete, AutocompleteItem, Button } from "@heroui/react";
+import { competitionRequestSchema } from "@/schemas/competition-request-schema";
 
-interface Item {
-    label: string;
+interface RegionItem {
     key: string;
-    description?: string;
-}
-
-interface MultiSelectAutocompleteProps {
-    items: Item[];
     label: string;
-    placeholder?: string;
-    selectedKeys: Set<string>;
-    onSelectionChange: (keys: Set<string>) => void;
-    variant?: "flat" | "bordered" | "faded" | "underlined";
 }
 
-export const MultiSelectAutocomplete: React.FC<MultiSelectAutocompleteProps> = ({
-    items,
-    label,
-    placeholder,
-    selectedKeys,
-    onSelectionChange,
-    variant = "bordered",
+export const MultiSelectAutocomplete = ({
+                                             regions,
+                                         }: {
+    regions: RegionItem[];
 }) => {
-    const [inputValue, setInputValue] = React.useState("");
-    const [isOpen, setIsOpen] = React.useState(false);
+    const { control, setValue, watch } = useFormContext<competitionRequestSchema>();
+    const selectedRegionKeys = watch("regions") || [];
 
-    // Filter items based on input value
-    const filteredItems = React.useMemo(() => {
-        if (!inputValue.trim()) return items;
+    const selectedRegions = selectedRegionKeys
+        .map((key: string) => regions.find(r => r.key === key))
+        .filter(Boolean) as RegionItem[];
 
-        const lowerCaseInput = inputValue.toLowerCase();
-        return items.filter(
-            (item) =>
-                item.label.toLowerCase().includes(lowerCaseInput) ||
-                item.description?.toLowerCase().includes(lowerCaseInput),
-        );
-    }, [items, inputValue]);
-
-    // Handle selection of an item
-    const handleSelectionChange = (key: React.Key) => {
-        const newSelectedKeys = new Set(selectedKeys);
-
-        if (newSelectedKeys.has(key.toString())) {
-            newSelectedKeys.delete(key.toString());
-        } else {
-            newSelectedKeys.add(key.toString());
+    const addRegion = (key: string) => {
+        if (!selectedRegionKeys.includes(key)) {
+            setValue("regions", [...selectedRegionKeys, key]);
         }
-
-        onSelectionChange(newSelectedKeys);
-        setInputValue("");
     };
 
-    // Remove a selected item
-    const handleRemove = (key: string) => {
-        const newSelectedKeys = new Set(selectedKeys);
-        newSelectedKeys.delete(key);
-        onSelectionChange(newSelectedKeys);
-    };
-
-    // Clear all selected items
-    const handleClearAll = () => {
-        onSelectionChange(new Set());
-    };
-
-    // Render selected items as chips
-    const renderSelectedItems = () => {
-        if (selectedKeys.size === 0) return null;
-
-        return (
-            <div className="mt-2 flex flex-wrap gap-1">
-                {Array.from(selectedKeys).map((key) => {
-                    const item = items.find((i) => i.key === key);
-                    if (!item) return null;
-
-                    return (
-                        <Chip
-                            key={key}
-                            onClose={() => {
-                                handleRemove(key);
-                            }}
-                            variant="flat"
-                            color="primary"
-                            size="sm"
-                            className="max-w-[200px]"
-                        >
-                            {item.label}
-                        </Chip>
-                    );
-                })}
-
-                {selectedKeys.size > 1 && (
-                    <Button size="sm" variant="light" color="danger" onPress={handleClearAll} className="ml-1">
-                        Clear all
-                    </Button>
-                )}
-            </div>
+    const removeRegion = (key: string) => {
+        setValue(
+            "regions",
+            selectedRegionKeys.filter(k => k !== key)
         );
     };
 
     return (
-        <div className="w-full">
-            <Autocomplete
-                label={label}
-                placeholder={placeholder}
-                variant={variant}
-                defaultItems={filteredItems}
-                inputValue={inputValue}
-                onInputChange={setInputValue}
-                onOpenChange={setIsOpen}
-                isOpen={isOpen}
-                className="w-full"
-                allowsCustomValue={false}
-                menuTrigger="input"
-                onSelectionChange={handleSelectionChange}
-                endContent={
-                    <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        onPress={() => {
-                            setIsOpen(!isOpen);
-                        }}
-                        className="mr-1"
-                    >
-                        <Icon
-                            icon={isOpen ? "lucide:chevron-up" : "lucide:chevron-down"}
-                            className="text-default-500"
-                        />
-                    </Button>
-                }
-            >
-                {(item) => (
-                    <AutocompleteItem key={item.key} textValue={item.label} className="flex items-center gap-2">
-                        <div className="flex flex-1 items-center">
-                            <span>{item.label}</span>
-                            {item.description && (
-                                <span className="text-default-400 ml-1 text-xs">({item.description})</span>
-                            )}
-                        </div>
-                        {selectedKeys.has(item.key) && <Icon icon="lucide:check" className="text-primary-500" />}
-                    </AutocompleteItem>
-                )}
-            </Autocomplete>
+        <div className="space-y-4">
+            {/* Отображение выбранных регионов */}
+            <div className="flex flex-wrap gap-2">
+                {selectedRegions.map((region) => (
+                    <div key={`selected-${region.key}`} className="flex items-center bg-default-100 px-3 py-1 rounded-full">
+                        <span>{region.label}</span>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="light"
+                            className="ml-2 text-danger-500"
+                            onPress={() => removeRegion(region.key)}
+                        >
+                            ×
+                        </Button>
+                    </div>
+                ))}
+            </div>
 
-            {renderSelectedItems()}
+            {/* Autocomplete для добавления новых регионов */}
+            <Controller
+                name="regionInput"
+                control={control}
+                render={({ field }) => (
+                    <Autocomplete
+                        label={selectedRegions.length === 0 ? "Регион" : "Добавить еще регион"}
+                        defaultItems={regions.filter(r => !selectedRegionKeys.includes(r.key))}
+                        selectedKey={field.value}
+                        onSelectionChange={(key) => {
+                            if (key) {
+                                addRegion(key as string);
+                                field.onChange(null); // Сбрасываем значение после выбора
+                            }
+                        }}
+                        allowsCustomValue={false}
+                    >
+                        {(region) => <AutocompleteItem key={region.key}>{region.label}</AutocompleteItem>}
+                    </Autocomplete>
+                )}
+            />
         </div>
     );
 };
