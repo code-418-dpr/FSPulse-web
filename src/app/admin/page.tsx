@@ -14,11 +14,14 @@ import NavbarElement from "@/components/navbar";
 import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
-import { SearchParams } from "@/types/search";
-import { CircularProgress } from "@heroui/react";
+import { RepresentativeRequestItem, SearchParams } from "@/types/search";
+import { Button, CircularProgress, useDisclosure } from "@heroui/react";
 
 import { RequestStatus } from "../generated/prisma";
 import { RepresentativeTableWithPagination } from "./_components/representative-table";
+import CompetitionCards from "./_components/competition/competition-cards";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { searchRepresentativeRequests } from "@/data/event";
 
 interface Paged<T> {
     items: T[];
@@ -35,6 +38,7 @@ export default function AdministratorPage() {
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
         requestStatus: RequestStatus.PENDING,
     });
+    const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
     const [isRequestsLoading, setIsRequestsLoading] = useState(false);
     const [page, setPage] = useState(1);
@@ -45,6 +49,7 @@ export default function AdministratorPage() {
     const [isTeamLoading, setIsTeamLoading] = useState(false);
     const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
     const [isAchievementLoading, setIsAchievementLoading] = useState(false);
+    const { onOpen } = useDisclosure();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -142,6 +147,42 @@ export default function AdministratorPage() {
                 setIsAchievementLoading(false);
             });
     }, [activeTab, page]);
+    useEffect(() => {
+            if (activeTab !== "requests" || !user?.id) return;
+            console.log(user.id);
+            const loadRequests = async () => {
+                setIsRequestsLoading(true);
+                try {
+                    const params = {
+                        ...searchParamsState,
+                        representativeId: user.id,
+                        page,
+                        pageSize: perPage,
+                    };
+                    console.log("Параметры поиска: ", params);
+                    const result = await searchRepresentativeRequests(params);
+                    console.log("Результат: ", result);
+                    setRequestsData({
+                        items: result.results,
+                        pagination: {
+                            page,
+                            pageSize: perPage,
+                            totalItems: result.totalItems,
+                            totalPages: result.totalPages,
+                        },
+                    });
+                } catch (error) {
+                    console.error("Error loading requests:", error);
+                } finally {
+                    setIsRequestsLoading(false);
+                }
+            };
+    
+            void loadRequests();
+        }, [activeTab, page, searchParamsState, user?.id]);
+
+    const compPageItems = requestsData?.items ?? [];
+    const totalCompPages = requestsData?.pagination.totalPages ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
@@ -187,7 +228,23 @@ export default function AdministratorPage() {
                         )}
                     </div>
                 )}
-
+                {activeTab === "requests" && (
+                                    <>
+                                        <MainCards<RepresentativeRequestItem>
+                                            isLoading={isRequestsLoading}
+                                            pageItems={compPageItems}
+                                            totalPages={totalCompPages}
+                                            page={page}
+                                            setPageAction={setPage}
+                                            renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
+                                        />
+                                        <div className="absolute right-10 bottom-10">
+                                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
+                                                <Icon icon="iconoir:plus" width={25} height={25} />
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
                 {activeTab === "events" && (
                     <MainCards<EventItem>
                         isLoading={isEventLoading}
