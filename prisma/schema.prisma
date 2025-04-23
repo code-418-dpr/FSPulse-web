@@ -128,9 +128,11 @@ model Coach {
 }
 
 model AthleteOfTeam {
-  teamId    String
-  athleteId String
-  isLeader  Boolean @default(false)
+  teamId         String
+  athleteId      String
+  isLeader       Boolean       @default(false)
+  requestStatus  RequestStatus @default(PENDING)
+  requestComment String?
 
   team    Team    @relation(fields: [teamId], references: [id])
   athlete Athlete @relation(fields: [athleteId], references: [id])

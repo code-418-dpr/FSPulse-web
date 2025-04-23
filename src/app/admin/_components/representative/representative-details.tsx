@@ -10,10 +10,10 @@ import { Icon } from "@iconify/react";
 
 interface Props {
     representativeId: string;
-    onClose: () => void;
+    onCloseAction: () => void;
 }
 
-export default function RepresentatDetails({ representativeId, onClose }: Props) {
+export default function RepresentatDetails({ representativeId, onCloseAction }: Props) {
     const [representative, setRepresentative] = useState<RepresentativeDetails | null>(null);
     const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.PENDING);
     const [comment, setComment] = useState("");
@@ -31,7 +31,7 @@ export default function RepresentatDetails({ representativeId, onClose }: Props)
         setIsSubmitting(true);
         try {
             await updateRepresentativeStatus(representativeId, selectedStatus as "APPROVED" | "DECLINED", comment);
-            onClose();
+            onCloseAction();
         } catch (err) {
             console.error("Ошибка при обновлении статуса:", err);
             setErrorMessage("Не удалось обновить статус");

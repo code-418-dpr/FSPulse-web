@@ -20,14 +20,14 @@ import RepresentatDetails from "./representative/representative-details";
 
 export function RepresentativeTableWithPagination({
     data,
-    onPageChange,
+    onPageChangeAction,
 }: {
     data: {
         items: RepresentativeItem[];
         totalPages: number;
         currentPage: number;
     };
-    onPageChange: (page: number) => void;
+    onPageChangeAction: (page: number) => void;
 }) {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -102,7 +102,7 @@ export function RepresentativeTableWithPagination({
                 <Pagination
                     total={data.totalPages}
                     page={data.currentPage}
-                    onChange={onPageChange}
+                    onChange={onPageChangeAction}
                     className="justify-center"
                 />
             )}

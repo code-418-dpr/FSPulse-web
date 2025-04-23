@@ -1,9 +1,9 @@
-import { createAgeGroups } from "@/data/age-group";
-import { createDisciplines } from "@/data/discipline";
-import { createRegions } from "@/data/region";
-import { createSkills } from "@/data/skill";
-import { createSkillsOfAthletes } from "@/data/skill-of-athlete";
-import { createUsers, getAthletes } from "@/data/user";
+import { seedAgeGroups } from "@/data/age-group";
+import { seedDisciplines } from "@/data/discipline";
+import { seedRegions } from "@/data/region";
+import { seedSkills } from "@/data/skill";
+import { seedSkillsOfAthletes } from "@/data/skill-of-athlete";
+import { getAthletes, seedUsers } from "@/data/user";
 import prisma from "@/lib/prisma";
 import { faker } from "@faker-js/faker/locale/ru";
 
@@ -21,25 +21,25 @@ const EVENT_COUNT = 1000;
 
 export async function main() {
     console.log("Seeding regions...");
-    await createRegions(regionNames);
+    await seedRegions(regionNames);
 
     console.log("Seeding users, athletes, coaches, representatives...");
     const usersData = await generateRandomUsers(USER_COUNT);
-    await createUsers(usersData);
+    await seedUsers(usersData);
 
     console.log("Seeding skills...");
-    const createdSkills = await createSkills(skillNames);
+    const createdSkills = await seedSkills(skillNames);
 
     console.log("Mapping skills to athletes...");
     const athletes = await getAthletes();
     const skillsOfAthletes = generateRandomSkillsOfAthletes(athletes, createdSkills);
-    await createSkillsOfAthletes(skillsOfAthletes);
+    await seedSkillsOfAthletes(skillsOfAthletes);
 
     console.log("Seeding disciplines...");
-    const createdDisciplines = await createDisciplines(disciplines);
+    const createdDisciplines = await seedDisciplines(disciplines);
 
     console.log("Seeding age groups...");
-    const createdAgeGroups = await createAgeGroups(ageGroups);
+    const createdAgeGroups = await seedAgeGroups(ageGroups);
 
     console.log("Mapping age groups to disciplines...");
     await prisma.ageGroupOfDiscipline.createMany({

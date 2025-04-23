@@ -66,7 +66,7 @@ export async function getRepresentativeById(id: string) {
     });
 }
 export async function updateRepresentativeStatus(id: string, status: "APPROVED" | "DECLINED", comment?: string) {
-    return await prisma.representative.update({
+    return prisma.representative.update({
         where: { id },
         data: {
             requestStatus: status,

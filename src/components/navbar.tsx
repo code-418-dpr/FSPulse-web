@@ -70,7 +70,14 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     // При закрытии уведомлений — пометить всё прочитанным
     useEffect(() => {
         if (prevOpenRef.current && !isNotificationOpen && unreadCount > 0) {
-            void markAllAsRead();
+            markAllAsRead().catch((error: unknown) => {
+                console.error("Form submission error:", error);
+                if (error instanceof Error) {
+                    console.error(error.message);
+                } else {
+                    console.error("Произошла неизвестная ошибка");
+                }
+            });
         }
         prevOpenRef.current = isNotificationOpen;
     }, [isNotificationOpen, unreadCount, markAllAsRead]);
