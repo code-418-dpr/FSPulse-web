@@ -136,7 +136,7 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
 
     return (
         <Form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid w-full grid-cols-1 gap-4">
                 <div className="col-span-full">
                     <Input
                         label="Поиск по описанию"

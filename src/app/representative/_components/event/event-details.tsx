@@ -8,10 +8,6 @@ import ModalOrDrawer from "@/components/modal-or-drawer";
 import { EventItem } from "@/types";
 import { Button, Chip, Image, useDisclosure } from "@heroui/react";
 
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
 interface Props {
     event: EventItem;
 }
