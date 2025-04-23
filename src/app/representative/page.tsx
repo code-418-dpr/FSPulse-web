@@ -6,31 +6,23 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
 import CompetitionCards from "@/app/representative/_components/competition/competition-cards";
+import CompetitionCreateForm from "@/app/representative/_components/competition/competition-create-form";
 import EventCards from "@/app/representative/_components/event/event-cards";
 import { MainCards } from "@/app/representative/_components/main-cards";
 import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import FooterElement from "@/components/footer";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import NavbarElement from "@/components/navbar";
 import { searchRepresentativeRequests } from "@/data/event";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
-import { CircularProgress } from "@heroui/react";
+import { Button, CircularProgress, useDisclosure } from "@heroui/react";
+import { Icon } from "@iconify/react";
 
 import { RequestStatus } from "../generated/prisma";
 
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
 
 interface Paged<T> {
     items: T[];
@@ -61,6 +53,8 @@ export default function RequestsPage() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const perPage = 12;
+
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     // sync tab from URL
     useEffect(() => {
@@ -189,14 +183,22 @@ export default function RequestsPage() {
 
                 {/* Main */}
                 {activeTab === "requests" && (
-                    <MainCards<RepresentativeRequestItem>
-                        isLoading={isRequestsLoading}
-                        pageItems={compPageItems}
-                        totalPages={totalCompPages}
-                        page={page}
-                        setPageAction={setPage}
-                        renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
-                    />
+                    <>
+                        <MainCards<RepresentativeRequestItem>
+                            isLoading={isRequestsLoading}
+                            pageItems={compPageItems}
+                            totalPages={totalCompPages}
+                            page={page}
+                            setPageAction={setPage}
+                            renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
+                        />
+                        <Button isIconOnly aria-label="Create" onPress={onOpen}>
+                            <Icon icon="iconoir:plus" width={18} height={18} className="mr-1" />
+                        </Button>
+                        <ModalOrDrawer label="Создание соревнования" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                            <CompetitionCreateForm />
+                        </ModalOrDrawer>
+                    </>
                 )}
 
                 {activeTab === "events" && (
