@@ -1,3 +1,7 @@
+// seed.ts
+import bcrypt from "bcrypt";
+
+import { Prisma, SportsCategory } from "@/app/generated/prisma";
 import { seedAgeGroups } from "@/data/age-group";
 import { seedDisciplines } from "@/data/discipline";
 import { seedRegions } from "@/data/region";
@@ -14,86 +18,112 @@ import { generateRandomEvents } from "./data/event";
 import regionNames from "./data/region";
 import skillNames from "./data/skill";
 import generateRandomSkillsOfAthletes from "./data/skill-of-athlete";
+import { generateTeamsAndMembers } from "./data/team";
 import generateRandomUsers from "./data/user";
 
-const USER_COUNT = 100;
-const EVENT_COUNT = 1000;
+const INITIAL_USER_COUNT = 50;
+const EVENT_COUNT = 50;
+
+// Хелпер, который генерит только «чистого» атлета
+async function generateRandomAthleteUser(): Promise<Prisma.UserCreateInput> {
+    const gender = faker.person.sexType();
+    const lastName = faker.person.lastName(gender);
+    const firstName = faker.person.firstName(gender);
+    const phoneNumber = faker.phone.number({ style: "international" });
+    const email = faker.internet.email();
+    const region = faker.helpers.arrayElement(regionNames);
+
+    const birthDate = faker.date.birthdate({ min: 20, max: 50, mode: "age" });
+    const address = `${faker.location.city()}, ${faker.location.streetAddress()}`;
+    const sportCategory = faker.helpers.arrayElement<SportsCategory>([
+        "HMS",
+        "MS",
+        "CMS",
+        "A",
+        "B",
+        "C",
+        "Ay",
+        "By",
+        "Cy",
+    ]);
+
+    return {
+        lastname: lastName,
+        firstname: firstName,
+        phoneNumber,
+        email,
+        password: await bcrypt.hash(email, 10),
+        region: { connect: { name: region } },
+        athlete: {
+            create: {
+                birthDate,
+                address,
+                sportCategory,
+            },
+        },
+    };
+}
 
 export async function main() {
-    console.log("Seeding regions...");
+    // 1) Регионы
+    console.log("Seeding regions…");
     await seedRegions(regionNames);
 
-    console.log("Seeding users, athletes, coaches, representatives...");
-    const usersData = await generateRandomUsers(USER_COUNT);
-    await seedUsers(usersData);
+    // 2) Юзеры (ATHLETE/REP/COACH)
+    console.log("Seeding initial users…");
+    const initialUsers = await generateRandomUsers(INITIAL_USER_COUNT);
+    await seedUsers(initialUsers);
 
-    console.log("Seeding skills...");
+    // 3) Навыки
+    console.log("Seeding skills…");
     const createdSkills = await seedSkills(skillNames);
 
-    console.log("Mapping skills to athletes...");
-    const athletes = await getAthletes();
-    const skillsOfAthletes = generateRandomSkillsOfAthletes(athletes, createdSkills);
-    await seedSkillsOfAthletes(skillsOfAthletes);
+    console.log("Mapping skills to athletes…");
+    const athletes0 = await getAthletes();
+    await seedSkillsOfAthletes(generateRandomSkillsOfAthletes(athletes0, createdSkills));
 
-    console.log("Seeding disciplines...");
+    // 4) Дисциплины
+    console.log("Seeding disciplines…");
     const createdDisciplines = await seedDisciplines(disciplines);
 
-    console.log("Seeding age groups...");
+    // 5) Возрастные группы
+    console.log("Seeding age groups…");
     const createdAgeGroups = await seedAgeGroups(ageGroups);
 
-    console.log("Mapping age groups to disciplines...");
+    console.log("Mapping age groups to disciplines…");
     await prisma.ageGroupOfDiscipline.createMany({
         data: mapDisciplinesAndAgeGroups(createdDisciplines, createdAgeGroups),
         skipDuplicates: true,
     });
 
-    console.log("Fetching representatives...");
-    const reps = await prisma.representative.findMany({ select: { id: true } });
-    const repIds = reps.map((r) => r.id);
-
-    console.log("Seeding events with representatives...");
+    // 6) События
+    console.log("Seeding events…");
     const randomEvents = await generateRandomEvents(EVENT_COUNT);
-
     for (const raw of randomEvents) {
-        const howMany = faker.number.int({ min: 1, max: 4 });
-        const repIdsForEvent = faker.helpers.arrayElements(repIds, howMany);
-
-        await prisma.event.create({
-            data: {
-                name: raw.name,
-                description: raw.description,
-                cover: raw.cover,
-                applicationTime: raw.applicationTime,
-                startRegistration: raw.startRegistration,
-                endRegistration: raw.endRegistration,
-                start: raw.start,
-                end: raw.end,
-                minAge: raw.minAge,
-                maxAge: raw.maxAge,
-                minTeamParticipantsCount: raw.minTeamParticipantsCount,
-                maxTeamParticipantsCount: raw.maxTeamParticipantsCount,
-                maxParticipantsCount: raw.maxParticipantsCount,
-                isPersonalFormatAllowed: raw.isPersonalFormatAllowed,
-                disciplineId: raw.disciplineId,
-                isOnline: raw.isOnline,
-                address: raw.address,
-                awards: raw.awards,
-                level: raw.level,
-                requestStatus: raw.requestStatus,
-                requestComment: raw.requestComment,
-
-                representatives: {
-                    create: repIdsForEvent.map((repId) => ({
-                        representative: { connect: { id: repId } },
-                    })),
-                },
-            },
-        });
-
-        console.log(`  ✔ Event "${raw.name}" linked with reps [${repIdsForEvent.join(", ")}]`);
+        // (ваша логика создания Event с representatives из data/event)
+        await prisma.event.create({ data: raw });
     }
 
-    console.log("✅ Seeding complete!");
+    // 7) Гарантируем: athletes > events
+    const totalEvents = await prisma.event.count();
+    let athletes = await getAthletes();
+    if (athletes.length <= totalEvents) {
+        const deficit = (totalEvents - athletes.length) * Math.floor(Math.random() * 10 + 1);
+        console.log(`Нужно ещё ${deficit} атлетов, чтобы их было больше событий…`);
+        const extra: Prisma.UserCreateInput[] = [];
+        for (let i = 0; i < deficit; i++) {
+            extra.push(await generateRandomAthleteUser());
+        }
+        await seedUsers(extra);
+        athletes = await getAthletes();
+    }
+    console.log(`Атлетов: ${athletes.length}, событий: ${totalEvents} — OK.`);
+
+    // 8) Генерим команды и участников
+    console.log("Seeding teams and memberships…");
+    await generateTeamsAndMembers();
+
+    console.log("✅ Full seed complete!");
 }
 
 void main().catch((e: unknown) => {
