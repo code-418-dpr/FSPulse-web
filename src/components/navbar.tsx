@@ -42,7 +42,10 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isLoading, isAuthenticated } = useAuth();
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
+
+    // Второе модальное окно (редактирование)
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
 
     const handleNavigation = (e: PressEvent, tab: Tab) => {
         router.push(`/representative?tab=${tab}`);
@@ -159,7 +162,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                             <DropdownItem
                                                 key="settings"
                                                 onPress={() => {
-                                                    onOpen();
+                                                    onEditOpen();
                                                 }}
                                             >
                                                 Настройки
@@ -177,23 +180,29 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                     </DropdownSection>
                                 </DropdownMenu>
                             </Dropdown>
-                            <ModalOrDrawer label="Редактирование" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                            <ModalOrDrawer
+                                label="Редактирование"
+                                isOpen={isEditOpen}
+                                onOpenChangeAction={onEditOpenChange}
+                            >
                                 <UserEditForm />
                             </ModalOrDrawer>
                         </div>
                     ) : (
                         <>
                             <Button
-                                onPress={() => {
-                                    onOpen();
-                                }}
+                                onPress={onCreateOpen}
                                 color="primary"
                                 variant="flat"
                                 startContent={<Icon icon="lucide:user" />}
                             >
                                 Вход
                             </Button>
-                            <ModalOrDrawer label="Авторизация" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                            <ModalOrDrawer
+                                label="Авторизация"
+                                isOpen={isCreateOpen}
+                                onOpenChangeAction={onCreateOpenChange}
+                            >
                                 <AuthForm />
                             </ModalOrDrawer>
                         </>
