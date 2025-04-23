@@ -1,13 +1,18 @@
 import bcrypt from "bcrypt";
 
-import { Prisma, SportsCategory } from "@/app/generated/prisma";
+import { Membership, Prisma, SportsCategory } from "@/app/generated/prisma";
 import { faker } from "@faker-js/faker/locale/ru";
 
 import regionNames from "./region";
 
-const getRandomSportCategory = (): SportsCategory => {
+const getRandomSportCategory = () => {
     const categories: SportsCategory[] = ["HMS", "MS", "CMS", "A", "B", "C", "Ay", "By", "Cy"];
     return faker.helpers.arrayElement(categories);
+};
+
+const getRandomMembership = () => {
+    const memberships: Membership[] = ["MAIN", "RESERVE", "NONE"];
+    return faker.helpers.arrayElement(memberships);
 };
 
 const getRandomBirthDate = () => {
@@ -52,6 +57,7 @@ const generateRandomUser = async () => {
                 birthDate: getRandomBirthDate(),
                 address: getRandomAddress(),
                 sportCategory: getRandomSportCategory(),
+                membership: getRandomMembership(),
             },
         };
     } else if (role === "REPRESENTATIVE") {
