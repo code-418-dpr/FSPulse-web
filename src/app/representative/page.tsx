@@ -23,7 +23,6 @@ import { Icon } from "@iconify/react";
 
 import { RequestStatus } from "../generated/prisma";
 
-
 interface Paged<T> {
     items: T[];
     pagination: {
@@ -179,7 +178,7 @@ export default function RequestsPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <SearchCardOrDrawer onSearch={handleSearch} tabType={activeTab} />
+                <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
 
                 {/* Main */}
                 {activeTab === "requests" && (

@@ -22,10 +22,10 @@ import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 interface SearchFormProps {
-    onSubmit: (params: SearchParams) => void;
+    onSubmitAction: (params: SearchParams) => void;
     tabType: Tab;
 }
-export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
+export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
     const [query, setQuery] = useState("");
     const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.PENDING);
     const [selectedDiscipline, setSelectedDiscipline] = React.useState<string>();
@@ -54,7 +54,7 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
             maxApplicationTime: selectedDateRange.end,
         };
 
-        onSubmit(searchParams);
+        onSubmitAction(searchParams);
         setIsLoading(false);
     };
     const handleReset = () => {
