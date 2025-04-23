@@ -5,15 +5,15 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
-import CompetitionCards from "@/app/representative/_components/competition/competition-cards";
-import CompetitionCreateForm from "@/app/representative/_components/competition/competition-create-form";
 import EventCards from "@/app/representative/_components/event/event-cards";
 import { MainCards } from "@/app/representative/_components/main-cards";
-import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
 import TeamCards from "@/app/representative/_components/team/team-cards";
+import CompetitionCards from "@/components/competition/competition-cards";
+import CompetitionCreateForm from "@/components/competition/competition-create-form";
 import FooterElement from "@/components/footer";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import NavbarElement from "@/components/navbar";
+import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeRequests } from "@/data/event";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
