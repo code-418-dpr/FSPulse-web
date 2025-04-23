@@ -15,10 +15,10 @@ export interface Paged<T> {
     totalPages: number;
 }
 
-export interface SearchRepresentativeRequestsParams {
+export interface SearchRepresentativeEventRequestsParams {
     page: number;
     pageSize: number;
-    representativeId: string;
+    representativeId?: string;
     query?: string;
     disciplineId?: string;
     minApplicationTime?: Date;
@@ -35,4 +35,20 @@ export interface RepresentativeRequestItem {
     level: EventLevel;
     requestStatus: RequestStatus;
     discipline: Discipline;
+}
+
+export interface SearchRepresentativeEventsParams {
+    page: number;
+    pageSize: number;
+    representativeId: string;
+    query?: string;
+    disciplineId?: string;
+    minStartTime?: Date;
+    maxStartTime?: Date;
+    level?: EventLevel;
+    minAge?: number;
+    maxAge?: number;
+    isOnline?: boolean;
+    isTeamFormatAllowed?: boolean;
+    isPersonalFormatAllowed?: boolean;
 }
