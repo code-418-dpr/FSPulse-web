@@ -153,7 +153,7 @@ export default function RequestsPage() {
     }, [activeTab, page]);
 
     const compPageItems = requestsData?.items ?? [];
-    const totalCompPages = requestsData?.pagination.totalPages ?? 1;
+    const totalCompPages = requestsData?.pagination.page ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
