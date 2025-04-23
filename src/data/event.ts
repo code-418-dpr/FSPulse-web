@@ -17,7 +17,7 @@ export async function searchRepresentativeRequests(params: SearchRepresentativeR
         requestStatus,
     } = params;
     const requiredWhere = {
-        representative: {
+        representatives: {
             some: { representativeId },
         },
     };
@@ -158,7 +158,7 @@ export async function getRepresentativeRequestById(id: string) {
     return prisma.event.findUnique({
         where: { id },
         include: {
-            representative: {
+            representatives: {
                 include: {
                     representative: {
                         include: {

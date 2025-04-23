@@ -1,7 +1,7 @@
-import { Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 
 import Loading from "./loading";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: ReactNode }) {
     return <Suspense fallback={<Loading />}>{children}</Suspense>;
 }

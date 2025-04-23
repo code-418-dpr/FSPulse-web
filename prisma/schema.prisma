@@ -23,8 +23,8 @@ model User {
   region         Region           @relation(fields: [regionId], references: [id])
   athlete        Athlete[]
   representative Representative[]
-
-  Notification Notification[]
+  coach          Coach[]
+  notifications  Notification[]
 }
 
 enum SportsCategory {
@@ -75,7 +75,7 @@ model AgeGroup {
   minAge Int    @db.SmallInt
   maxAge Int?   @db.SmallInt
 
-  discipline AgeGroupOfDiscipline[]
+  disciplines AgeGroupOfDiscipline[]
 
   @@unique([name, minAge, maxAge])
 }
@@ -90,6 +90,7 @@ model Skill {
 model SkillOfAthlete {
   athleteId String
   skillId   String
+  grade     Int    @default(0) @db.SmallInt
 
   skill   Skill   @relation(fields: [skillId], references: [id])
   athlete Athlete @relation(fields: [athleteId], references: [id])
@@ -107,31 +108,35 @@ model Athlete {
   id            String          @id
   birthDate     DateTime        @db.Date()
   address       String
+  about         String?
   sportCategory SportsCategory?
   membership    Membership      @default(NONE)
   github        String?         @unique
 
-  user  User             @relation(fields: [id], references: [id])
-  teams AthleteOfTeam[]
-  skill SkillOfAthlete[]
+  user   User             @relation(fields: [id], references: [id])
+  teams  AthleteOfTeam[]
+  skills SkillOfAthlete[]
 }
 
-enum TeamRole {
-  MEMBER // Член команды
-  LEADER // Лидер
-  COACH // Тренер
+model Coach {
+  id        String   @id
+  birthDate DateTime @db.Date()
+  address   String
+
+  user  User   @relation(fields: [id], references: [id])
+  teams Team[]
 }
 
 model AthleteOfTeam {
   teamId    String
   athleteId String
-  role      TeamRole @default(MEMBER)
+  isLeader  Boolean @default(false)
 
   team    Team    @relation(fields: [teamId], references: [id])
   athlete Athlete @relation(fields: [athleteId], references: [id])
 
   @@unique([teamId, athleteId])
-  @@unique([teamId, athleteId, role])
+  @@unique([teamId, isLeader])
 }
 
 model Team {
@@ -139,9 +144,11 @@ model Team {
   name    String
   eventId String
   score   Int?
+  coachId String?
   isReady Boolean @default(false)
 
   event    Event           @relation(fields: [eventId], references: [id])
+  coach    Coach?          @relation(fields: [coachId], references: [id])
   athletes AthleteOfTeam[]
 }
 
@@ -162,7 +169,6 @@ model Event {
   name                     String
   description              String
   cover                    Bytes         @db.ByteA
-  applicationTime          DateTime      @default(now())
   startRegistration        DateTime
   endRegistration          DateTime
   start                    DateTime
@@ -178,13 +184,14 @@ model Event {
   address                  String?
   awards                   Int[]         @db.SmallInt
   level                    EventLevel
+  applicationTime          DateTime      @default(now())
   requestStatus            RequestStatus @default(PENDING)
   requestComment           String?
 
-  discipline     Discipline              @relation(fields: [disciplineId], references: [id])
-  representative EventOfRepresentative[]
-  files          File[]
-  teams          Team[]
+  discipline      Discipline              @relation(fields: [disciplineId], references: [id])
+  representatives EventOfRepresentative[]
+  files           File[]
+  teams           Team[]
 }
 
 model EventOfRepresentative {
@@ -207,9 +214,10 @@ model File {
 }
 
 model Representative {
-  id             String        @id
-  requestStatus  RequestStatus @default(PENDING)
-  requestComment String?
+  id              String        @id
+  applicationTime DateTime      @default(now())
+  requestStatus   RequestStatus @default(PENDING)
+  requestComment  String?
 
   user   User                    @relation(fields: [id], references: [id])
   events EventOfRepresentative[]
@@ -223,13 +231,13 @@ enum NotificationType {
 }
 
 model Notification {
-  id               String           @id @default(uuid())
-  userId           String
-  title            String
-  notificationTime DateTime         @default(now())
-  content          String
-  isRead           Boolean          @default(false)
-  type             NotificationType
+  id       String           @id @default(uuid())
+  userId   String
+  type     NotificationType
+  title    String
+  content  String
+  sendTime DateTime         @default(now())
+  isRead   Boolean          @default(false)
 
   user User @relation(fields: [userId], references: [id])
 }

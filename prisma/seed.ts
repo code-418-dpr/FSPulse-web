@@ -5,24 +5,35 @@ import { createAgeGroups } from "@/data/age-group";
 import { createDisciplines } from "@/data/discipline";
 import { createRegions } from "@/data/region";
 import { createSkills } from "@/data/skill";
-import { createUsers } from "@/data/user";
+import { createSkillsOfAthletes } from "@/data/skill-of-athlete";
+import { createUsers, getAthletes } from "@/data/user";
 import prisma from "@/lib/prisma";
 
 import ageGroups from "./data/age-group";
-import disciplineNamesAndMinAges from "./data/age-group-of-discipline";
+import mapDisciplinesAndAgeGroups from "./data/age-group-of-discipline";
 import disciplines from "./data/discipline";
 import eventRepresentatives from "./data/eventRepresentatives";
 import events from "./data/events";
 import regionNames from "./data/region";
 import skillNames from "./data/skill";
-import users from "./data/user";
+import generateRandomSkillsOfAthletes from "./data/skill-of-user";
+import generateRandomUsers from "./data/user";
+
+const userCount = 100;
 
 export async function main() {
     console.log("Seeding regions...");
     await createRegions(regionNames);
 
+    console.log("Seeding users, athletes, coaches, representatives...");
+    await createUsers(await generateRandomUsers(userCount));
+
     console.log("Seeding skills...");
-    await createSkills(skillNames);
+    const createdSkills = await createSkills(skillNames);
+
+    console.log("Mapping skills to athletes...");
+    const athletes = await getAthletes();
+    await createSkillsOfAthletes(generateRandomSkillsOfAthletes(athletes, createdSkills));
 
     console.log("Seeding disciplines...");
     const createdDisciplines = await createDisciplines(disciplines);
@@ -31,27 +42,10 @@ export async function main() {
     const createdAgeGroups = await createAgeGroups(ageGroups);
 
     console.log("Mapping age groups to disciplines...");
-    const disciplinesMap = Object.fromEntries(createdDisciplines.map((d) => [d.name, d.id]));
-    const ageGroupsMap = Object.fromEntries(createdAgeGroups.map((ag) => [ag.minAge, ag.id]));
-    const mappedData = disciplineNamesAndMinAges.flatMap(([discipline, ages]) =>
-        (ages as number[]).map((age) => {
-            const disciplineId = disciplinesMap[discipline as string];
-            const ageGroupId = ageGroupsMap[age];
-            if (disciplineId && ageGroupId) {
-                return {
-                    disciplineId,
-                    ageGroupId,
-                };
-            }
-        }),
-    );
     await prisma.ageGroupOfDiscipline.createMany({
-        data: mappedData.filter((relation) => relation !== undefined),
+        data: mapDisciplinesAndAgeGroups(createdDisciplines, createdAgeGroups),
         skipDuplicates: true,
     });
-
-    console.log("Seeding users, athletes, representatives...");
-    await createUsers(users);
 
     console.log("Seeding Events...");
     for (const raw of events) {

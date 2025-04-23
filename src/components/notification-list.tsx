@@ -1,12 +1,11 @@
 import React from "react";
 
-import { Notification, NotificationType } from "@/types/notification";
+import { NotificationType, Prisma } from "@/app/generated/prisma";
 import { Chip } from "@heroui/react";
-// Divider убран, он не использовался
 import { Icon } from "@iconify/react";
 
 interface NotificationListProps {
-    notifications: Notification[];
+    notifications: Prisma.NotificationCreateInput[];
 }
 
 export const NotificationList: React.FC<NotificationListProps> = ({ notifications }) => {
@@ -30,16 +29,16 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
     );
 };
 
-const NotificationItem: React.FC<{ notification: Notification }> = ({ notification }) => {
+const NotificationItem: React.FC<{ notification: Prisma.NotificationCreateInput }> = ({ notification }) => {
     const getIconByType = (type: NotificationType) => {
         switch (type) {
-            case NotificationType.INFORMATION:
+            case "INFO":
                 return "lucide:info";
-            case NotificationType.SUCCESS:
+            case "SUCCESS":
                 return "lucide:check-circle";
-            case NotificationType.WARNING:
+            case "WARNING":
                 return "lucide:alert-triangle";
-            case NotificationType.ERROR:
+            case "ERROR":
                 return "lucide:alert-circle";
             default:
                 return "lucide:bell";
@@ -48,13 +47,13 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
 
     const getColorByType = (type: NotificationType) => {
         switch (type) {
-            case NotificationType.INFORMATION:
+            case "INFO":
                 return "primary";
-            case NotificationType.SUCCESS:
+            case "SUCCESS":
                 return "success";
-            case NotificationType.WARNING:
+            case "WARNING":
                 return "warning";
-            case NotificationType.ERROR:
+            case "ERROR":
                 return "danger";
             default:
                 return "default";
@@ -86,7 +85,7 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
                     <p className="text-default-500 mt-1 text-sm">{notification.content}</p>
                     <div className="mt-2 flex items-center justify-between">
                         <span className="text-default-400 text-xs">
-                            {new Date(notification.notificationTime).toLocaleString("ru-RU", {
+                            {new Date(notification.sendTime as Date).toLocaleString("ru-RU", {
                                 day: "numeric",
                                 month: "short",
                                 hour: "2-digit",

@@ -102,7 +102,7 @@ export function RepresentativeTableWithPagination({
                 <Pagination
                     total={data.totalPages}
                     page={data.currentPage}
-                    onChange={onPageChange}
+                    onChange={onPageChangeAction}
                     className="justify-center"
                 />
             )}

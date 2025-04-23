@@ -3,6 +3,10 @@
 import { Prisma, User } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
+export const getAthletes = async () => {
+    return prisma.athlete.findMany({ include: { user: true } });
+};
+
 export const createUsers = async (users: Prisma.UserCreateInput[]) => {
     const existingAgeGroups = (await prisma.user.findMany({ select: { phoneNumber: true } })).map(
         ({ phoneNumber }) => phoneNumber,

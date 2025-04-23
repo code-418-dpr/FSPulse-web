@@ -93,7 +93,7 @@ export default function CompetitionDetails({ eventId }: Props) {
                         color="success"
                         variant="solid"
                     >
-                        {competition.representative.map((rep) => rep.representative.user.region.name).join(", ")}
+                        {competition.representatives.map((rep) => rep.representative.user.region.name).join(", ")}
                     </Chip>
                 </div>
                 {/* Status */}

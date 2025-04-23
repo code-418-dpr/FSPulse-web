@@ -15,7 +15,7 @@ export interface CompetitionItem {
 
 export type RepresentativeEventRequest = Prisma.EventGetPayload<{
     include: {
-        representative: {
+        representatives: {
             include: {
                 representative: {
                     include: {

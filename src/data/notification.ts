@@ -1,53 +1,15 @@
 import prisma from "@/lib/prisma";
 
-export const getAllNotifications = async (userId: string, page: number, pageSize: number) => {
-    const notifications = await prisma.notification.findMany({
-        where: {
-            userId: userId,
-        },
-        orderBy: {
-            notificationTime: "asc",
-        },
-        skip: pageSize * (page - 1),
-        take: pageSize,
+export async function getUserNotifications(userId: string) {
+    return prisma.notification.findMany({
+        where: { userId },
+        orderBy: { sendTime: "desc" },
     });
+}
 
-    const totalItems = await prisma.notification.count({
-        where: {
-            userId: userId,
-        },
+export async function markUserNotificationsRead(userId: string) {
+    await prisma.notification.updateMany({
+        where: { userId, isRead: false },
+        data: { isRead: true },
     });
-
-    return {
-        notifications,
-        totalItems,
-        totalPages: Math.ceil(totalItems / pageSize),
-    };
-};
-
-export const getUnreadNotifications = async (userId: string, page: number, pageSize: number) => {
-    const notifications = await prisma.notification.findMany({
-        where: {
-            userId: userId,
-            isRead: false,
-        },
-        orderBy: {
-            notificationTime: "asc",
-        },
-        skip: pageSize * (page - 1),
-        take: pageSize,
-    });
-
-    const totalItems = await prisma.notification.count({
-        where: {
-            userId: userId,
-            isRead: false,
-        },
-    });
-
-    return {
-        notifications,
-        totalItems,
-        totalPages: Math.ceil(totalItems / pageSize),
-    };
-};
+}

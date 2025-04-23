@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
                     },
                 },
             },
-            representative: {
+            representatives: {
                 select: {
                     representative: {
                         select: {
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
             });
         });
 
-        event.representative.forEach((rep) => {
+        event.representatives.forEach((rep) => {
             if (rep.representative.user.tg) {
                 tgIds.add(rep.representative.user.tg);
             }
