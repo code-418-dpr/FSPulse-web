@@ -101,8 +101,8 @@ export default function AdministratorPage() {
     // Обработчик поиска
     const handleSearch = (params: SearchParams) => {
         setSearchParamsState(params);
-              setPage(1);
-      };
+        setPage(1);
+    };
     // load events when on "events"
     useEffect(() => {
         if (activeTab !== "events") return;
@@ -170,23 +170,23 @@ export default function AdministratorPage() {
 
                 {/* Main */}
                 {activeTab === "representative" && (
-        <div className="flex-1 p-4">
-          {isRequestsLoading ? (
-            <CircularProgress aria-label="Загрузка..." />
-          ) : representativesData ? (
-            <RepresentativeTableWithPagination
-              data={{
-                items: representativesData.items,
-                totalPages: representativesData.pagination.totalPages,
-                currentPage: page,
-              }}
-              onPageChange={setPage}
-            />
-          ) : (
-            <div className="text-center text-gray-500">Нет данных</div>
-          )}
-        </div>
-      )}
+                    <div className="flex-1 p-4">
+                        {isRequestsLoading ? (
+                            <CircularProgress aria-label="Загрузка..." />
+                        ) : representativesData ? (
+                            <RepresentativeTableWithPagination
+                                data={{
+                                    items: representativesData.items,
+                                    totalPages: representativesData.pagination.totalPages,
+                                    currentPage: page,
+                                }}
+                                onPageChange={setPage}
+                            />
+                        ) : (
+                            <div className="text-center text-gray-500">Нет данных</div>
+                        )}
+                    </div>
+                )}
 
                 {activeTab === "events" && (
                     <MainCards<EventItem>

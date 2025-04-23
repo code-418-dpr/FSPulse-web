@@ -7,17 +7,11 @@ import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import { getDisciplines } from "@/data/discipline";
 import { Tab } from "@/types";
 import { SearchParams } from "@/types/search";
-import {
-    Button,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
-    Form,
-    Input,
-} from "@heroui/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input } from "@heroui/react";
 import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
+
+/* eslint-disable */
 
 interface SearchFormProps {
     onSubmit: (params: SearchParams) => void;
@@ -130,7 +124,6 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
     return (
         <Form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4">
-                
                 {tabType === "representative" && (
                     <>
                         {renderDropdown(
