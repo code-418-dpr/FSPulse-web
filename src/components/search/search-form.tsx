@@ -137,19 +137,38 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
     return (
         <Form onSubmit={handleSubmit}>
             <div className="grid w-full grid-cols-1 gap-4">
-                <div className="col-span-full">
-                    <Input
-                        label="Название / описание"
-                        variant="bordered"
-                        fullWidth
-                        value={query}
-                        onChange={(e) => {
-                            setQuery(e.target.value);
-                        }}
-                    />
-                </div>
+                {tabType === "representative" && (
+                    <>
+                        {renderDropdown(
+                            "Статус",
+                            Object.values(RequestStatus).map((s) => ({
+                                key: s,
+                                name: getStatusName(s),
+                            })),
+                            selectedStatus,
+                            (keys) => {
+                                handleSelectionChange(
+                                    keys,
+                                    setSelectedStatus as React.Dispatch<React.SetStateAction<string | undefined>>,
+                                );
+                            },
+                            true,
+                        )}
+                    </>
+                )}
                 {tabType === "requests" && (
                     <>
+                        <div className="col-span-full">
+                            <Input
+                                label="Название / описание"
+                                variant="bordered"
+                                fullWidth
+                                value={query}
+                                onChange={(e) => {
+                                    setQuery(e.target.value);
+                                }}
+                            />
+                        </div>
                         {renderDropdown(
                             "Дисциплина",
                             disciplines.map((d) => ({ key: d.id, name: d.name })),
@@ -203,6 +222,17 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                 )}
                 {tabType === "events" && (
                     <>
+                        <div className="col-span-full">
+                            <Input
+                                label="Название / описание"
+                                variant="bordered"
+                                fullWidth
+                                value={query}
+                                onChange={(e) => {
+                                    setQuery(e.target.value);
+                                }}
+                            />
+                        </div>
                         {renderDropdown(
                             "Дисциплина",
                             disciplines.map((d) => ({ key: d.id, name: d.name })),

@@ -2,13 +2,14 @@
 
 import * as React from "react";
 
-import { SearchForm } from "@/app/admin/_components/search/search-form";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Tab } from "@/types";
 import type { SearchParams } from "@/types/search";
 import { Card, CardBody, CardHeader, useDisclosure } from "@heroui/react";
 import { Button, Drawer, DrawerBody, DrawerContent, DrawerHeader } from "@heroui/react";
 import { Icon } from "@iconify/react";
+
+import { SearchForm } from "./search-form";
 
 // Убедитесь что тип определен
 

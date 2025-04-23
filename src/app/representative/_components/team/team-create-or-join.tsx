@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import TeamCreateForm from "@/app/representative/_components/team/team-create-form";
 import TeamJoinForm from "@/app/representative/_components/team/team-join-form";
+import { getTeamsByEvent } from "@/data/team";
 import { TeamWithMembersItem } from "@/types";
 import { CircularProgress, Pagination, Tab, Tabs } from "@heroui/react";
 
@@ -27,21 +28,32 @@ function createTeam(): TeamWithMembersItem {
 
 const teamsWithMembers: TeamWithMembersItem[] = Array.from({ length: 13 }, createTeam);
 
-export default function TeamCreateOrJoin() {
+export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
     const [teamsData, setTeamsData] = useState<Paged<TeamWithMembersItem> | null>(null);
     const [isTeamsLoading, setIsTeamsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const teamsPageItems = teamsData?.items ?? [];
     const totalTeamsPages = teamsData?.pagination.totalPages ?? 1;
 
-    useEffect(() => {
+    const handleCreateValues = React.useCallback(async () => {
         const pageSize = 6;
-        const totalItems = teamsWithMembers.length;
-        const totalPages = Math.ceil(totalItems / pageSize);
+        const teamsOnEvent = await getTeamsByEvent(eventId);
 
+        // Объединяем тестовые данные с реальными командами
+        const allTeams = [
+            ...teamsOnEvent.map((team) => ({
+                name: team.name,
+                leader: "Капитан команды", // Можно получить из team.athletes
+                members: [], // Можно заполнить дополнительным запросом
+            })),
+            ...teamsWithMembers,
+        ];
+
+        const totalItems = allTeams.length;
+        const totalPages = Math.ceil(totalItems / pageSize);
         const startIndex = (page - 1) * pageSize;
         const endIndex = startIndex + pageSize;
-        const paginatedItems = teamsWithMembers.slice(startIndex, endIndex);
+        const paginatedItems = allTeams.slice(startIndex, endIndex);
 
         const pagedData: Paged<TeamWithMembersItem> = {
             items: paginatedItems,
@@ -53,15 +65,36 @@ export default function TeamCreateOrJoin() {
             },
         };
 
-        setIsTeamsLoading(true);
         setTeamsData(pagedData);
-        setIsTeamsLoading(false);
-    }, [page]);
+    }, [eventId, page]); // Зависимости функции
+
+    useEffect(() => {
+        setIsTeamsLoading(true);
+        handleCreateValues()
+            .catch((error: unknown) => {
+                // Явное указание типа unknown
+                if (error instanceof Error) {
+                    console.error("Ошибка загрузки команд:", error.message);
+                } else {
+                    console.error("Неизвестная ошибка:", error);
+                }
+                setTeamsData({
+                    items: [],
+                    pagination: {
+                        page: 1,
+                        pageSize: 6,
+                        totalItems: 0,
+                        totalPages: 1,
+                    },
+                });
+            })
+            .finally(() => { setIsTeamsLoading(false); });
+    }, [handleCreateValues]);
 
     return (
         <Tabs aria-label="RegisterForms" className="w-full" fullWidth>
             <Tab key="create" title="Создать команду">
-                <TeamCreateForm />
+                <TeamCreateForm eventId={eventId} />
             </Tab>
             <Tab key="join" title="Присоединиться к команде">
                 <div className="container mx-auto w-full flex-1 px-3 py-4">

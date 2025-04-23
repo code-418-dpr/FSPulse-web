@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import CompetitionDetails from "@/app/representative/_components/competition/competition-details";
+import CompetitionDetails from "@/components/competition/competition-details";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { RepresentativeRequestItem } from "@/types/search";
 import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";

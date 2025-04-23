@@ -7,10 +7,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AchievementCards from "@/app/admin/_components/achievement/achievement-cards";
 import EventCards from "@/app/admin/_components/event/event-cards";
 import { MainCards } from "@/app/admin/_components/main-cards";
-import { SearchCardOrDrawer } from "@/app/admin/_components/search/search-card-or-drawer";
 import TeamCards from "@/app/representative/_components/team/team-cards";
+import CompetitionCards from "@/components/competition/competition-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
+import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeRequests } from "@/data/event";
 import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
@@ -20,7 +21,6 @@ import { Button, CircularProgress, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { RequestStatus } from "../generated/prisma";
-import CompetitionCards from "./_components/competition/competition-cards";
 import { RepresentativeTableWithPagination } from "./_components/representative-table";
 
 interface Paged<T> {
@@ -148,39 +148,39 @@ export default function AdministratorPage() {
             });
     }, [activeTab, page]);
     useEffect(() => {
-            if (activeTab !== "requests" || !user?.id) return;
-            const loadRequests = async () => {
-                setIsRequestsLoading(true);
-                try {
-                    const params = {
-                        ...searchParamsState,
+        if (activeTab !== "requests" || !user?.id) return;
+        const loadRequests = async () => {
+            setIsRequestsLoading(true);
+            try {
+                const params = {
+                    ...searchParamsState,
+                    page,
+                    pageSize: perPage,
+                };
+                console.log("Параметры поиска: ", params);
+                const result = await searchRepresentativeRequests(params);
+                console.log("Результат: ", result);
+                setRequestsData({
+                    items: result.results,
+                    pagination: {
                         page,
                         pageSize: perPage,
-                    };
-                    console.log("Параметры поиска: ", params);
-                    const result = await searchRepresentativeRequests(params);
-                    console.log("Результат: ", result);
-                    setRequestsData({
-                        items: result.results,
-                        pagination: {
-                            page,
-                            pageSize: perPage,
-                            totalItems: result.totalItems,
-                            totalPages: result.totalPages,
-                        },
-                    });
-                } catch (error) {
-                    console.error("Error loading requests:", error);
-                } finally {
-                    setIsRequestsLoading(false);
-                }
-            };
-    
-            void loadRequests();
-        }, [activeTab, page, searchParamsState, user?.id]);
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading requests:", error);
+            } finally {
+                setIsRequestsLoading(false);
+            }
+        };
+
+        void loadRequests();
+    }, [activeTab, page, searchParamsState, user?.id]);
 
     const compPageItems = requestsData?.items ?? [];
-    const totalCompPages = requestsData?.pagination.totalPages ?? 1;
+    const totalCompPages = requestsData?.pagination.page ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
@@ -236,9 +236,15 @@ export default function AdministratorPage() {
                             setPageAction={setPage}
                             renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
                         />
-                        <div className="absolute right-10 bottom-10">
-                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
-                                <Icon icon="iconoir:plus" width={25} height={25} />
+                        <div className="absolute">
+                            <Button
+                                className="fixed right-5 bottom-5 z-10"
+                                isIconOnly
+                                aria-label="Create"
+                                onPress={onOpen}
+                                size="lg"
+                            >
+                                <Icon icon="iconoir:plus" width={50} height={50} />
                             </Button>
                         </div>
                     </>

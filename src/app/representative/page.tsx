@@ -5,15 +5,15 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
-import CompetitionCards from "@/app/representative/_components/competition/competition-cards";
-import CompetitionCreateForm from "@/app/representative/_components/competition/competition-create-form";
 import EventCards from "@/app/representative/_components/event/event-cards";
 import { MainCards } from "@/app/representative/_components/main-cards";
-import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
 import TeamCards from "@/app/representative/_components/team/team-cards";
+import CompetitionCards from "@/components/competition/competition-cards";
+import CompetitionCreateForm from "@/components/competition/competition-create-form";
 import FooterElement from "@/components/footer";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import NavbarElement from "@/components/navbar";
+import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeRequests } from "@/data/event";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
@@ -191,9 +191,15 @@ export default function RequestsPage() {
                             setPageAction={setPage}
                             renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
                         />
-                        <div className="absolute right-10 bottom-10">
-                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
-                                <Icon icon="iconoir:plus" width={25} height={25} />
+                        <div className="absolute">
+                            <Button
+                                className="fixed right-5 bottom-5 z-10"
+                                isIconOnly
+                                aria-label="Create"
+                                onPress={onOpen}
+                                size="lg"
+                            >
+                                <Icon icon="iconoir:plus" width={50} height={50} />
                             </Button>
                         </div>
                         <ModalOrDrawer label="Создание соревнования" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
