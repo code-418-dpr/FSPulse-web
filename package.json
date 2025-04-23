@@ -13,7 +13,8 @@
         "db:gen": "bun run prisma generate",
         "db:push": "bun run prisma db push",
         "db:seed": "bun prisma/seed.ts",
-        "db:studio": "bun run prisma studio"
+        "db:studio": "bun run prisma studio",
+        "anton": "NODE_OPTIONS=--max-old-space-size=2048 next dev"
     },
     "prisma": {
         "seed": "bun run --bun prisma/seed.ts"

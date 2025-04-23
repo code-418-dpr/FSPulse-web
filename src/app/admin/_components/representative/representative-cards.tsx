@@ -11,7 +11,7 @@ interface Props {
     paginatedData: RepresentativeRequestItem[];
 }
 
-export default function CompetitionCards({ paginatedData }: Props) {
+export default function RepCards({ paginatedData }: Props) {
     const [selected, setSelected] = useState<string | null>(null);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 

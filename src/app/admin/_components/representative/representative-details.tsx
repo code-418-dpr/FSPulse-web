@@ -43,6 +43,8 @@ export default function RepresentatDetails({ representativeId, onClose }: Props)
         const loadData = async () => {
             try {
                 const data = await getRepresentativeById(representativeId);
+                console.log("Представительство: ", representativeId);
+                console.log(data);
                 setRepresentative(data);
             } catch {
                 setError("Не удалось загрузить данные представителя");

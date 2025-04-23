@@ -62,7 +62,7 @@ export default function AdministratorPage() {
             setActiveTab(tab);
         } else {
             router.replace("/admin?tab=representative");
-            setActiveTab("requests");
+            setActiveTab("representative");
         }
     }, [pathname, router, searchParams]);
     useEffect(() => {
@@ -149,7 +149,6 @@ export default function AdministratorPage() {
     }, [activeTab, page]);
     useEffect(() => {
             if (activeTab !== "requests" || !user?.id) return;
-            console.log(user.id);
             const loadRequests = async () => {
                 setIsRequestsLoading(true);
                 try {

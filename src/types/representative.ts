@@ -7,10 +7,5 @@ export type RepresentativeDetails = Prisma.RepresentativeGetPayload<{
                 region: true;
             };
         };
-        events: {
-            include: {
-                event: true;
-            };
-        };
     };
 }>;
