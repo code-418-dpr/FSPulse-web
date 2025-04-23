@@ -26,7 +26,12 @@ export default function CompetitionCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange} label={"Заявка"} size="xl">
+                <ModalOrDrawer
+                    isOpen={isOpen}
+                    onOpenChangeAction={onOpenChange}
+                    label={"Заявка на проведение мероприятия"}
+                    size="xl"
+                >
                     <CompetitionDetails eventId={selected} />
                 </ModalOrDrawer>
             )}
@@ -47,7 +52,7 @@ export default function CompetitionCards({ paginatedData }: Props) {
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-bold">{c.name}</h3>
                                 <div className="flex items-center justify-between pt-2">
-                                    <h4 className="text-md text-foreground/50 font-bold"> {c.discipline.name}</h4>
+                                    <h4 className="text-foreground/50 text-sm font-bold"> {c.discipline.name}</h4>
 
                                     <Chip color="secondary" variant="flat">
                                         {c.level == "FEDERAL"

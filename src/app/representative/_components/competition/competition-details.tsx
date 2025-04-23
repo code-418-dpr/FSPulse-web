@@ -65,17 +65,27 @@ export default function CompetitionDetails({ eventId }: Props) {
                     className="w-[80%] rounded-xl object-cover"
                 />
                 <div className="grid grid-cols-1">
-                    <p className="text-md text-foreground/50 -translate-x-10">{competition.description}</p>
-                    <p className="text-md text-foreground/50 -translate-x-10">{competition.discipline.name}</p>
+                    <p className="text-md -translate-x-10">{competition.description}</p>
+                    <p className="text-foreground/50 -translate-x-10 text-sm font-bold">
+                        {competition.discipline.name}
+                    </p>
                     <div className="grid grid-cols-2 space-y-2">
-                        <p className="col-span-2 pt-1 text-right text-sm">
-                            {formatDatetime(competition.start)} – {formatDatetime(competition.end)}
+                        <p className="left col-span-2 pt-1 text-sm">
+                            Начало:
+                            <span className="text-foreground/50 ml-1 -translate-x-10 text-sm">
+                                {formatDatetime(competition.start)}
+                            </span>
+                            <br />
+                            Конец:
+                            <span className="text-foreground/50 ml-1 -translate-x-10 text-sm">
+                                {formatDatetime(competition.end)}
+                            </span>
                         </p>
                     </div>
                     <div className="flex items-center justify-between pt-2">
                         <p className="-translate-x-10 text-sm">Формат:</p>
-                        <Chip color={competition.isOnline ? "success" : "danger"} variant="solid">
-                            {competition.isOnline ? "Онлайн" : "Оффлайн"}
+                        <Chip color={"primary"} variant="flat">
+                            {competition.isOnline ? "Онлайн" : "Офлайн"}
                         </Chip>
                     </div>
                 </div>
@@ -120,8 +130,8 @@ export default function CompetitionDetails({ eventId }: Props) {
                 </div>
                 {/* Application date */}
                 <div className="grid grid-cols-2 space-y-2">
-                    <p className="pt-1 text-left text-sm">Зарегистрирован:</p>
-                    <p className="pt-1 text-right text-sm">{competition.applicationTime.toLocaleDateString()}</p>
+                    <p className="pt-1 text-left text-sm">Время подачи:</p>
+                    <p className="pt-1 text-right text-sm">{formatDatetime(competition.applicationTime)}</p>
                 </div>
             </div>
         </>
