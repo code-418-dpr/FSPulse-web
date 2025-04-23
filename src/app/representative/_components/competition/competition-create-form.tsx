@@ -352,8 +352,6 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                                     field.onChange(selected);
                                     setSelectedKeys(keys);
                                 }}
-                                isInvalid={!!errors.regions}
-                                errorMessage={errors.regions?.message}
                             />
                         );
                     }}
