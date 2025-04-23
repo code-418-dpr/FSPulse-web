@@ -201,7 +201,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                             </Autocomplete>
                         )}
                     />
-                    <div className="mb-4">
+                    <div className="mb-4 flex justify-between">
                         <label>Формат соревнований:</label>
                         <Controller
                             name="isOnline"
