@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,10 +8,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AuthForm from "@/components/auth/auth-form";
 import UserEditForm from "@/components/edit-forms/user-edit-form";
 import ModalOrDrawer from "@/components/modal-or-drawer";
+import { NotificationList } from "@/components/notification-list";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 import { Tab } from "@/types";
 import {
     Avatar,
+    Badge,
     Button,
     Dropdown,
     DropdownItem,
@@ -24,7 +27,6 @@ import {
     NavbarBrand,
     NavbarContent,
     NavbarItem,
-    PressEvent,
     Spinner,
     User,
     useDisclosure,
@@ -42,22 +44,41 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isLoading, isAuthenticated } = useAuth();
+
+    // Модалки
     const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
-
-    // Второе модальное окно (редактирование)
     const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
+    const {
+        isOpen: isNotificationOpen,
+        onOpen: onNotificationOpen,
+        onOpenChange: onNotificationOpenChange,
+    } = useDisclosure();
 
-    const handleNavigation = (e: PressEvent, tab: Tab) => {
-        router.push(`/representative?tab=${tab}`);
-        setActiveTabAction(tab);
-    };
+    // Уведомления
+    const { notifications, unreadCount, markAllAsRead } = useNotifications();
+    const prevOpenRef = useRef(isNotificationOpen);
 
+    // Синхронизация tab из query
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["requests", "events", "team"].includes(tab)) {
+        if (tab && ["requests", "events", "team", "achievement"].includes(tab)) {
             setActiveTabAction(tab);
         }
     }, [searchParams, setActiveTabAction]);
+
+    // При закрытии уведомлений — пометить всё прочитанным
+    useEffect(() => {
+        if (prevOpenRef.current && !isNotificationOpen && unreadCount > 0) {
+            markAllAsRead();
+        }
+        prevOpenRef.current = isNotificationOpen;
+    }, [isNotificationOpen, unreadCount, markAllAsRead]);
+
+    // Навигация между вкладками
+    const handleNavigation = (tab: Tab) => {
+        router.push(`/representative?tab=${tab}`);
+        setActiveTabAction(tab);
+    };
 
     const handleLogout = async () => {
         await signOut({ redirect: false });
@@ -71,21 +92,20 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                 <Image src="/images/FSPLogo.svg" alt="FSPulse Logo" className="h-8 w-8" />
                 <p className="ml-2 text-2xl font-bold">ФСПульс</p>
             </NavbarBrand>
+
             {isAuthenticated && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["requests", "events", "team"] as Tab[]).map((tab) => (
+                    {(["requests", "events", "team", "achievement"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
                                 href="#"
-                                onPress={(e) => {
-                                    handleNavigation(e, tab);
-                                }}
+                                onPress={() => { handleNavigation(tab); }}
                                 className={activeTab === tab ? "font-bold" : ""}
                             >
                                 {
                                     {
-                                        requests: "Заявки",
+                                        requests: "Представительства",
                                         events: "Соревнования",
                                         team: "Сборная",
                                         achievement: "Достижения",
@@ -96,7 +116,37 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                     ))}
                 </NavbarContent>
             )}
+
             <NavbarContent justify="end">
+                {isAuthenticated && (
+                    <NavbarItem>
+                        <div className="relative">
+                            <Button
+                                isIconOnly
+                                variant="light"
+                                radius="full"
+                                onPress={onNotificationOpen}
+                                aria-label="Notifications"
+                            >
+                                <Icon icon="lucide:bell" className="h-5 w-5" />
+                                {unreadCount > 0 && (
+                                    <Badge color="primary" shape="circle" placement="top-right" size="sm">
+                                        {unreadCount > 99 ? "99+" : unreadCount}
+                                    </Badge>
+                                )}
+                            </Button>
+                            <ModalOrDrawer
+                                label="Уведомления"
+                                isOpen={isNotificationOpen}
+                                onOpenChangeAction={onNotificationOpenChange}
+                                size="md"
+                            >
+                                <NotificationList notifications={notifications} />
+                            </ModalOrDrawer>
+                        </div>
+                    </NavbarItem>
+                )}
+
                 <NavbarItem>
                     {isLoading ? (
                         <Spinner size="sm" />
@@ -105,7 +155,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                             <Dropdown
                                 showArrow
                                 classNames={{
-                                    base: "before:bg-default-200", // change arrow background
+                                    base: "before:bg-default-200",
                                     content: "p-0 border-small border-divider bg-background",
                                 }}
                                 radius="sm"
@@ -157,17 +207,14 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                             />
                                         </DropdownItem>
                                     </DropdownSection>
+
                                     <DropdownSection aria-label="Settings & Logout">
                                         {user?.role !== "admin" ? (
-                                            <DropdownItem
-                                                key="settings"
-                                                onPress={() => {
-                                                    onEditOpen();
-                                                }}
-                                            >
+                                            <DropdownItem key="settings" onPress={onEditOpen}>
                                                 Настройки
                                             </DropdownItem>
                                         ) : null}
+
                                         <DropdownItem
                                             key="logout"
                                             className="text-danger data-[hover=true]:text-danger data-[focus-visible=true]:text-danger"
@@ -180,6 +227,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                     </DropdownSection>
                                 </DropdownMenu>
                             </Dropdown>
+
                             <ModalOrDrawer
                                 label="Редактирование"
                                 isOpen={isEditOpen}
@@ -208,6 +256,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                         </>
                     )}
                 </NavbarItem>
+
                 <NavbarItem>
                     <ThemeSwitcher />
                 </NavbarItem>

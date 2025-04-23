@@ -37,7 +37,7 @@ export const MultiSelectAutocomplete: React.FC<MultiSelectAutocompleteProps> = (
         return items.filter(
             (item) =>
                 item.label.toLowerCase().includes(lowerCaseInput) ||
-                (item.description?.toLowerCase().includes(lowerCaseInput)),
+                item.description?.toLowerCase().includes(lowerCaseInput),
         );
     }, [items, inputValue]);
 
@@ -80,7 +80,9 @@ export const MultiSelectAutocomplete: React.FC<MultiSelectAutocompleteProps> = (
                     return (
                         <Chip
                             key={key}
-                            onClose={() => { handleRemove(key); }}
+                            onClose={() => {
+                                handleRemove(key);
+                            }}
                             variant="flat"
                             color="primary"
                             size="sm"
@@ -116,7 +118,15 @@ export const MultiSelectAutocomplete: React.FC<MultiSelectAutocompleteProps> = (
                 menuTrigger="input"
                 onSelectionChange={handleSelectionChange}
                 endContent={
-                    <Button isIconOnly size="sm" variant="light" onPress={() => { setIsOpen(!isOpen); }} className="mr-1">
+                    <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        onPress={() => {
+                            setIsOpen(!isOpen);
+                        }}
+                        className="mr-1"
+                    >
                         <Icon
                             icon={isOpen ? "lucide:chevron-up" : "lucide:chevron-down"}
                             className="text-default-500"

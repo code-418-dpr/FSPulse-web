@@ -56,7 +56,7 @@ export default function SignInForm({ className }: SignInFormProps) {
             });
 
             if (result?.error) {
-                setError("Неверный email или пароль");
+                setError(result.error);
                 return;
             }
             router.push("/");

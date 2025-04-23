@@ -40,7 +40,14 @@ export const authOptions: NextAuthOptions = {
                     if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
                         throw new Error("Неверный email или пароль");
                     }
-
+                    if (user.representative.length > 0) {
+                        const representative = user.representative[0];
+                        if (representative.requestStatus === 'PENDING') {
+                            throw new Error("Ваша заявка на представительство находится на рассмотрении.");
+                        } else if (representative.requestStatus === 'DECLINED') {
+                            throw new Error("Ваша заявка на представительство отклонена.");
+                        }
+                    }
                     let role: "athlete" | "representative" = "athlete";
                     if (user.representative.length > 0) role = "representative";
 
@@ -52,7 +59,7 @@ export const authOptions: NextAuthOptions = {
                     };
                 } catch (error) {
                     console.error("Auth error:", error);
-                    return null;
+                    throw error;
                 }
             },
         }),
