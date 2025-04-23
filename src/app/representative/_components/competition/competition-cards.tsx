@@ -5,19 +5,8 @@ import { useState } from "react";
 import CompetitionDetails from "@/app/representative/_components/competition/competition-details";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { RepresentativeRequestItem } from "@/types/search";
+import { formatDatetime } from "@/utils";
 import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
 
 interface Props {
     paginatedData: RepresentativeRequestItem[];
@@ -37,7 +26,7 @@ export default function CompetitionCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange} label={"Заявки"} size="xl">
+                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange} label={"Заявка"} size="xl">
                     <CompetitionDetails eventId={selected} />
                 </ModalOrDrawer>
             )}
@@ -69,7 +58,7 @@ export default function CompetitionCards({ paginatedData }: Props) {
                                     </Chip>
                                 </div>
                                 <div className="flex items-center justify-between pt-2">
-                                    <p className="pt-1 text-left text-sm">{c.applicationTime.toLocaleDateString()}</p>
+                                    <p className="pt-1 text-left text-sm">{formatDatetime(c.applicationTime)}</p>
                                     <Chip
                                         color={
                                             c.requestStatus == "APPROVED"

@@ -25,7 +25,7 @@ export default function CompetitionCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange} label={"Заявки"} size="xl">
+                <ModalOrDrawer isOpen={isOpen} onOpenChangeAction={onOpenChange} label={"Заявка"} size="xl">
                     <CompetitionDetails eventId={selected} />
                 </ModalOrDrawer>
             )}

@@ -87,8 +87,8 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
     const getStatusName = (status: RequestStatus) => {
         const names: Record<RequestStatus, string> = {
             [RequestStatus.PENDING]: "На рассмотрении",
-            [RequestStatus.APPROVED]: "Одобрено",
-            [RequestStatus.DECLINED]: "Отклонено",
+            [RequestStatus.APPROVED]: "Одобрена",
+            [RequestStatus.DECLINED]: "Отклонена",
         };
         return names[status];
     };
@@ -139,7 +139,7 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
             <div className="grid grid-cols-1 gap-4">
                 <div className="col-span-full">
                     <Input
-                        label="Поиск по описанию"
+                        label="Название / описание"
                         variant="bordered"
                         fullWidth
                         value={query}
@@ -161,13 +161,9 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                         )}
 
                         <div className="mb-4">
-                            <label className="mb-2 block text-sm font-medium">Даты подачи заявки</label>
+                            <label className="mb-2 block text-sm font-medium">Интервал подачи</label>
                             <DateRangePicker
                                 className="w-full"
-                                defaultValue={{
-                                    start: today(getLocalTimeZone()).subtract({ days: 7 }),
-                                    end: today(getLocalTimeZone()),
-                                }}
                                 onChange={(range) => {
                                     const timeZone = getLocalTimeZone();
                                     setSelectedDateRange({
@@ -179,7 +175,7 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                         </div>
 
                         {renderDropdown(
-                            "Уровень события",
+                            "Уровень соревнования",
                             levels.map((l) => ({ key: l, name: getLevelName(l) })),
                             selectedLevel,
                             (keys) => {

@@ -62,7 +62,12 @@ export async function searchRepresentativeRequests(params: SearchRepresentativeE
         orderBy: { applicationTime: "desc" },
     });
     const totalItems = await prisma.event.count({ where: requiredWhere });
-    return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
+    return {
+        results,
+        pages: Math.ceil(results.length / pageSize),
+        totalItems,
+        totalPages: Math.ceil(totalItems / pageSize),
+    };
 }
 
 export async function searchRepresentativeEvents(params: SearchRepresentativeEventsParams) {
@@ -137,7 +142,12 @@ export async function searchRepresentativeEvents(params: SearchRepresentativeEve
         orderBy: { applicationTime: "desc" },
     });
     const totalItems = await prisma.event.count({ where: requiredWhere });
-    return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
+    return {
+        results,
+        pages: Math.ceil(results.length / pageSize),
+        totalItems,
+        totalPages: Math.ceil(totalItems / pageSize),
+    };
 }
 
 export async function getRepresentativeRequestById(id: string) {

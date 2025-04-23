@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import { getRepresentativeRequestById } from "@/data/event";
 import { RepresentativeEventRequest } from "@/types/competitions";
+import { formatDatetime } from "@/utils";
 import { Chip, Image, Spinner } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
@@ -68,7 +69,7 @@ export default function CompetitionDetails({ eventId }: Props) {
                     <p className="text-md text-foreground/50 -translate-x-10">{competition.discipline.name}</p>
                     <div className="grid grid-cols-2 space-y-2">
                         <p className="col-span-2 pt-1 text-right text-sm">
-                            {competition.start.toLocaleDateString()} – {competition.end.toLocaleDateString()}
+                            {formatDatetime(competition.start)} – {formatDatetime(competition.end)}
                         </p>
                     </div>
                     <div className="flex items-center justify-between pt-2">
