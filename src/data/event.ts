@@ -1,10 +1,10 @@
 "use server";
 
-import { EventLevel, RequestStatus } from "@/app/generated/prisma";
+import { RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
-import { SearchRepresentativeRequestsParams } from "@/types/search";
+import { SearchRepresentativeEventRequestsParams, SearchRepresentativeEventsParams } from "@/types/search";
 
-export async function searchRepresentativeRequests(params: SearchRepresentativeRequestsParams) {
+export async function searchRepresentativeRequests(params: SearchRepresentativeEventRequestsParams) {
     const {
         page,
         pageSize,
@@ -17,9 +17,11 @@ export async function searchRepresentativeRequests(params: SearchRepresentativeR
         requestStatus,
     } = params;
     const requiredWhere = {
-        representatives: {
-            some: { representativeId },
-        },
+        representatives: representativeId
+            ? {
+                  some: { representativeId },
+              }
+            : {},
     };
     const results = await prisma.event.findMany({
         where: {
@@ -61,22 +63,6 @@ export async function searchRepresentativeRequests(params: SearchRepresentativeR
     });
     const totalItems = await prisma.event.count({ where: requiredWhere });
     return { results, totalItems, totalPages: Math.ceil(totalItems / pageSize) };
-}
-
-interface SearchRepresentativeEventsParams {
-    page: number;
-    pageSize: number;
-    representativeId: string;
-    query?: string;
-    disciplineId?: string;
-    minStartTime?: Date;
-    maxStartTime?: Date;
-    level?: EventLevel;
-    minAge?: number;
-    maxAge?: number;
-    isOnline?: boolean;
-    isTeamFormatAllowed?: boolean;
-    isPersonalFormatAllowed?: boolean;
 }
 
 export async function searchRepresentativeEvents(params: SearchRepresentativeEventsParams) {
@@ -175,6 +161,8 @@ export async function getRepresentativeRequestById(id: string) {
         },
     });
 }
+
+// —————————————————————————————————————————
 
 export interface EventSummary {
     id: string;

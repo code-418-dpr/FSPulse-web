@@ -1,21 +1,41 @@
 "use client";
 
-import { RepresentativeItem } from "@/data/representative";
-import { Chip, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
+import { useState } from "react";
 
-interface RepresentativeTableWithPaginationProps {
+import ModalOrDrawer from "@/components/modal-or-drawer";
+import { RepresentativeItem } from "@/data/representative";
+import {
+    Chip,
+    Pagination,
+    Table,
+    TableBody,
+    TableCell,
+    TableColumn,
+    TableHeader,
+    TableRow,
+    useDisclosure,
+} from "@heroui/react";
+
+import RepresentativeDetails from "./representative/representative-details";
+
+export function RepresentativeTableWithPagination({
+    data,
+    onPageChange,
+}: {
     data: {
         items: RepresentativeItem[];
         totalPages: number;
         currentPage: number;
     };
-    onPageChangeAction: (page: number) => void;
-}
+    onPageChange: (page: number) => void;
+}) {
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-export function RepresentativeTableWithPagination({
-    data,
-    onPageChangeAction,
-}: RepresentativeTableWithPaginationProps) {
+    const handleRowClick = (id: string) => {
+        setSelectedId(id);
+        onOpen();
+    };
     return (
         <div className="space-y-4">
             <div className="overflow-x-auto">
@@ -28,7 +48,13 @@ export function RepresentativeTableWithPagination({
                     <TableBody>
                         {data.items.length > 0 ? (
                             data.items.map((rep) => (
-                                <TableRow key={rep.id}>
+                                <TableRow
+                                    key={rep.id}
+                                    className="hover:bg-foreground/10 cursor-pointer"
+                                    onClick={() => {
+                                        handleRowClick(rep.id);
+                                    }}
+                                >
                                     <TableCell>{rep.region}</TableCell>
                                     <TableCell>{rep.fio}</TableCell>
                                     <TableCell>
@@ -60,13 +86,23 @@ export function RepresentativeTableWithPagination({
                         )}
                     </TableBody>
                 </Table>
+                {selectedId && (
+                    <ModalOrDrawer
+                        isOpen={isOpen}
+                        onOpenChangeAction={onOpenChange}
+                        label="Детали представителя"
+                        size="xl"
+                    >
+                        <RepresentativeDetails representativeId={selectedId} onClose={onOpenChange} />
+                    </ModalOrDrawer>
+                )}
             </div>
 
             {data.totalPages > 1 && (
                 <Pagination
                     total={data.totalPages}
                     page={data.currentPage}
-                    onChange={onPageChangeAction}
+                    onChange={onPageChange}
                     className="justify-center"
                 />
             )}

@@ -14,7 +14,7 @@ import disciplines from "./data/discipline";
 import { generateRandomEvents } from "./data/event";
 import regionNames from "./data/region";
 import skillNames from "./data/skill";
-import generateRandomSkillsOfAthletes from "./data/skill-of-user";
+import generateRandomSkillsOfAthletes from "./data/skill-of-athlete";
 import generateRandomUsers from "./data/user";
 
 const USER_COUNT = 100;
