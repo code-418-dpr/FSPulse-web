@@ -12,13 +12,13 @@ export async function GET(req: Request) {
 
     const list = await prisma.notification.findMany({
         where: { userId },
-        orderBy: { notificationTime: "desc" },
+        orderBy: { sendTime: "desc" },
     });
 
     return NextResponse.json(
         list.map((i) => ({
             ...i,
-            notificationTime: i.notificationTime.toISOString(),
+            sendTime: i.sendTime.toISOString(),
         })),
     );
 }

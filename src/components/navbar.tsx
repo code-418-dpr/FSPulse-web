@@ -70,7 +70,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     // При закрытии уведомлений — пометить всё прочитанным
     useEffect(() => {
         if (prevOpenRef.current && !isNotificationOpen && unreadCount > 0) {
-            markAllAsRead();
+            void markAllAsRead();
         }
         prevOpenRef.current = isNotificationOpen;
     }, [isNotificationOpen, unreadCount, markAllAsRead]);

@@ -1,8 +1,6 @@
 import { Prisma } from "@/app/generated/prisma";
 
-import DisciplineCreateInput = Prisma.DisciplineCreateInput;
-
-const disciplines: DisciplineCreateInput[] = [
+const disciplines: Prisma.DisciplineCreateInput[] = [
     {
         name: "Программирование продуктовое",
         minDuration: 12,

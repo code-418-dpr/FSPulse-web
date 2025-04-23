@@ -1,11 +1,12 @@
 const skillNames = [
     "Docker",
     "Next.js",
-    "JS",
-    "TS",
+    "JavaScript",
+    "TypeScript",
     "Python",
     "C#",
     ".NET",
+    "ASP.NET",
     "PHP",
     "HTML",
     "CSS",
@@ -19,6 +20,14 @@ const skillNames = [
     "Webpack",
     "Git",
     "Svelte",
+    "Java",
+    "Spring",
+    "C",
+    "C++",
+    "Nuxt.js",
+    "NestJS",
+    "Figma",
+    "CI/CD",
 ];
 
 export default skillNames;

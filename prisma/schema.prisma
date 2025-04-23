@@ -90,6 +90,7 @@ model Skill {
 model SkillOfAthlete {
   athleteId String
   skillId   String
+  grade     Int    @default(0) @db.SmallInt
 
   skill   Skill   @relation(fields: [skillId], references: [id])
   athlete Athlete @relation(fields: [athleteId], references: [id])
@@ -118,10 +119,9 @@ model Athlete {
 }
 
 model Coach {
-  id            String          @id
-  birthDate     DateTime        @db.Date()
-  address       String
-  sportCategory SportsCategory?
+  id        String   @id
+  birthDate DateTime @db.Date()
+  address   String
 
   user  User   @relation(fields: [id], references: [id])
   teams Team[]
@@ -231,13 +231,13 @@ enum NotificationType {
 }
 
 model Notification {
-  id               String           @id @default(uuid())
-  userId           String
-  title            String
-  notificationTime DateTime         @default(now())
-  content          String
-  isRead           Boolean          @default(false)
-  type             NotificationType
+  id       String           @id @default(uuid())
+  userId   String
+  type     NotificationType
+  title    String
+  content  String
+  sendTime DateTime         @default(now())
+  isRead   Boolean          @default(false)
 
   user User @relation(fields: [userId], references: [id])
 }

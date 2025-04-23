@@ -8,7 +8,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import { EventLevel } from "@/app/generated/prisma";
-import { MultiSelectAutocomplete } from "@/components/multiselect-autocomplite";
+import { MultiSelectAutocomplete } from "@/components/multiselect-autocomplete";
 import { getDisciplines } from "@/data/discipline";
 import { getRegions } from "@/data/region";
 import { competitionRequestSchema } from "@/schemas/competition-request-schema";

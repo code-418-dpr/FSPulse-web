@@ -1,16 +1,13 @@
-// src/hooks/use-notifications.ts
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
 
+import { Prisma } from "@/app/generated/prisma";
 import { useAuth } from "@/hooks/use-auth";
-import { Notification } from "@/types/notification";
-
-// src/hooks/use-notifications.ts
 
 export const useNotifications = () => {
     const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<Prisma.NotificationCreateInput[]>([]);
     const [loading, setLoading] = useState(true);
 
     const load = useCallback(async () => {
@@ -21,7 +18,7 @@ export const useNotifications = () => {
         if (res.ok) {
             const data: unknown = await res.json();
             if (Array.isArray(data)) {
-                setNotifications(data as Notification[]);
+                setNotifications(data as Prisma.NotificationCreateInput[]);
             }
         }
 
