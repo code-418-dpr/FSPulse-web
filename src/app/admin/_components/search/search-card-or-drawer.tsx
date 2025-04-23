@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { SearchForm } from "@/app/representative/_components/search/search-form";
+import { SearchForm } from "@/app/admin/_components/search/search-form";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Tab } from "@/types";
 import type { SearchParams } from "@/types/search";

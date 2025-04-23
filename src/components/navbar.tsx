@@ -27,6 +27,7 @@ import {
     NavbarBrand,
     NavbarContent,
     NavbarItem,
+    PressEvent,
     Spinner,
     User,
     useDisclosure,
@@ -75,8 +76,9 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     }, [isNotificationOpen, unreadCount, markAllAsRead]);
 
     // Навигация между вкладками
-    const handleNavigation = (tab: Tab) => {
-        router.push(`/representative?tab=${tab}`);
+    const handleNavigation = (e: PressEvent, tab: Tab) => {
+        if (user?.role === "representative") router.push(`/representative?tab=${tab}`);
+        else if (user?.role === "admin") router.push(`/admin?tab=${tab}`);
         setActiveTabAction(tab);
     };
 
@@ -93,14 +95,16 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                 <p className="ml-2 text-2xl font-bold">ФСПульс</p>
             </NavbarBrand>
 
-            {isAuthenticated && (
+            {isAuthenticated && user?.role === "representative" && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
                     {(["requests", "events", "team", "achievement"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
                                 href="#"
-                                onPress={() => { handleNavigation(tab); }}
+                                onPress={(e) => {
+                                    handleNavigation(e, tab);
+                                }}
                                 className={activeTab === tab ? "font-bold" : ""}
                             >
                                 {
@@ -109,6 +113,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                         events: "Соревнования",
                                         team: "Сборная",
                                         achievement: "Достижения",
+                                        representative: "Представительства",
                                     }[tab]
                                 }
                             </Link>
@@ -116,7 +121,32 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                     ))}
                 </NavbarContent>
             )}
-
+            {isAuthenticated && user?.role === "admin" && (
+                <NavbarContent className="hidden gap-4 sm:flex" justify="center">
+                    {(["representative", "events", "team"] as Tab[]).map((tab) => (
+                        <NavbarItem key={tab}>
+                            <Link
+                                color="foreground"
+                                href="#"
+                                onPress={(e) => {
+                                    handleNavigation(e, tab);
+                                }}
+                                className={activeTab === tab ? "font-bold" : ""}
+                            >
+                                {
+                                    {
+                                        requests: "Представительства",
+                                        events: "Соревнования",
+                                        team: "Сборная",
+                                        achievement: "Достижения",
+                                        representative: "Представительства",
+                                    }[tab]
+                                }
+                            </Link>
+                        </NavbarItem>
+                    ))}
+                </NavbarContent>
+            )}
             <NavbarContent justify="end">
                 {isAuthenticated && (
                     <NavbarItem>
