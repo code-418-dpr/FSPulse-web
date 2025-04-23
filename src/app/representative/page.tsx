@@ -191,9 +191,11 @@ export default function RequestsPage() {
                             setPageAction={setPage}
                             renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
                         />
-                        <Button isIconOnly aria-label="Create" onPress={onOpen}>
-                            <Icon icon="iconoir:plus" width={18} height={18} className="mr-1" />
-                        </Button>
+                        <div className="absolute right-10 bottom-10">
+                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
+                                <Icon icon="iconoir:plus" width={25} height={25} />
+                            </Button>
+                        </div>
                         <ModalOrDrawer label="Создание соревнования" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
                             <CompetitionCreateForm />
                         </ModalOrDrawer>
