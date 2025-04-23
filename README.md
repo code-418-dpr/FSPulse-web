@@ -9,7 +9,7 @@
 [![codeql](https://github.com/code-418-dpr/FSPulse-web/actions/workflows/codeql.yaml/badge.svg)](https://github.com/code-418-dpr/FSPulse-web/actions/workflows/codeql.yaml)
 [![build](https://github.com/code-418-dpr/FSPulse-web/actions/workflows/build.yaml/badge.svg)](https://github.com/code-418-dpr/FSPulse-web/actions/workflows/build.yaml)
 
-Модуль фронтенда для проекта FSPulse
+Модуль веб-приложения для проекта FSPulse
 
 ## Особенности реализации
 
@@ -22,6 +22,8 @@
 - **Next.js** — фронтенд-фреймворк на основе React
 - **Tailwind CSS** — CSS-фреймворк
 - **HeroUI** — набор компонентов
+- **Prisma ORM** — ORM для работы с БД
+- **Auth.js** — авторизация и управление сессиями
 - **ESLint** — статический анализатор кода
 - **Stylelint** — анализатор стилей
 - **Prettier** — форматировщик кода
@@ -30,7 +32,7 @@
 ## Установка и запуск
 
 > [!WARNING]
-> Полноценная работа фронтенда возможна только при запущенном бэкенде.
+> Полноценная работа веб-приложения возможна только при запущенной базе данных.
 
 0. Клонируйте репозиторий и перейдите в его папку.
 
