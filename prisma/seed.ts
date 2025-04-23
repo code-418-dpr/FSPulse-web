@@ -1,6 +1,4 @@
-import fs from "fs";
-import path from "path";
-
+// seed.ts
 import { createAgeGroups } from "@/data/age-group";
 import { createDisciplines } from "@/data/discipline";
 import { createRegions } from "@/data/region";
@@ -8,36 +6,44 @@ import { createSkills } from "@/data/skill";
 import { createSkillsOfAthletes } from "@/data/skill-of-athlete";
 import { createUsers, getAthletes } from "@/data/user";
 import prisma from "@/lib/prisma";
+import { faker } from "@faker-js/faker/locale/ru";
 
 import ageGroups from "./data/age-group";
 import mapDisciplinesAndAgeGroups from "./data/age-group-of-discipline";
 import disciplines from "./data/discipline";
-import eventRepresentatives from "./data/eventRepresentatives";
-import events from "./data/events";
+import { generateRandomEvents } from "./data/event";
 import regionNames from "./data/region";
 import skillNames from "./data/skill";
 import generateRandomSkillsOfAthletes from "./data/skill-of-athlete";
 import generateRandomUsers from "./data/user";
 
-const userCount = 100;
+const USER_COUNT = 100;
+const EVENT_COUNT = 50;
 
 export async function main() {
+    // 1) Регионы
     console.log("Seeding regions...");
     await createRegions(regionNames);
 
+    // 2) Пользователи (спортсмены, представители, тренеры)
     console.log("Seeding users, athletes, coaches, representatives...");
-    await createUsers(await generateRandomUsers(userCount));
+    const usersData = await generateRandomUsers(USER_COUNT);
+    await createUsers(usersData);
 
+    // 3) Навыки и распределение по спортсменам
     console.log("Seeding skills...");
     const createdSkills = await createSkills(skillNames);
 
     console.log("Mapping skills to athletes...");
     const athletes = await getAthletes();
-    await createSkillsOfAthletes(generateRandomSkillsOfAthletes(athletes, createdSkills));
+    const skillsOfAthletes = generateRandomSkillsOfAthletes(athletes, createdSkills);
+    await createSkillsOfAthletes(skillsOfAthletes);
 
+    // 4) Дисциплины
     console.log("Seeding disciplines...");
     const createdDisciplines = await createDisciplines(disciplines);
 
+    // 5) Возрастные группы и их связь с дисциплинами
     console.log("Seeding age groups...");
     const createdAgeGroups = await createAgeGroups(ageGroups);
 
@@ -47,88 +53,61 @@ export async function main() {
         skipDuplicates: true,
     });
 
-    console.log("Seeding Events...");
-    for (const raw of events) {
-        try {
-            const exists = await prisma.event.findFirst({ where: { name: raw.name } });
-            if (exists) {
-                console.log(`  • Event "${raw.name}" exists, skip`);
-                continue;
-            }
+    // 6) Подготовка списка представителей
+    console.log("Fetching representatives...");
+    const reps = await prisma.representative.findMany({ select: { id: true } });
+    const repIds = reps.map((r) => r.id);
 
-            const discipline = await prisma.discipline.findUnique({ where: { name: raw.disciplineName } });
-            if (!discipline) throw new Error(`Discipline "${raw.disciplineName}" not found`);
+    // 7) Создание событий вместе с представителями
+    console.log("Seeding events with representatives...");
+    const randomEvents = await generateRandomEvents(EVENT_COUNT);
 
-            const cover = fs.readFileSync(path.join(__dirname, raw.coverPath));
+    for (const raw of randomEvents) {
+        // выбираем от 1 до 3 уникальных представителей
+        const howMany = faker.number.int({ min: 1, max: 4 });
+        const repIdsForEvent = faker.helpers.arrayElements(repIds, howMany);
 
-            await prisma.event.create({
-                data: {
-                    name: raw.name,
-                    description: raw.description,
-                    cover,
-                    applicationTime: new Date(raw.applicationTime),
-                    startRegistration: new Date(raw.startRegistration),
-                    endRegistration: new Date(raw.endRegistration),
-                    start: new Date(raw.start),
-                    end: new Date(raw.end),
-                    minAge: raw.minAge,
-                    maxAge: raw.maxAge,
-                    minTeamParticipantsCount: 0,
-                    maxTeamParticipantsCount: 0,
-                    maxParticipantsCount: raw.maxParticipantsCount,
-                    discipline: { connect: { id: discipline.id } },
-                    isOnline: raw.isOnline,
-                    address: raw.address,
-                    awards: raw.awards,
-                    level: raw.level,
-                    isPersonalFormatAllowed: raw.isPersonalFormatAllowed,
-                    requestStatus: raw.status,
-                    requestComment: null,
+        await prisma.event.create({
+            data: {
+                // поля события
+                name: raw.name,
+                description: raw.description,
+                cover: raw.cover,
+                applicationTime: raw.applicationTime,
+                startRegistration: raw.startRegistration,
+                endRegistration: raw.endRegistration,
+                start: raw.start,
+                end: raw.end,
+                minAge: raw.minAge,
+                maxAge: raw.maxAge,
+                minTeamParticipantsCount: raw.minTeamParticipantsCount,
+                maxTeamParticipantsCount: raw.maxTeamParticipantsCount,
+                maxParticipantsCount: raw.maxParticipantsCount,
+                isPersonalFormatAllowed: raw.isPersonalFormatAllowed,
+                disciplineId: raw.disciplineId,
+                isOnline: raw.isOnline,
+                address: raw.address,
+                awards: raw.awards,
+                level: raw.level,
+                requestStatus: raw.requestStatus,
+                requestComment: raw.requestComment,
+
+                // вложенные записи EventOfRepresentative
+                representatives: {
+                    create: repIdsForEvent.map((repId) => ({
+                        representative: { connect: { id: repId } },
+                    })),
                 },
-            });
-            console.log(`  ✔ Event "${raw.name}"`);
-        } catch (error: unknown) {
-            const e = error as { message?: string };
-            console.warn(`  ! Event "${raw.name}" skipped: ${e.message}`);
-        }
+            },
+        });
+
+        console.log(`  ✔ Event "${raw.name}" linked with reps [${repIdsForEvent.join(", ")}]`);
     }
 
-    console.log("Seeding EventOfRepresentative...");
-    for (const { representativeEmail, eventName } of eventRepresentatives) {
-        try {
-            const rep = await prisma.representative.findFirst({
-                include: { user: true },
-                where: { user: { email: representativeEmail } },
-            });
-            const evt = await prisma.event.findFirst({ where: { name: eventName } });
-
-            if (!rep || !evt) {
-                console.warn(`  • Relation "${representativeEmail}"↔"${eventName}" skipped: Rep or Event not found`);
-                continue;
-            }
-
-            const exists = await prisma.eventOfRepresentative.findUnique({
-                where: { representativeId_eventId: { representativeId: rep.id, eventId: evt.id } },
-            });
-
-            if (exists) {
-                console.log(`  • Relation "${representativeEmail}"↔"${eventName}" already exists, skip`);
-                continue;
-            }
-
-            await prisma.eventOfRepresentative.create({
-                data: {
-                    representative: { connect: { id: rep.id } },
-                    event: { connect: { id: evt.id } },
-                },
-            });
-
-            console.log(`  ✔ Linked "${representativeEmail}" → "${eventName}"`);
-        } catch (error: unknown) {
-            const e = error as { message?: string };
-            console.warn(`  • Relation "${representativeEmail}"↔"${eventName}" skipped: ${e.message}`);
-        }
-    }
+    console.log("✅ Seeding complete!");
 }
 
-void main();
+void main().catch((e: unknown) => {
+    console.error("Seed error:", e);
+    process.exit(1);
+});
