@@ -1,17 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
-import { signOut } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-
-import AuthForm from "@/components/auth/auth-form";
-import UserEditForm from "@/components/edit-forms/user-edit-form";
-import ModalOrDrawer from "@/components/modal-or-drawer";
 import { useAuth } from "@/hooks/use-auth";
-import { Tab } from "@/types";
 import {
     Avatar,
+    Badge,
     Button,
     Dropdown,
     DropdownItem,
@@ -24,43 +18,53 @@ import {
     NavbarBrand,
     NavbarContent,
     NavbarItem,
-    PressEvent,
     Spinner,
     User,
     useDisclosure,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
+import { useNotifications } from "../hooks/use-notifications";
+import ModalOrDrawer from "./modal-or-drawer";
+import { NotificationList } from "./notification-list";
 import { ThemeSwitcher } from "./theme-switcher";
 
+// <-- импорт хука аутентификации
+
 interface NavbarProps {
-    activeTab: Tab;
-    setActiveTabAction: React.Dispatch<React.SetStateAction<Tab>>;
+    activeTab: "requests" | "events" | "team";
+    setActiveTabAction: React.Dispatch<React.SetStateAction<"requests" | "events" | "team">>;
 }
 
 export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarProps) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const { user, isLoading, isAuthenticated } = useAuth();
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isAuthOpen, onOpen: onAuthOpen, onOpenChange: onAuthOpenChange } = useDisclosure();
+    const { isOpen: isProfileOpen, onOpen: onProfileOpen, onOpenChange: onProfileOpenChange } = useDisclosure();
+    const {
+        isOpen: isNotificationOpen,
+        onOpen: onNotificationOpen,
+        onOpenChange: onNotificationOpenChange,
+    } = useDisclosure();
 
-    const handleNavigation = (e: PressEvent, tab: Tab) => {
-        router.push(`/representative?tab=${tab}`);
+    const { notifications, unreadCount, markAllAsRead } = useNotifications();
+    const { user, isAuthenticated, isLoading } = useAuth();
+
+    // Ref для отслеживания закрытия
+    const prevOpenRef = useRef(isNotificationOpen);
+    useEffect(() => {
+        if (prevOpenRef.current && !isNotificationOpen && unreadCount > 0) {
+            markAllAsRead();
+        }
+        prevOpenRef.current = isNotificationOpen;
+    }, [isNotificationOpen, unreadCount, markAllAsRead]);
+
+    const handleNavigation = (tab: "requests" | "events" | "team") => {
         setActiveTabAction(tab);
     };
 
-    useEffect(() => {
-        const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["requests", "events", "team"].includes(tab)) {
-            setActiveTabAction(tab);
-        }
-    }, [searchParams, setActiveTabAction]);
-
-    const handleLogout = async () => {
-        await signOut({ redirect: false });
-        router.push("/");
-        router.refresh();
-    };
+    function handleLogout(): void {
+        console.log("Logging out");
+        // TODO: реальный выход
+    }
 
     return (
         <Navbar maxWidth="xl" isBordered>
@@ -68,16 +72,15 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                 <Image src="/images/FSPLogo.svg" alt="FSPulse Logo" className="h-8 w-8" />
                 <p className="ml-2 text-2xl font-bold">ФСПульс</p>
             </NavbarBrand>
+
             {isAuthenticated && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["requests", "events", "team"] as Tab[]).map((tab) => (
+                    {(["requests", "events", "team"] as const).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
                                 href="#"
-                                onPress={(e) => {
-                                    handleNavigation(e, tab);
-                                }}
+                                onPress={() => { handleNavigation(tab); }}
                                 className={activeTab === tab ? "font-bold" : ""}
                             >
                                 {
@@ -85,7 +88,6 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                         requests: "Заявки",
                                         events: "Соревнования",
                                         team: "Сборная",
-                                        achievement: "Достижения",
                                     }[tab]
                                 }
                             </Link>
@@ -93,7 +95,37 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                     ))}
                 </NavbarContent>
             )}
+
             <NavbarContent justify="end">
+                {isAuthenticated && (
+                    <NavbarItem>
+                        <div className="relative">
+                            <Button
+                                isIconOnly
+                                variant="light"
+                                radius="full"
+                                onPress={onNotificationOpen}
+                                aria-label="Notifications"
+                            >
+                                <Icon icon="lucide:bell" className="h-5 w-5" />
+                                {unreadCount > 0 && (
+                                    <Badge color="primary" shape="circle" placement="top-right" size="sm">
+                                        {unreadCount > 99 ? "99+" : unreadCount}
+                                    </Badge>
+                                )}
+                            </Button>
+                            <ModalOrDrawer
+                                label="Уведомления"
+                                isOpen={isNotificationOpen}
+                                onOpenChangeAction={onNotificationOpenChange}
+                                size="md"
+                            >
+                                <NotificationList notifications={notifications} />
+                            </ModalOrDrawer>
+                        </div>
+                    </NavbarItem>
+                )}
+
                 <NavbarItem>
                     {isLoading ? (
                         <Spinner size="sm" />
@@ -102,7 +134,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                             <Dropdown
                                 showArrow
                                 classNames={{
-                                    base: "before:bg-default-200", // change arrow background
+                                    base: "before:bg-default-200",
                                     content: "p-0 border-small border-divider bg-background",
                                 }}
                                 radius="sm"
@@ -155,48 +187,53 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                         </DropdownItem>
                                     </DropdownSection>
                                     <DropdownSection aria-label="Settings & Logout">
-                                        <DropdownItem
-                                            key="settings"
-                                            onPress={() => {
-                                                onOpen();
-                                            }}
-                                        >
+                                        <DropdownItem key="settings" onPress={onProfileOpen}>
                                             Настройки
                                         </DropdownItem>
                                         <DropdownItem
                                             key="logout"
                                             className="text-danger data-[hover=true]:text-danger data-[focus-visible=true]:text-danger"
-                                            onPress={() => {
-                                                handleLogout().catch(console.error);
-                                            }}
+                                            onPress={handleLogout}
                                         >
                                             Выход
                                         </DropdownItem>
                                     </DropdownSection>
                                 </DropdownMenu>
                             </Dropdown>
-                            <ModalOrDrawer label="Редактирование" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
-                                <UserEditForm />
+
+                            <ModalOrDrawer
+                                label="Редактирование"
+                                isOpen={isProfileOpen}
+                                onOpenChangeAction={onProfileOpenChange}
+                            >
+                                <div className="p-4">
+                                    <p>User edit form would go here</p>
+                                </div>
                             </ModalOrDrawer>
                         </div>
                     ) : (
                         <>
                             <Button
-                                onPress={() => {
-                                    onOpen();
-                                }}
+                                onPress={onAuthOpen}
                                 color="primary"
                                 variant="flat"
                                 startContent={<Icon icon="lucide:user" />}
                             >
                                 Вход
                             </Button>
-                            <ModalOrDrawer label="Авторизация" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
-                                <AuthForm />
+                            <ModalOrDrawer
+                                label="Авторизация"
+                                isOpen={isAuthOpen}
+                                onOpenChangeAction={onAuthOpenChange}
+                            >
+                                <div className="p-4">
+                                    <p>Auth form would go here</p>
+                                </div>
                             </ModalOrDrawer>
                         </>
                     )}
                 </NavbarItem>
+
                 <NavbarItem>
                     <ThemeSwitcher />
                 </NavbarItem>
