@@ -1,52 +1,11 @@
-// src/app/representative/_components/event/event-details.tsx
 "use client";
 
+import React from "react";
+
+import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import { EventItem } from "@/types";
-import { Chip, Image } from "@heroui/react";
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
+import { Button, Chip, Image, useDisclosure } from "@heroui/react";
 
 // src/app/representative/_components/event/event-details.tsx
 
@@ -57,6 +16,8 @@ interface Props {
 }
 
 export default function EventDetails({ event }: Props) {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     return (
         <>
             <h3 className="text-2xl font-bold">{event.name}</h3>
@@ -76,6 +37,11 @@ export default function EventDetails({ event }: Props) {
                         {event.status}
                     </Chip>
                 </div>
+                <Button onPress={onOpen}>Распределить баллы</Button>
+
+                <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                    <CompetitionResultForm />
+                </ModalOrDrawer>
             </div>
         </>
     );

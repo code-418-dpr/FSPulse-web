@@ -2,7 +2,16 @@
 
 import React, { useEffect, useRef } from "react";
 
+import { signOut } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import AuthForm from "@/components/auth/auth-form";
+import UserEditForm from "@/components/edit-forms/user-edit-form";
+import ModalOrDrawer from "@/components/modal-or-drawer";
+import { NotificationList } from "@/components/notification-list";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
+import { Tab } from "@/types";
 import {
     Avatar,
     Badge,
@@ -24,32 +33,40 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
-import { useNotifications } from "../hooks/use-notifications";
-import ModalOrDrawer from "./modal-or-drawer";
-import { NotificationList } from "./notification-list";
 import { ThemeSwitcher } from "./theme-switcher";
 
-// <-- импорт хука аутентификации
-
 interface NavbarProps {
-    activeTab: "requests" | "events" | "team";
-    setActiveTabAction: React.Dispatch<React.SetStateAction<"requests" | "events" | "team">>;
+    activeTab: Tab;
+    setActiveTabAction: React.Dispatch<React.SetStateAction<Tab>>;
 }
 
 export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarProps) {
-    const { isOpen: isAuthOpen, onOpen: onAuthOpen, onOpenChange: onAuthOpenChange } = useDisclosure();
-    const { isOpen: isProfileOpen, onOpen: onProfileOpen, onOpenChange: onProfileOpenChange } = useDisclosure();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { user, isLoading, isAuthenticated } = useAuth();
+
+    // Модалки
+    const { isOpen: isCreateOpen, onOpen: onCreateOpen, onOpenChange: onCreateOpenChange } = useDisclosure();
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onOpenChange: onEditOpenChange } = useDisclosure();
     const {
         isOpen: isNotificationOpen,
         onOpen: onNotificationOpen,
         onOpenChange: onNotificationOpenChange,
     } = useDisclosure();
 
+    // Уведомления
     const { notifications, unreadCount, markAllAsRead } = useNotifications();
-    const { user, isAuthenticated, isLoading } = useAuth();
-
-    // Ref для отслеживания закрытия
     const prevOpenRef = useRef(isNotificationOpen);
+
+    // Синхронизация tab из query
+    useEffect(() => {
+        const tab = searchParams.get("tab") as Tab | null;
+        if (tab && ["requests", "events", "team", "achievement"].includes(tab)) {
+            setActiveTabAction(tab);
+        }
+    }, [searchParams, setActiveTabAction]);
+
+    // При закрытии уведомлений — пометить всё прочитанным
     useEffect(() => {
         if (prevOpenRef.current && !isNotificationOpen && unreadCount > 0) {
             markAllAsRead();
@@ -57,14 +74,17 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
         prevOpenRef.current = isNotificationOpen;
     }, [isNotificationOpen, unreadCount, markAllAsRead]);
 
-    const handleNavigation = (tab: "requests" | "events" | "team") => {
+    // Навигация между вкладками
+    const handleNavigation = (tab: Tab) => {
+        router.push(`/representative?tab=${tab}`);
         setActiveTabAction(tab);
     };
 
-    function handleLogout(): void {
-        console.log("Logging out");
-        // TODO: реальный выход
-    }
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        router.push("/");
+        router.refresh();
+    };
 
     return (
         <Navbar maxWidth="xl" isBordered>
@@ -75,7 +95,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
 
             {isAuthenticated && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["requests", "events", "team"] as const).map((tab) => (
+                    {(["requests", "events", "team", "achievement"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
@@ -88,6 +108,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                         requests: "Заявки",
                                         events: "Соревнования",
                                         team: "Сборная",
+                                        achievement: "Достижения",
                                     }[tab]
                                 }
                             </Link>
@@ -186,14 +207,20 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                             />
                                         </DropdownItem>
                                     </DropdownSection>
+
                                     <DropdownSection aria-label="Settings & Logout">
-                                        <DropdownItem key="settings" onPress={onProfileOpen}>
-                                            Настройки
-                                        </DropdownItem>
+                                        {user?.role !== "admin" ? (
+                                            <DropdownItem key="settings" onPress={onEditOpen}>
+                                                Настройки
+                                            </DropdownItem>
+                                        ) : null}
+
                                         <DropdownItem
                                             key="logout"
                                             className="text-danger data-[hover=true]:text-danger data-[focus-visible=true]:text-danger"
-                                            onPress={handleLogout}
+                                            onPress={() => {
+                                                handleLogout().catch(console.error);
+                                            }}
                                         >
                                             Выход
                                         </DropdownItem>
@@ -203,18 +230,16 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
 
                             <ModalOrDrawer
                                 label="Редактирование"
-                                isOpen={isProfileOpen}
-                                onOpenChangeAction={onProfileOpenChange}
+                                isOpen={isEditOpen}
+                                onOpenChangeAction={onEditOpenChange}
                             >
-                                <div className="p-4">
-                                    <p>User edit form would go here</p>
-                                </div>
+                                <UserEditForm />
                             </ModalOrDrawer>
                         </div>
                     ) : (
                         <>
                             <Button
-                                onPress={onAuthOpen}
+                                onPress={onCreateOpen}
                                 color="primary"
                                 variant="flat"
                                 startContent={<Icon icon="lucide:user" />}
@@ -223,12 +248,10 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                             </Button>
                             <ModalOrDrawer
                                 label="Авторизация"
-                                isOpen={isAuthOpen}
-                                onOpenChangeAction={onAuthOpenChange}
+                                isOpen={isCreateOpen}
+                                onOpenChangeAction={onCreateOpenChange}
                             >
-                                <div className="p-4">
-                                    <p>Auth form would go here</p>
-                                </div>
+                                <AuthForm />
                             </ModalOrDrawer>
                         </>
                     )}

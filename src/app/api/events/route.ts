@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { getEventSummaries } from "@/data/event";
 
-// src/app/api/events/approved
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {

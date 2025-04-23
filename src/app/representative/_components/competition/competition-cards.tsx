@@ -1,4 +1,3 @@
-// src/app/representative/_components/competition/competition-cards.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,6 +6,10 @@ import CompetitionDetails from "@/app/representative/_components/competition/com
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { RepresentativeRequestItem } from "@/types/search";
 import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
+
+// src/app/representative/_components/competition/competition-cards.tsx
+
+// src/app/representative/_components/competition/competition-cards.tsx
 
 // src/app/representative/_components/competition/competition-cards.tsx
 
