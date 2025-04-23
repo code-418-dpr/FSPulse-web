@@ -50,7 +50,8 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
             disciplineId: selectedDiscipline,
             level: selectedLevel as EventLevel,
             requestStatus: selectedStatus as RequestStatus,
-            dateRange: selectedDateRange,
+            minApplicationTime: selectedDateRange.start,
+            maxApplicationTime: selectedDateRange.end,
         };
 
         onSubmit(searchParams);
@@ -160,7 +161,7 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
                         )}
 
                         <div className="mb-4">
-                            <label className="mb-2 block text-sm font-medium">Даты проведения</label>
+                            <label className="mb-2 block text-sm font-medium">Даты подачи заявки</label>
                             <DateRangePicker
                                 className="w-full"
                                 defaultValue={{

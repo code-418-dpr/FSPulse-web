@@ -5,10 +5,8 @@ export interface SearchParams {
     disciplineId?: string; // Изменили на одиночное значение
     level?: EventLevel; // Изменили на одиночное значение
     requestStatus?: RequestStatus; // Изменили на одиночное значение
-    dateRange?: {
-        start?: Date;
-        end?: Date;
-    };
+    minApplicationTime?: Date;
+    maxApplicationTime?: Date;
 }
 
 export interface Paged<T> {

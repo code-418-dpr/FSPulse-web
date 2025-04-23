@@ -155,14 +155,16 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                         </DropdownItem>
                                     </DropdownSection>
                                     <DropdownSection aria-label="Settings & Logout">
-                                        <DropdownItem
-                                            key="settings"
-                                            onPress={() => {
-                                                onOpen();
-                                            }}
-                                        >
-                                            Настройки
-                                        </DropdownItem>
+                                        {user?.role !== "admin" ? (
+                                            <DropdownItem
+                                                key="settings"
+                                                onPress={() => {
+                                                    onOpen();
+                                                }}
+                                            >
+                                                Настройки
+                                            </DropdownItem>
+                                        ) : null}
                                         <DropdownItem
                                             key="logout"
                                             className="text-danger data-[hover=true]:text-danger data-[focus-visible=true]:text-danger"

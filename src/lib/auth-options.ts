@@ -17,6 +17,18 @@ export const authOptions: NextAuthOptions = {
                 try {
                     if (!credentials?.email || !credentials.password) return null;
 
+                    if (
+                        credentials.email === process.env.ADMIN_EMAIL &&
+                        credentials.password === process.env.ADMIN_PASSWORD
+                    ) {
+                        return {
+                            id: "admin-id",
+                            email: process.env.ADMIN_EMAIL,
+                            name: "Федерация",
+                            role: "admin",
+                        };
+                    }
+
                     const user = await prisma.user.findUnique({
                         where: { email: credentials.email },
                         include: {
@@ -55,7 +67,7 @@ export const authOptions: NextAuthOptions = {
         },
         session({ session, token }) {
             if (token.role && token.id) {
-                session.user.role = token.role as "athlete" | "representative";
+                session.user.role = token.role as "athlete" | "representative" | "admin";
                 session.user.id = token.id as string;
             }
             return session;
