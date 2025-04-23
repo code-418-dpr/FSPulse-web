@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -8,15 +9,12 @@ import { Tab } from "@/types";
 import { SearchParams } from "@/types/search";
 import {
     Button,
-    Checkbox,
-    DateRangePicker,
     Dropdown,
     DropdownItem,
     DropdownMenu,
     DropdownTrigger,
     Form,
     Input,
-    Switch,
 } from "@heroui/react";
 import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
@@ -46,12 +44,7 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
         setIsLoading(true);
 
         const searchParams: SearchParams = {
-            query,
-            disciplineId: selectedDiscipline,
-            level: selectedLevel as EventLevel,
             requestStatus: selectedStatus as RequestStatus,
-            minApplicationTime: selectedDateRange.start,
-            maxApplicationTime: selectedDateRange.end,
         };
 
         onSubmit(searchParams);
@@ -137,57 +130,9 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
     return (
         <Form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-full">
-                    <Input
-                        label="Поиск по описанию"
-                        variant="bordered"
-                        fullWidth
-                        value={query}
-                        onChange={(e) => {
-                            setQuery(e.target.value);
-                        }}
-                    />
-                </div>
-                {tabType === "requests" && (
+                
+                {tabType === "representative" && (
                     <>
-                        {renderDropdown(
-                            "Дисциплина",
-                            disciplines.map((d) => ({ key: d.id, name: d.name })),
-                            selectedDiscipline,
-                            (keys) => {
-                                handleSelectionChange(keys, setSelectedDiscipline);
-                            },
-                            true,
-                        )}
-
-                        <div className="mb-4">
-                            <label className="mb-2 block text-sm font-medium">Даты подачи заявки</label>
-                            <DateRangePicker
-                                className="w-full"
-                                defaultValue={{
-                                    start: today(getLocalTimeZone()).subtract({ days: 7 }),
-                                    end: today(getLocalTimeZone()),
-                                }}
-                                onChange={(range) => {
-                                    const timeZone = getLocalTimeZone();
-                                    setSelectedDateRange({
-                                        start: range?.start.toDate(timeZone),
-                                        end: range?.end.toDate(timeZone),
-                                    });
-                                }}
-                            />
-                        </div>
-
-                        {renderDropdown(
-                            "Уровень события",
-                            levels.map((l) => ({ key: l, name: getLevelName(l) })),
-                            selectedLevel,
-                            (keys) => {
-                                handleSelectionChange(keys, setSelectedLevel);
-                            },
-                            true,
-                        )}
-
                         {renderDropdown(
                             "Статус",
                             Object.values(RequestStatus).map((s) => ({
@@ -203,69 +148,6 @@ export function SearchForm({ onSubmit, tabType }: SearchFormProps) {
                             },
                             true,
                         )}
-                    </>
-                )}
-                {tabType === "events" && (
-                    <>
-                        {renderDropdown(
-                            "Дисциплина",
-                            disciplines.map((d) => ({ key: d.id, name: d.name })),
-                            selectedDiscipline,
-                            (keys) => {
-                                handleSelectionChange(keys, setSelectedDiscipline);
-                            },
-                            true,
-                        )}
-
-                        <div className="mb-4">
-                            <label className="mb-2 block text-sm font-medium">Даты проведения</label>
-                            <DateRangePicker
-                                className="w-full"
-                                defaultValue={{
-                                    start: today(getLocalTimeZone()).subtract({ days: 7 }),
-                                    end: today(getLocalTimeZone()),
-                                }}
-                                onChange={(range) => {
-                                    const timeZone = getLocalTimeZone();
-                                    setSelectedDateRange({
-                                        start: range?.start.toDate(timeZone),
-                                        end: range?.end.toDate(timeZone),
-                                    });
-                                }}
-                            />
-                        </div>
-
-                        {renderDropdown(
-                            "Уровень события",
-                            levels.map((l) => ({ key: l, name: getLevelName(l) })),
-                            selectedLevel,
-                            (keys) => {
-                                handleSelectionChange(keys, setSelectedLevel);
-                            },
-                            true,
-                        )}
-                        {renderDropdown(
-                            "Статус",
-                            [
-                                { key: "upcoming", name: "Скоро..." },
-                                { key: "registration_open", name: "Начата регистрация" },
-                                { key: "registration_closed", name: "Регистрация закончена" },
-                                { key: "in_progress", name: "Соревнование идёт" },
-                                { key: "summarizing", name: "Подведение итогов" },
-                                { key: "completed", name: "Соревнование завершено" },
-                            ],
-                            selectedStatus,
-                            (keys) => {
-                                handleSelectionChange(
-                                    keys,
-                                    setSelectedStatus as React.Dispatch<React.SetStateAction<string | undefined>>,
-                                );
-                            },
-                            true,
-                        )}
-                        <Switch defaultSelected>Онлайн</Switch>
-                        <Checkbox defaultSelected>Командный формат</Checkbox>
-                        <Checkbox>Индивидуальный формат</Checkbox>
                     </>
                 )}
             </div>

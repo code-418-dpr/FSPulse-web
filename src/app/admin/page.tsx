@@ -4,22 +4,21 @@ import React, { useEffect, useState } from "react";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
-import EventCards from "@/app/representative/_components/event/event-cards";
-import { MainCards } from "@/app/representative/_components/main-cards";
-import { SearchCardOrDrawer } from "@/app/representative/_components/search/search-card-or-drawer";
+import AchievementCards from "@/app/admin/_components/achievement/achievement-cards";
+import EventCards from "@/app/admin/_components/event/event-cards";
+import { MainCards } from "@/app/admin/_components/main-cards";
+import { SearchCardOrDrawer } from "@/app/admin/_components/search/search-card-or-drawer";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
+import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
 import { SearchParams } from "@/types/search";
-import { CircularProgress, Pagination } from "@heroui/react";
+import { CircularProgress } from "@heroui/react";
 
 import { RequestStatus } from "../generated/prisma";
-import { getRepresentatives, RepresentativeItem } from "@/data/representative";
-import RepresentativeTable from "./_components/representative-table";
-
+import { RepresentativeTableWithPagination } from "./_components/representative-table";
 
 interface Paged<T> {
     items: T[];
@@ -34,7 +33,7 @@ interface Paged<T> {
 export default function AdministratorPage() {
     const { isAuthenticated, isLoading, user } = useAuth();
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
-        requestStatus: RequestStatus.PENDING,
+        requestStatus: RequestStatus.APPROVED,
     });
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
     const [isRequestsLoading, setIsRequestsLoading] = useState(false);
@@ -70,41 +69,40 @@ export default function AdministratorPage() {
     // load competitions when on "requests"
     useEffect(() => {
         if (activeTab !== "representative" || !user?.id) return;
-      
+
         const loadRepresentatives = async () => {
-          setIsRequestsLoading(true);
-          try {
-            const result = await getRepresentatives({
-              ...searchParamsState,
-              page,
-              pageSize: perPage,
-            });
-      
-            setRepresentativesData({
-              items: result.results,
-              pagination: {
-                page,
-                pageSize: perPage,
-                totalItems: result.totalItems,
-                totalPages: result.totalPages,
-              },
-            });
-          } catch (error) {
-            console.error("Error loading representatives:", error);
-          } finally {
-            setIsRequestsLoading(false);
-          }
+            setIsRequestsLoading(true);
+            try {
+                const result = await getRepresentatives({
+                    ...searchParamsState,
+                    page,
+                    pageSize: perPage,
+                });
+
+                setRepresentativesData({
+                    items: result.results,
+                    pagination: {
+                        page,
+                        pageSize: perPage,
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading representatives:", error);
+            } finally {
+                setIsRequestsLoading(false);
+            }
         };
-      
+
         void loadRepresentatives();
-      }, [activeTab, page, searchParamsState, user?.id]);
+    }, [activeTab, page, searchParamsState, user?.id]);
 
     // Обработчик поиска
     const handleSearch = (params: SearchParams) => {
         setSearchParamsState(params);
-        setPage(1);
-    };
-
+              setPage(1);
+      };
     // load events when on "events"
     useEffect(() => {
         if (activeTab !== "events") return;
@@ -145,7 +143,6 @@ export default function AdministratorPage() {
             });
     }, [activeTab, page]);
 
-
     const evtPageItems = eventsData?.items ?? [];
     const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
 
@@ -173,27 +170,23 @@ export default function AdministratorPage() {
 
                 {/* Main */}
                 {activeTab === "representative" && (
-                    <div className="flex-1 p-4">
-                    {isRequestsLoading ? (
-                      <CircularProgress aria-label="Загрузка..." size="lg" />
-                    ) : (
-                      <>
-                        <RepresentativeTable
-                          representatives={representativesData?.items ?? []}
-                        />
-                        
-                        {representativesData?.pagination && (
-                          <Pagination
-                          showControls
-                          total={representativesData.pagination.totalPages}
-                          initialPage={representativesData.pagination.page}
-                          onChange={(newPage: number) => { setPage(newPage); }}
-                         />
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
+        <div className="flex-1 p-4">
+          {isRequestsLoading ? (
+            <CircularProgress aria-label="Загрузка..." />
+          ) : representativesData ? (
+            <RepresentativeTableWithPagination
+              data={{
+                items: representativesData.items,
+                totalPages: representativesData.pagination.totalPages,
+                currentPage: page,
+              }}
+              onPageChange={setPage}
+            />
+          ) : (
+            <div className="text-center text-gray-500">Нет данных</div>
+          )}
+        </div>
+      )}
 
                 {activeTab === "events" && (
                     <MainCards<EventItem>

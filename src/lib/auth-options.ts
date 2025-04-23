@@ -42,9 +42,9 @@ export const authOptions: NextAuthOptions = {
                     }
                     if (user.representative.length > 0) {
                         const representative = user.representative[0];
-                        if (representative.requestStatus === 'PENDING') {
+                        if (representative.requestStatus === "PENDING") {
                             throw new Error("Ваша заявка на представительство находится на рассмотрении.");
-                        } else if (representative.requestStatus === 'DECLINED') {
+                        } else if (representative.requestStatus === "DECLINED") {
                             throw new Error("Ваша заявка на представительство отклонена.");
                         }
                     }
