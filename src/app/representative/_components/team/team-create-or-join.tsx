@@ -27,7 +27,7 @@ function createTeam(): TeamWithMembersItem {
 
 const teamsWithMembers: TeamWithMembersItem[] = Array.from({ length: 13 }, createTeam);
 
-export default function TeamCreateOrJoin() {
+export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
     const [teamsData, setTeamsData] = useState<Paged<TeamWithMembersItem> | null>(null);
     const [isTeamsLoading, setIsTeamsLoading] = useState(false);
     const [page, setPage] = useState(1);
@@ -61,7 +61,7 @@ export default function TeamCreateOrJoin() {
     return (
         <Tabs aria-label="RegisterForms" className="w-full" fullWidth>
             <Tab key="create" title="Создать команду">
-                <TeamCreateForm />
+                <TeamCreateForm eventId={eventId} />
             </Tab>
             <Tab key="join" title="Присоединиться к команде">
                 <div className="container mx-auto w-full flex-1 px-3 py-4">
