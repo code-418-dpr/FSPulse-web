@@ -17,10 +17,8 @@ interface RegionItem {
 export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) => {
     const { control, setValue, watch } = useFormContext<CompetitionRequest>();
 
-    // Явно указываем тип для selectedRegionKeys
     const selectedRegionKeys: string[] = watch("regions");
 
-    // Безопасная фильтрация регионов
     const selectedRegions = regions.filter((region): region is RegionItem => selectedRegionKeys.includes(region.key));
 
     const addRegion = (key: string) => {
@@ -50,9 +48,7 @@ export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) 
                             size="sm"
                             variant="light"
                             className="text-danger-500 ml-2"
-                            onPress={() => {
-                                removeRegion(region.key);
-                            }}
+                            onPress={() => { removeRegion(region.key); }}
                         >
                             ×
                         </Button>
@@ -63,15 +59,14 @@ export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) 
             <Controller
                 name="regions"
                 control={control}
-                render={({ field }) => (
+                render={() => (
                     <Autocomplete
                         label={selectedRegions.length === 0 ? "Регион" : "Добавить еще регион"}
                         defaultItems={regions.filter((region) => !selectedRegionKeys.includes(region.key))}
-                        selectedKey={field.value}
+                        selectedKey={null}
                         onSelectionChange={(key) => {
                             if (key) {
                                 addRegion(key as string);
-                                field.onChange(null);
                             }
                         }}
                         allowsCustomValue={false}
