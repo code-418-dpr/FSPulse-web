@@ -1,4 +1,3 @@
-// src/types.ts
 export type Tab = "requests" | "events" | "team" | "achievement";
 
 export interface CompetitionItem {

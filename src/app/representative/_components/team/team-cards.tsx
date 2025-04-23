@@ -1,4 +1,3 @@
-// src/app/representative/_components/competition/competition-cards.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,52 +6,6 @@ import TeamDetails from "@/app/representative/_components/team/team-details";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { TeamItem } from "@/types";
 import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
 
 interface Props {
     paginatedData: TeamItem[];

@@ -1,4 +1,3 @@
-// src/app/representative/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -20,14 +19,6 @@ import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { CircularProgress } from "@heroui/react";
 
 import { RequestStatus } from "../generated/prisma";
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
-
-// src/app/representative/page.tsx
 
 interface Paged<T> {
     items: T[];
