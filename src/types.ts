@@ -40,3 +40,9 @@ export interface AchievementItem {
     region: string;
     imageBase64: string;
 }
+
+export interface TeamWithMembersItem {
+    name: string;
+    leader: string;
+    members: string[];
+}

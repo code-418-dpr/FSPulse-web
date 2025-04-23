@@ -62,11 +62,6 @@ export async function getRepresentativeById(id: string) {
                     region: true,
                 },
             },
-            events: {
-                include: {
-                    event: true,
-                },
-            },
         },
     });
 }

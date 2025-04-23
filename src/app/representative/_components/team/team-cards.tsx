@@ -7,56 +7,6 @@ import ModalOrDrawer from "@/components/modal-or-drawer";
 import { TeamItem } from "@/types";
 import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
 
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
-// src/app/representative/_components/competition/competition-cards.tsx
-
 interface Props {
     paginatedData: TeamItem[];
 }
