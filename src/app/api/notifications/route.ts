@@ -1,7 +1,6 @@
-// src/app/api/notifications/route.ts
 import { NextResponse } from "next/server";
 
-import prisma from "@/lib/prisma";
+import { getUserNotifications, markUserNotificationsRead } from "@/data/notification";
 
 export async function GET(req: Request) {
     const url = new URL(req.url);
@@ -10,10 +9,7 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
-    const list = await prisma.notification.findMany({
-        where: { userId },
-        orderBy: { sendTime: "desc" },
-    });
+    const list = await getUserNotifications(userId);
 
     return NextResponse.json(
         list.map((i) => ({
@@ -30,10 +26,7 @@ export async function PUT(req: Request) {
         return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
-    await prisma.notification.updateMany({
-        where: { userId, isRead: false },
-        data: { isRead: true },
-    });
+    await markUserNotificationsRead(userId);
 
     return NextResponse.json({ success: true });
 }

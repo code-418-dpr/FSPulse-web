@@ -3,17 +3,19 @@
 import { RepresentativeItem } from "@/data/representative";
 import { Chip, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
 
-export function RepresentativeTableWithPagination({
-    data,
-    onPageChange,
-}: {
+interface RepresentativeTableWithPaginationProps {
     data: {
         items: RepresentativeItem[];
         totalPages: number;
         currentPage: number;
     };
-    onPageChange: (page: number) => void;
-}) {
+    onPageChangeAction: (page: number) => void;
+}
+
+export function RepresentativeTableWithPagination({
+    data,
+    onPageChangeAction,
+}: RepresentativeTableWithPaginationProps) {
     return (
         <div className="space-y-4">
             <div className="overflow-x-auto">
@@ -64,7 +66,7 @@ export function RepresentativeTableWithPagination({
                 <Pagination
                     total={data.totalPages}
                     page={data.currentPage}
-                    onChange={onPageChange}
+                    onChange={onPageChangeAction}
                     className="justify-center"
                 />
             )}

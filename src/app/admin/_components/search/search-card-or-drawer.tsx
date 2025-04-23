@@ -13,27 +13,27 @@ import { Icon } from "@iconify/react";
 // Убедитесь что тип определен
 
 interface Props {
-    onSearch: (params: SearchParams) => void;
+    onSearchAction: (params: SearchParams) => void;
     tabType: Tab;
 }
 
-export function SearchCardOrDrawer({ onSearch, tabType }: Props) {
+export function SearchCardOrDrawer({ onSearchAction, tabType }: Props) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     return isDesktop
-        ? SearchCard({ onSearch, tabType })
-        : SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch, tabType });
+        ? SearchCard({ onSearchAction, tabType })
+        : SearchDrawer({ isOpen, onOpen, onOpenChange, onSearchAction, tabType });
 }
 
-function SearchCard({ onSearch, tabType }: { onSearch: Props["onSearch"]; tabType: Tab }) {
+function SearchCard({ onSearchAction, tabType }: { onSearchAction: Props["onSearchAction"]; tabType: Tab }) {
     return (
         <div className="w-full p-4 sm:w-1/4">
             <Card className="sticky top-20">
                 <CardHeader className="text-xl">Поиск</CardHeader>
                 <CardBody>
                     <div className="max-h-[70vh] overflow-y-auto pr-2">
-                        <SearchForm onSubmit={onSearch} tabType={tabType} />
+                        <SearchForm onSubmitAction={onSearchAction} tabType={tabType} />
                     </div>
                 </CardBody>
             </Card>
@@ -48,7 +48,7 @@ interface DrawerProps extends Props {
     tabType: Tab;
 }
 
-function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch, tabType }: DrawerProps) {
+function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearchAction, tabType }: DrawerProps) {
     return (
         <>
             <Button
@@ -66,7 +66,7 @@ function SearchDrawer({ isOpen, onOpen, onOpenChange, onSearch, tabType }: Drawe
                 <DrawerContent className="p-4">
                     <DrawerHeader className="text-center text-2xl">Поиск</DrawerHeader>
                     <DrawerBody>
-                        <SearchForm onSubmit={onSearch} tabType={tabType} />
+                        <SearchForm onSubmitAction={onSearchAction} tabType={tabType} />
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>

@@ -166,7 +166,7 @@ export default function AdministratorPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <SearchCardOrDrawer onSearch={handleSearch} tabType={activeTab} />
+                <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
 
                 {/* Main */}
                 {activeTab === "representative" && (
@@ -180,7 +180,7 @@ export default function AdministratorPage() {
                                     totalPages: representativesData.pagination.totalPages,
                                     currentPage: page,
                                 }}
-                                onPageChange={setPage}
+                                onPageChangeAction={setPage}
                             />
                         ) : (
                             <div className="text-center text-gray-500">Нет данных</div>
