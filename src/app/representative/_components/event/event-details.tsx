@@ -16,7 +16,8 @@ interface Props {
 }
 
 export default function EventDetails({ event }: Props) {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isTeamsOpen, onOpen: onTeamsOpen, onOpenChange: onTeamsOpenChange } = useDisclosure();
+    const { isOpen: isGradesOpen, onOpen: onGradesOpen, onOpenChange: onGradesOpenChange } = useDisclosure();
 
     return (
         <>
@@ -37,9 +38,25 @@ export default function EventDetails({ event }: Props) {
                         {event.status}
                     </Chip>
                 </div>
-                <Button onPress={onOpen}>Распределить баллы</Button>
+                <Button className="m-3" onPress={onTeamsOpen}>
+                    Зарегистрироваться
+                </Button>
 
-                <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                <ModalOrDrawer
+                    label="Регистрация на соревнование"
+                    isOpen={isTeamsOpen}
+                    onOpenChangeAction={onTeamsOpenChange}
+                >
+                    <CompetitionResultForm />
+                </ModalOrDrawer>
+
+                <Button onPress={onGradesOpen}>Распределить баллы</Button>
+
+                <ModalOrDrawer
+                    label="Распределение баллов"
+                    isOpen={isGradesOpen}
+                    onOpenChangeAction={onGradesOpenChange}
+                >
                     <CompetitionResultForm />
                 </ModalOrDrawer>
             </div>
