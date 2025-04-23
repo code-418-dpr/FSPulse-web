@@ -3,6 +3,7 @@
 import React from "react";
 
 import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
+import TeamCreateOrJoin from "@/app/representative/_components/team/team-create-or-join";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { EventItem } from "@/types";
 import { Button, Chip, Image, useDisclosure } from "@heroui/react";
@@ -47,7 +48,7 @@ export default function EventDetails({ event }: Props) {
                     isOpen={isTeamsOpen}
                     onOpenChangeAction={onTeamsOpenChange}
                 >
-                    <CompetitionResultForm />
+                    <TeamCreateOrJoin />
                 </ModalOrDrawer>
 
                 <Button onPress={onGradesOpen}>Распределить баллы</Button>
