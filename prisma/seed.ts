@@ -16,7 +16,7 @@ import eventRepresentatives from "./data/eventRepresentatives";
 import events from "./data/events";
 import regionNames from "./data/region";
 import skillNames from "./data/skill";
-import generateRandomSkillsOfAthletes from "./data/skill-of-user";
+import generateRandomSkillsOfAthletes from "./data/skill-of-athlete";
 import generateRandomUsers from "./data/user";
 
 const userCount = 100;
