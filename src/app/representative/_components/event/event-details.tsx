@@ -3,13 +3,10 @@
 import React from "react";
 
 import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
+import TeamCreateOrJoin from "@/app/representative/_components/team/team-create-or-join";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import { EventItem } from "@/types";
 import { Button, Chip, Image, useDisclosure } from "@heroui/react";
-
-// src/app/representative/_components/event/event-details.tsx
-
-// src/app/representative/_components/event/event-details.tsx
 
 interface Props {
     event: EventItem;
@@ -47,7 +44,7 @@ export default function EventDetails({ event }: Props) {
                     isOpen={isTeamsOpen}
                     onOpenChangeAction={onTeamsOpenChange}
                 >
-                    <CompetitionResultForm />
+                    <TeamCreateOrJoin />
                 </ModalOrDrawer>
 
                 <Button onPress={onGradesOpen}>Распределить баллы</Button>

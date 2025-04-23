@@ -138,7 +138,6 @@ model AthleteOfTeam {
   athlete Athlete @relation(fields: [athleteId], references: [id])
 
   @@unique([teamId, athleteId])
-  @@unique([teamId, isLeader])
 }
 
 model Team {

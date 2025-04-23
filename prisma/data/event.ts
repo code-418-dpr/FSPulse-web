@@ -1,3 +1,4 @@
+// prisma/data/event.ts
 import fs from "fs";
 import path from "path";
 
@@ -6,13 +7,13 @@ import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 import { faker } from "@faker-js/faker/locale/ru";
 
-// Для createMany используем соответствующий Input
 export type EventCreateInput = Prisma.EventCreateManyInput;
 
 const HACKATHON_COVER = fs.readFileSync(path.resolve(process.cwd(), "prisma", "covers", "hackathon.png"));
 
+const eventTypes = ["Кубок", "Турнир", "Чемпионат", "Фестиваль", "Марафон"];
+
 export async function generateRandomEvents(count: number): Promise<EventCreateInput[]> {
-    // Тянем все disciplineId из базы
     const disciplines = await prisma.discipline.findMany({ select: { id: true } });
     const disciplineIds = disciplines.map((d) => d.id);
 
@@ -24,14 +25,15 @@ export async function generateRandomEvents(count: number): Promise<EventCreateIn
     const events: EventCreateInput[] = [];
 
     for (let i = 0; i < count; i++) {
-        // Генерируем уникальное название
+        // Русское название
         let name: string;
         do {
-            name = faker.company.catchPhrase() + " Cup";
+            const base = faker.company.name(); // <-- здесь
+            const suffix = faker.helpers.arrayElement(eventTypes);
+            name = `${base} ${suffix}`;
         } while (usedNames.has(name));
         usedNames.add(name);
 
-        // Генерация дат
         const applicationTime = faker.date.soon({ days: 30 });
         const startRegistration = faker.date.between({
             from: applicationTime,
@@ -50,7 +52,6 @@ export async function generateRandomEvents(count: number): Promise<EventCreateIn
             to: new Date(start.getTime() + MS_PER_DAY * 5),
         });
 
-        // Числовые поля и булевы
         const minAge = faker.number.int({ min: 16, max: 30 });
         const maxAge = faker.number.int({ min: minAge + 1, max: 60 });
         const minTeamParticipantsCount = faker.number.int({ min: 0, max: 2 });
@@ -59,11 +60,9 @@ export async function generateRandomEvents(count: number): Promise<EventCreateIn
         const isOnline = faker.datatype.boolean();
         const isPersonalFormatAllowed = faker.datatype.boolean();
 
-        // Адрес и награды
         const address = faker.location.streetAddress();
         const awards = Array.from({ length: 3 }, () => faker.number.int({ min: 1, max: 5 }));
 
-        // Выбор из enum
         const level = faker.helpers.arrayElement(levels);
         const requestStatus = faker.helpers.arrayElement(statuses);
         const requestComment = requestStatus === RequestStatus.DECLINED ? faker.lorem.sentence() : null;
