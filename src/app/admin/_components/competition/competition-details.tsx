@@ -19,6 +19,7 @@ export default function CompetitionDetails({ eventId }: Props) {
         const loadEvent = async () => {
             try {
                 const data = await getRepresentativeRequestById(eventId);
+                console.log(data);
                 setCompetition(data);
             } catch {
                 setError("Не удалось загрузить данные о событии.");
@@ -93,7 +94,7 @@ export default function CompetitionDetails({ eventId }: Props) {
                         color="success"
                         variant="solid"
                     >
-                        {competition.representatives.map((rep) => rep.representative.user.region.name).join(", ")}
+                        {competition.representatives.map((rep) => rep.representative!.user.region?.name).join(", ")}
                     </Chip>
                 </div>
                 {/* Status */}

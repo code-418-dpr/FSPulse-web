@@ -62,7 +62,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     // Синхронизация tab из query
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["requests", "events", "team", "achievement"].includes(tab)) {
+        if (tab && ["requests", "events", "team", "achievement", "representative"].includes(tab)) {
             setActiveTabAction(tab);
         }
     }, [searchParams, setActiveTabAction]);
@@ -70,7 +70,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     // При закрытии уведомлений — пометить всё прочитанным
     useEffect(() => {
         if (prevOpenRef.current && !isNotificationOpen && unreadCount > 0) {
-            void markAllAsRead();
+            markAllAsRead();
         }
         prevOpenRef.current = isNotificationOpen;
     }, [isNotificationOpen, unreadCount, markAllAsRead]);
@@ -123,7 +123,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
             )}
             {isAuthenticated && user?.role === "admin" && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["representative", "events", "team"] as Tab[]).map((tab) => (
+                    {(["representative", "requests", "events", "team"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
@@ -135,7 +135,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                             >
                                 {
                                     {
-                                        requests: "Представительства",
+                                        requests: "Заявки",
                                         events: "Соревнования",
                                         team: "Сборная",
                                         achievement: "Достижения",

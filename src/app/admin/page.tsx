@@ -58,7 +58,7 @@ export default function AdministratorPage() {
     // sync tab from URL
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["representative", "events", "team"].includes(tab)) {
+        if (tab && ["representative", "events", "team", "requests"].includes(tab)) {
             setActiveTab(tab);
         } else {
             router.replace("/admin?tab=representative");
@@ -155,7 +155,6 @@ export default function AdministratorPage() {
                 try {
                     const params = {
                         ...searchParamsState,
-                        representativeId: user.id,
                         page,
                         pageSize: perPage,
                     };
