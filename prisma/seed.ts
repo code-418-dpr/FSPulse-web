@@ -14,7 +14,7 @@ import { faker } from "@faker-js/faker/locale/ru";
 import ageGroups from "./data/age-group";
 import mapDisciplinesAndAgeGroups from "./data/age-group-of-discipline";
 import disciplines from "./data/discipline";
-import { generateRandomEvents } from "./data/event";
+import { generateRandomEventsWithReps } from "./data/event";
 import regionNames from "./data/region";
 import skillNames from "./data/skill";
 import generateRandomSkillsOfAthletes from "./data/skill-of-athlete";
@@ -98,7 +98,7 @@ export async function main() {
 
     // 6) События
     console.log("Seeding events…");
-    const randomEvents = await generateRandomEvents(EVENT_COUNT);
+    const randomEvents = await generateRandomEventsWithReps(EVENT_COUNT);
     for (const raw of randomEvents) {
         // (ваша логика создания Event с representatives из data/event)
         await prisma.event.create({ data: raw });
