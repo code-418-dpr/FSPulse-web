@@ -53,3 +53,29 @@ export async function getRepresentatives(params: { page?: number; pageSize?: num
         totalPages: Math.ceil(totalItems / pageSize),
     };
 }
+export async function getRepresentativeById(id: string) {
+    return prisma.representative.findUnique({
+        where: { id },
+        include: {
+            user: {
+                include: {
+                    region: true,
+                },
+            },
+            events: {
+                include: {
+                    event: true,
+                },
+            },
+        },
+    });
+}
+export async function updateRepresentativeStatus(id: string, status: "APPROVED" | "DECLINED", comment?: string) {
+    return await prisma.representative.update({
+        where: { id },
+        data: {
+            requestStatus: status,
+            requestComment: status === "DECLINED" ? comment : null,
+        },
+    });
+}
