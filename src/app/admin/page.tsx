@@ -33,7 +33,7 @@ interface Paged<T> {
 export default function AdministratorPage() {
     const { isAuthenticated, isLoading, user } = useAuth();
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
-        requestStatus: RequestStatus.APPROVED,
+        requestStatus: RequestStatus.PENDING,
     });
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
     const [isRequestsLoading, setIsRequestsLoading] = useState(false);

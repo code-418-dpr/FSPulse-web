@@ -2,38 +2,60 @@
 
 import React, { useEffect, useState } from "react";
 
-import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
-import ModalOrDrawer from "@/components/modal-or-drawer";
-import { getRepresentativeRequestById } from "@/data/event";
-import { RepresentativeEventRequest } from "@/types/competitions";
-import { Button, Chip, Image, Spinner, useDisclosure } from "@heroui/react";
+import { RequestStatus } from "@/app/generated/prisma";
+import { getRepresentativeById, updateRepresentativeStatus } from "@/data/representative";
+import { RepresentativeDetails } from "@/types/representative";
+import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, Textarea } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 interface Props {
-    eventId: string;
+    representativeId: string;
+    onClose: () => void;
 }
-export default function CompetitionDetails({ eventId }: Props) {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [competition, setCompetition] = useState<RepresentativeEventRequest | null>(null);
+
+export default function RepresentatDetails({ representativeId, onClose }: Props) {
+    const [representative, setRepresentative] = useState<RepresentativeDetails | null>(null);
+    const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.PENDING);
+    const [comment, setComment] = useState("");
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const handleConfirm = async () => {
+        if (selectedStatus === RequestStatus.DECLINED && comment.trim() === "") {
+            setErrorMessage("Пожалуйста, укажите комментарий при отклонении");
+            return;
+        }
 
+        setErrorMessage(null);
+        setIsSubmitting(true);
+        try {
+            await updateRepresentativeStatus(representativeId, selectedStatus as "APPROVED" | "DECLINED", comment);
+            onClose();
+        } catch (err) {
+            console.error("Ошибка при обновлении статуса:", err);
+            setErrorMessage("Не удалось обновить статус");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
     useEffect(() => {
-        const loadEvent = async () => {
+        const loadData = async () => {
             try {
-                const data = await getRepresentativeRequestById(eventId);
-                setCompetition(data);
+                const data = await getRepresentativeById(representativeId);
+                setRepresentative(data);
             } catch {
-                setError("Не удалось загрузить данные о событии.");
+                setError("Не удалось загрузить данные представителя");
             } finally {
                 setLoading(false);
             }
         };
 
-        if (eventId) {
-            void loadEvent();
+        if (representativeId) {
+            void loadData();
         }
-    }, [eventId]);
+    }, [representativeId]);
+
     if (loading) {
         return (
             <div className="flex h-64 items-center justify-center">
@@ -42,96 +64,138 @@ export default function CompetitionDetails({ eventId }: Props) {
         );
     }
 
-    if (error || !competition) {
-        return <div className="text-danger-500 py-8 text-center">{error ?? "Событие не найдено"}</div>;
+    if (error || !representative) {
+        return <div className="text-danger-500 py-8 text-center">{error ?? "Представитель не найден"}</div>;
     }
-    const arrayBufferToBase64 = (buffer: Uint8Array) => {
-        return `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
-    };
     return (
-        <>
-            <div className="flex items-center justify-between pt-2">
-                <h3 className="text-xl font-bold">{competition.name}</h3>
-                <Chip color="secondary" variant="flat">
-                    {competition.level == "FEDERAL"
-                        ? "Всероссийский"
-                        : competition.level == "OPEN"
-                          ? "Открытый"
-                          : "Региональный"}
-                </Chip>
-            </div>
-            <div className="grid grid-cols-2">
-                <Image
-                    alt={competition.name}
-                    src={arrayBufferToBase64(competition.cover)}
-                    className="w-[80%] rounded-xl object-cover"
-                />
-                <div className="grid grid-cols-1">
-                    <p className="text-md text-foreground/50 -translate-x-10">{competition.description}</p>
-                    <p className="text-md text-foreground/50 -translate-x-10">{competition.discipline.name}</p>
-                    <div className="grid grid-cols-2 space-y-2">
-                        <p className="col-span-2 pt-1 text-right text-sm">
-                            {competition.start.toLocaleDateString()} – {competition.end.toLocaleDateString()}
-                        </p>
-                    </div>
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
                     <div className="flex items-center justify-between pt-2">
-                        <p className="-translate-x-10 text-sm">Формат:</p>
-                        <Chip color={competition.isOnline ? "success" : "danger"} variant="solid">
-                            {competition.isOnline ? "Онлайн" : "Оффлайн"}
-                        </Chip>
+                        <h2 className="text-2xl font-bold">
+                            {[
+                                representative.user.lastname,
+                                representative.user.firstname,
+                                representative.user.middlename,
+                            ]
+                                .filter(Boolean)
+                                .join(" ")}
+                        </h2>
+                        <div className="space-y-2">
+                            <Chip
+                                color={
+                                    representative.requestStatus === "APPROVED"
+                                        ? "success"
+                                        : representative.requestStatus === "DECLINED"
+                                          ? "danger"
+                                          : "warning"
+                                }
+                                variant="solid"
+                                className="w-full justify-center"
+                            >
+                                {representative.requestStatus === "APPROVED"
+                                    ? "Одобрено"
+                                    : representative.requestStatus === "DECLINED"
+                                      ? "Отклонено"
+                                      : "На рассмотрении"}
+                            </Chip>
+                        </div>
                     </div>
+                    <h3 className="text-xl font-semibold">Контактная информация</h3>
+                    <p className="text-foreground/80">Контактный телефон: {representative.user.phoneNumber}</p>
+                    <p className="text-foreground/80">Контактная почта: {representative.user.email}</p>
                 </div>
             </div>
-            <div className="grid grid-cols-1 space-y-2">
-                {/* Region */}
-                <div className="grid grid-cols-3 space-y-2">
-                    <p className="pt-1 text-left text-sm">Регион:</p>
-                    <Chip
-                        startContent={
-                            <span className="flex items-center">
-                                <Icon icon="iconoir:map-pin" width={18} height={18} className="mr-1" />
-                            </span>
-                        }
-                        className="col-span-2 place-self-end"
-                        color="success"
-                        variant="solid"
-                    >
-                        {competition.representative.map((rep) => rep.representative.user.region.name).join(", ")}
-                    </Chip>
-                </div>
-                {/* Status */}
-                <div className="grid grid-cols-2 space-y-2">
-                    <p className="pt-1 text-left text-sm">Статус:</p>
-                    <Chip
-                        className="place-self-end"
-                        color={
-                            competition.requestStatus == "APPROVED"
-                                ? "success"
-                                : competition.requestStatus == "DECLINED"
-                                  ? "danger"
-                                  : "warning"
-                        }
-                        variant="solid"
-                    >
-                        {competition.requestStatus == "APPROVED"
-                            ? "Одобрено"
-                            : competition.requestStatus == "DECLINED"
-                              ? "Отклонено"
-                              : "На рассмотрении"}
-                    </Chip>
-                </div>
-                {/* Application date */}
-                <div className="grid grid-cols-2 space-y-2">
-                    <p className="pt-1 text-left text-sm">Зарегистрирован:</p>
-                    <p className="pt-1 text-right text-sm">{competition.applicationTime.toLocaleDateString()}</p>
-                </div>
+            <div className="grid grid-cols-1 gap-4">
+                {representative.requestStatus === "APPROVED" && (
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <Chip
+                                startContent={
+                                    <span className="flex items-center">
+                                        <Icon icon="iconoir:map-pin" width={18} height={18} className="mr-1" />
+                                    </span>
+                                }
+                                className="col-span-2 place-self-end"
+                                color="success"
+                                variant="solid"
+                            >
+                                {representative.user.region.name}
+                            </Chip>
+                        </div>
+                    </div>
+                )}
+                {representative.requestStatus === "APPROVED" ||
+                    (representative.requestStatus === "DECLINED" && (
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-semibold">Дополнительная информация</h3>
+                            {representative.user.tg && (
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="mdi:telegram" className="h-5 w-5" />
+                                    <span>@{representative.user.tg}</span>
+                                </div>
+                            )}
+                            {representative.requestComment && <p>Комментарий: {representative.requestComment}</p>}
+                        </div>
+                    ))}
+                {representative.requestStatus === "PENDING" && (
+                    <div className="mb-4 space-y-4">
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">Статус</label>
+                            <Dropdown className="w-full">
+                                <DropdownTrigger>
+                                    <Button variant="bordered" className="w-full justify-between text-left">
+                                        {[
+                                            { key: RequestStatus.APPROVED, name: "Одобрить" },
+                                            { key: RequestStatus.DECLINED, name: "Отклонить" },
+                                        ].find((i) => i.key === selectedStatus)?.name ?? "Выберите..."}
+                                    </Button>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                    disallowEmptySelection
+                                    selectionMode="single"
+                                    selectedKeys={new Set([selectedStatus])}
+                                    onSelectionChange={(keys) => {
+                                        const value = Array.from(keys as Set<string>)[0];
+                                        setSelectedStatus(value);
+                                        setErrorMessage(null);
+                                    }}
+                                >
+                                    <DropdownItem key={RequestStatus.APPROVED}>Одобрить</DropdownItem>
+                                    <DropdownItem key={RequestStatus.DECLINED}>Отклонить</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        </div>
 
-                <Button onPress={onOpen}>Распределить баллы</Button>
+                        {selectedStatus === RequestStatus.DECLINED && (
+                            <div>
+                                <Textarea
+                                    label="Комментарий"
+                                    placeholder="Укажите причину отклонения"
+                                    value={comment}
+                                    onChange={(e) => {
+                                        setComment(e.target.value);
+                                    }}
+                                    className="w-full"
+                                />
+                            </div>
+                        )}
 
-                <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
-                    <CompetitionResultForm />
-                </ModalOrDrawer>
+                        {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
+
+                        <div className="flex justify-end">
+                            <Button
+                                color="success"
+                                onPress={() => void handleConfirm()}
+                                isDisabled={isSubmitting}
+                                isLoading={isSubmitting}
+                            >
+                                Подтвердить
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
-        </>
+        </div>
     );
 }
