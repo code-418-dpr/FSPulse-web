@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 
-export const createSkillsOfAthletes = async (
+export const seedSkillsOfAthletes = async (
     skillsOfAthletes: { athleteId: string; skillId: string; grade?: number }[],
 ) => {
     const existingSkillsOfAthletes = await prisma.skillOfAthlete.findMany();

@@ -14,7 +14,7 @@ export const getDisciplinesWithAgeGroups = async () => {
     });
 };
 
-export const createDisciplines = async (disciplines: Prisma.DisciplineCreateInput[]) => {
+export const seedDisciplines = async (disciplines: Prisma.DisciplineCreateInput[]) => {
     const existingDisciplines = (await prisma.discipline.findMany({ select: { name: true } })).map(({ name }) => name);
     return prisma.discipline.createManyAndReturn({
         data: disciplines.filter(({ name }) => !existingDisciplines.includes(name)),
