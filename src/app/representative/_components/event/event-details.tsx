@@ -1,4 +1,3 @@
-// src/app/representative/_components/event/event-details.tsx
 "use client";
 
 import { EventItem } from "@/types";

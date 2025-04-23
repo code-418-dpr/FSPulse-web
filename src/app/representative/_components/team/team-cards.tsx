@@ -1,4 +1,3 @@
-// src/app/representative/_components/competition/competition-cards.tsx
 "use client";
 
 import { useState } from "react";

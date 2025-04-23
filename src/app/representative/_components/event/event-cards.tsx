@@ -1,4 +1,3 @@
-// src/app/representative/_components/event/event-cards.tsx
 "use client";
 
 import { useState } from "react";
