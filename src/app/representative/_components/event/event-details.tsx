@@ -43,6 +43,7 @@ export default function EventDetails({ event }: Props) {
                     label="Регистрация на соревнование"
                     isOpen={isTeamsOpen}
                     onOpenChangeAction={onTeamsOpenChange}
+                    size="xl"
                 >
                     <TeamCreateOrJoin />
                 </ModalOrDrawer>

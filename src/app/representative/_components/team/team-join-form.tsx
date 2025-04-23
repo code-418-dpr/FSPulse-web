@@ -27,15 +27,17 @@ export default function TeamJoinForm({ paginatedData }: Props) {
     };
 
     return (
-        <div>
-            {paginatedData.map((teamWithMembers) => (
-                <Card key={teamWithMembers.name + teamWithMembers.leader}>
+        <>
+            {paginatedData.map((teamWithMembers, i) => (
+                <Card key={i + 1}>
                     <CardHeader>{teamWithMembers.name}</CardHeader>
                     <CardBody>
-                        <h3 className="text-2xl">1. Капитан: {teamWithMembers.leader}</h3>
+                        <h3 className="text-base">
+                            0. Капитан: <span className="block">{teamWithMembers.leader}</span>
+                        </h3>
                         <div>
                             {teamWithMembers.members.map((member, index) => (
-                                <p key={member}>
+                                <p key={member} className="text-sm">
                                     {index + 1}. {member}
                                 </p>
                             ))}
@@ -46,7 +48,7 @@ export default function TeamJoinForm({ paginatedData }: Props) {
                             color="success"
                             isLoading={isLoading}
                             fullWidth
-                            className="mt-6"
+                            className="mt-6 text-sm"
                             onPress={() => void onSubmit(teamWithMembers.name)}
                         >
                             Вступить в команду
@@ -54,6 +56,6 @@ export default function TeamJoinForm({ paginatedData }: Props) {
                     </CardFooter>
                 </Card>
             ))}
-        </div>
+        </>
     );
 }

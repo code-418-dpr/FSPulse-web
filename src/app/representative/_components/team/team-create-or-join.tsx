@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 
-import { MainCards } from "@/app/representative/_components/main-cards";
 import TeamCreateForm from "@/app/representative/_components/team/team-create-form";
 import TeamJoinForm from "@/app/representative/_components/team/team-join-form";
 import { TeamWithMembersItem } from "@/types";
-import { Tab, Tabs } from "@heroui/react";
+import { CircularProgress, Pagination, Tab, Tabs } from "@heroui/react";
 
 interface Paged<T> {
     items: T[];
@@ -36,20 +35,28 @@ export default function TeamCreateOrJoin() {
     const totalTeamsPages = teamsData?.pagination.totalPages ?? 1;
 
     useEffect(() => {
+        const pageSize = 6;
+        const totalItems = teamsWithMembers.length;
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedItems = teamsWithMembers.slice(startIndex, endIndex);
+
         const pagedData: Paged<TeamWithMembersItem> = {
-            items: teamsWithMembers,
+            items: paginatedItems,
             pagination: {
-                page: 1,
-                pageSize: 6,
-                totalItems: teamsWithMembers.length,
-                totalPages: Math.ceil(teamsWithMembers.length / 6),
+                page,
+                pageSize,
+                totalItems,
+                totalPages,
             },
         };
 
         setIsTeamsLoading(true);
         setTeamsData(pagedData);
         setIsTeamsLoading(false);
-    }, []);
+    }, [page]);
 
     return (
         <Tabs aria-label="RegisterForms" className="w-full" fullWidth>
@@ -57,14 +64,26 @@ export default function TeamCreateOrJoin() {
                 <TeamCreateForm />
             </Tab>
             <Tab key="join" title="Присоединиться к команде">
-                <MainCards<TeamWithMembersItem>
-                    isLoading={isTeamsLoading}
-                    pageItems={teamsPageItems}
-                    totalPages={totalTeamsPages}
-                    page={page}
-                    setPageAction={setPage}
-                    renderCardsAction={(items) => <TeamJoinForm paginatedData={items} />}
-                />
+                <div className="container mx-auto w-full flex-1 px-3 py-4">
+                    {teamsPageItems.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                            {isTeamsLoading ? (
+                                <CircularProgress aria-label="Loading..." size="lg" />
+                            ) : (
+                                <TeamJoinForm paginatedData={teamsPageItems} />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="content-center justify-center">
+                            <p className="text-secondary text-2xl">Здесь пока ничего нет</p>
+                        </div>
+                    )}
+                    {totalTeamsPages > 1 && (
+                        <div className="mt-8 flex justify-center">
+                            <Pagination showControls page={page} total={totalTeamsPages} onChange={setPage} />
+                        </div>
+                    )}
+                </div>
             </Tab>
         </Tabs>
     );
