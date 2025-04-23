@@ -81,20 +81,28 @@ export default function CompetitionDetails({ eventId }: Props) {
             </div>
             <div className="grid grid-cols-1 space-y-2">
                 {/* Region */}
-                <div className="grid grid-cols-3 space-y-2">
-                    <p className="pt-1 text-left text-sm">Регион:</p>
-                    <Chip
-                        startContent={
-                            <span className="flex items-center">
-                                <Icon icon="iconoir:map-pin" width={18} height={18} className="mr-1" />
-                            </span>
-                        }
-                        className="col-span-2 place-self-end"
-                        color="success"
-                        variant="solid"
-                    >
-                        {competition.representatives.map((rep) => rep.representative.user.region.name).join(", ")}
-                    </Chip>
+                <div className="flex items-start gap-2">
+                    <p className="text-sm pt-1 min-w-[60px]">Регион:</p>
+                    <div className="flex-1 flex justify-end">
+                        <div className="flex flex-wrap gap-2 justify-end">
+                        {competition.representatives.map((rep) => (
+                            <Chip
+                            key={rep.representative.id}
+                            startContent={
+                                <span className="flex items-center">
+                                <Icon icon="iconoir:map-pin" width={14} height={14} className="mr-1" />
+                                </span>
+                            }
+                            size="sm"
+                            color="success"
+                            variant="solid"
+                            className="whitespace-nowrap"
+                            >
+                            {rep.representative.user.region.name}
+                            </Chip>
+                        ))}
+                        </div>
+                    </div>
                 </div>
                 {/* Status */}
                 <div className="grid grid-cols-2 space-y-2">

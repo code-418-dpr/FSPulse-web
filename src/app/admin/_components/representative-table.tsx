@@ -93,7 +93,7 @@ export function RepresentativeTableWithPagination({
                         label="Детали представителя"
                         size="xl"
                     >
-                        <RepresentatDetails representativeId={selectedId} onClose={onOpenChange} />
+                        <RepresentatDetails representativeId={selectedId} onCloseAction={onOpenChange} />
                     </ModalOrDrawer>
                 )}
             </div>
