@@ -6,9 +6,6 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-
 import PasswordInput from "@/components/password-input";
 import { registerUser } from "@/data/auth";
 import { getRegions } from "@/data/region";
@@ -35,7 +32,7 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
     const [isLoading, setIsLoading] = useState(false);
     const [regions, setRegions] = useState<RegionOption[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
-    const router = useRouter();
+    const [formCongrats, setFormCongrats] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchRegions = async () => {
@@ -65,24 +62,13 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
             setIsLoading(true);
             setFormError(null);
 
-            const result = await registerUser({
+            await registerUser({
                 ...data,
                 role: "representative",
                 regionId: data.region,
             });
 
-            const signInResult = await signIn("credentials", {
-                email: result?.email,
-                password: data.password,
-                redirect: false,
-            });
-
-            if (signInResult?.error) {
-                throw new Error(signInResult.error);
-            }
-
-            router.push("/");
-            router.refresh();
+            setFormCongrats("Заявка на регистрацию успешно направлена. Попробуйте войти позднее.");
         } catch (error) {
             if (error instanceof Error) {
                 if (error.message.includes("email") || error.message.includes("phone")) {
@@ -175,6 +161,7 @@ export default function SpokesmanSignupForm({ className }: React.ComponentProps<
                     errorMessage={errors.passwordRepeat?.message}
                 />
                 {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
+                {formCongrats && <div className="text-success-500 text-center text-sm">{formCongrats}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
                     Регистрация
                 </Button>

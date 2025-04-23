@@ -1,4 +1,4 @@
-export type Tab = "requests" | "events" | "team" | "achievement";
+export type Tab = "requests" | "events" | "team" | "achievement" | "representative";
 
 export interface CompetitionItem {
     title: string;
