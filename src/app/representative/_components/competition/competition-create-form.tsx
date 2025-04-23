@@ -9,69 +9,16 @@ import { useRouter } from "next/navigation";
 
 import { EventLevel } from "@/app/generated/prisma";
 import { MultiSelectAutocomplete } from "@/components/multiselect-autocomplite";
+import { getDisciplines } from "@/data/discipline";
 import { getRegions } from "@/data/region";
+import { competitionRequestSchema } from "@/schemas/competition-request-schema";
 import { RegionOption } from "@/types/region";
 import { Textarea } from "@heroui/input";
 import { Autocomplete, AutocompleteItem, Button, DateRangePicker, Image, Input, Switch, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { getLocalTimeZone } from "@internationalized/date";
 
-/*
-name                     String
-description              String
-cover                    Bytes         @db.ByteA
-applicationTime          DateTime      @default(now())
-startRegistration        DateTime
-endRegistration          DateTime
-start                    DateTime
-end                      DateTime
-minAge                   Int           @db.SmallInt
-maxAge                   Int           @db.SmallInt
-minTeamParticipantsCount Int           @db.SmallInt
-maxTeamParticipantsCount Int           @db.SmallInt
-isPersonalFormatAllowed  Boolean
-maxParticipantsCount     Int           @db.SmallInt
-disciplineId             String
-isOnline                 Boolean
-address                  String?
-awards                   Int[]         @db.SmallInt
-level                    EventLevel
-requestStatus            RequestStatus @default(PENDING)
-requestComment           String?
-discipline               Discipline    @relation(fields: [disciplineId], references: [id])
-representative           EventOfRepresentative[]
- */
-
-const userSchema = z.object({
-    name: z
-        .string()
-        .min(1, "Фамилия обязательна")
-        .min(3, "Фамилия должна содержать минимум 3 символа")
-        .regex(/^[а-яА-ЯёЁ\s]+$/, "Фамилия должна содержать только кириллические буквы"),
-    description: z
-        .string()
-        .min(1, "Имя обязательно")
-        .min(3, "Имя должно содержать минимум 3 символа")
-        .regex(/^[а-яА-ЯёЁ\s]+$/, "Имя должно содержать только кириллические буквы"),
-    middlename: z.string().nullable(),
-    startRegistration: z.string().refine((val) => !isNaN(new Date(val).getTime())),
-    endRegistration: z.string().refine((val) => !isNaN(new Date(val).getTime())),
-    start: z.string().refine((val) => !isNaN(new Date(val).getTime())),
-    end: z.string().refine((val) => !isNaN(new Date(val).getTime())),
-    minAge: z.number().min(14),
-    maxAge: z.number().max(60),
-    minTeamParticipantsCount: z.number().min(1),
-    maxTeamParticipantsCount: z.number().max(10),
-    isPersonalFormatAllowed: z.boolean(),
-    maxParticipantsCount: z.number(),
-    disciplineId: z.string(),
-    isOnline: z.boolean(),
-    address: z.string().min(1, "Адрес обязателен").min(3, "Адрес должен содержать минимум 3 символа"),
-    awards: z.array(z.number()),
-    level: z.string(),
-    discipline: z.string(),
-    regions: z.array(z.string()).min(1, "Выберите хотя бы один регион"),
-});
+const userSchema = competitionRequestSchema;
 
 type UserFormData = z.infer<typeof userSchema>;
 export default function CompetitionCreateForm({ className }: React.ComponentProps<"form">) {
@@ -80,31 +27,40 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
     const [levels] = React.useState(Object.values(EventLevel));
     const [formError, setFormError] = useState<string | null>(null);
     const router = useRouter();
-    const [setSelectedDateRange] = useState<{
-        start?: Date;
-        end?: Date;
-    }>({
-        start: today(getLocalTimeZone()).subtract({ days: 7 }).toDate(getLocalTimeZone()),
-        end: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
-    });
     const [preview, setPreview] = useState<string | null>(null);
-    const [selectedKeys, setSelectedKeys] = React.useState<Set<string>>(new Set(["javascript", "typescript"]));
+    const [selectedKeys, setSelectedKeys] = React.useState<Set<string>>(
+        new Set(
+            regions.map((r) => {
+                return r.name;
+            }),
+        ),
+    );
+    const [disciplines, setDisciplines] = React.useState<{ id: string; name: string }[]>([]);
 
-    const handleSelectionChange = (keys: Set<string>) => {
-        setSelectedKeys(keys);
-    };
+    const {
+        control,
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(userSchema),
+    });
 
     useEffect(() => {
-        const fetchRegions = async () => {
+        const fetchData = async () => {
             try {
-                const data = (await getRegions()) as RegionOption[];
-                setRegions(data);
+                const regions = (await getRegions()) as RegionOption[];
+                setRegions(regions);
+
+                const disciplines = await getDisciplines();
+                setDisciplines(disciplines);
             } catch (err) {
-                console.error("Ошибка загрузки регионов:", err);
+                console.error("Ошибка загрузки:", err);
             }
         };
 
-        void fetchRegions();
+        void fetchData();
     }, []);
 
     const getLevelName = (level: EventLevel) => {
@@ -134,53 +90,62 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
         reader.readAsDataURL(file);
     };
 
-    const {
-        control,
-        register,
-        handleSubmit,
-        setError,
-        formState: { errors },
-    } = useForm<UserFormData>({
-        resolver: zodResolver(userSchema),
-    });
-
     const onSubmit: SubmitHandler<UserFormData> = async (data) => {
         try {
             setIsLoading(true);
             setFormError(null);
 
-            console.log(data);
-            await new Promise((resolve) => {
-                setTimeout(resolve, 100);
-            });
-            /*
-            const athlete = await registerUser({
-                ...data,
-                role: "athlete",
-                birthDate: new Date(data.birthDate),
-                regionId: data.region,
-                sportCategory: data.sportCategory ?? undefined,
-            });
+            // Валидация дат
+            const now = new Date();
+            const startReg = new Date(data.startRegistration);
+            const endReg = new Date(data.endRegistration);
+            const start = new Date(data.start);
+            const end = new Date(data.end);
 
-            const signInResult = await signIn("credentials", {
-                email: athlete?.email,
-                password: data.password,
-                redirect: false,
-            });
-            if (signInResult?.error) {
-                throw new Error(signInResult.error);
+            if (startReg >= endReg) {
+                throw new Error("Дата окончания регистрации должна быть позже даты начала");
             }
-             */
+
+            if (start >= end) {
+                throw new Error("Дата окончания соревнования должна быть позже даты начала");
+            }
+
+            if (endReg > start) {
+                throw new Error("Регистрация должна заканчиваться до начала соревнования");
+            }
+
+            // Валидация возраста
+            if (data.minAge >= data.maxAge) {
+                throw new Error("Максимальный возраст должен быть больше минимального");
+            }
+
+            // Валидация количества участников
+            if (data.minTeamParticipantsCount >= data.maxTeamParticipantsCount) {
+                throw new Error("Максимальное количество участников должно быть больше минимального");
+            }
+
+            // Подготовка данных для вывода
+            const formData = {
+                ...data,
+                startRegistration: startReg.toISOString(),
+                endRegistration: endReg.toISOString(),
+                start: start.toISOString(),
+                end: end.toISOString(),
+                regions: Array.from(selectedKeys), // Преобразуем Set в массив
+                createdAt: now.toISOString(),
+            };
+
+            console.log("Отправляемые данные:", formData);
+
+            // Здесь будет реальный запрос к API
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
             router.push("/");
             router.refresh();
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message.includes("email") || error.message.includes("phoneNumber")) {
-                    setError("root", { message: error.message });
-                    setFormError(error.message);
-                } else {
-                    setFormError(error.message);
-                }
+                setFormError(error.message);
+                console.error("Ошибка валидации:", error.message);
             }
         } finally {
             setIsLoading(false);
@@ -195,8 +160,27 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
     return (
         <form className={cn("grid items-start gap-4", className)} onSubmit={handleFormSubmit}>
             <div className="flex flex-col gap-4">
+                <Controller
+                    name="discipline"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            aria-label="Дисциплина"
+                            label="Дисциплина"
+                            defaultItems={disciplines.map((d) => ({ key: d.id, name: d.name }))}
+                            selectedKey={field.value}
+                            onSelectionChange={field.onChange}
+                            isInvalid={!!errors.discipline}
+                            errorMessage={errors.discipline?.message}
+                            allowsCustomValue={false}
+                        >
+                            {(level) => <AutocompleteItem key={level.key}>{level.name}</AutocompleteItem>}
+                        </Autocomplete>
+                    )}
+                />
                 <Input
                     label="Название"
+                    aria-label="Название"
                     type="text"
                     variant="bordered"
                     {...register("name")}
@@ -208,6 +192,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                     control={control}
                     render={({ field }) => (
                         <Autocomplete
+                            aria-label="Уровень соревнований"
                             label="Уровень соревнований"
                             defaultItems={levels.map((l) => ({ key: l, name: getLevelName(l) }))}
                             selectedKey={field.value}
@@ -220,41 +205,74 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                         </Autocomplete>
                     )}
                 />
-                <Switch defaultSelected {...register("isOnline")}>
-                    Онлайн
-                </Switch>
                 <div className="mb-4">
-                    <label className="mb-2 block text-sm font-medium">Даты регистрации</label>
-                    <DateRangePicker
-                        className="w-full"
-                        defaultValue={{
-                            start: today(getLocalTimeZone()).subtract({ days: 7 }),
-                            end: today(getLocalTimeZone()),
-                        }}
-                        onChange={(range) => {
-                            const timeZone = getLocalTimeZone();
-                            setSelectedDateRange({
-                                start: range?.start.toDate(timeZone),
-                                end: range?.end.toDate(timeZone),
-                            });
-                        }}
+                    <label>Формат соревнований:</label>
+                    <Controller
+                        name="isOnline"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch aria-label="Онлайн режим" isSelected={field.value} onValueChange={field.onChange}>
+                                Онлайн
+                            </Switch>
+                        )}
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="mb-2 block text-sm font-medium">Даты проведения</label>
-                    <DateRangePicker
-                        className="w-full"
-                        defaultValue={{
-                            start: today(getLocalTimeZone()).subtract({ days: 7 }),
-                            end: today(getLocalTimeZone()),
-                        }}
-                        onChange={(range) => {
-                            const timeZone = getLocalTimeZone();
-                            setSelectedDateRange({
-                                start: range?.start.toDate(timeZone),
-                                end: range?.end.toDate(timeZone),
-                            });
-                        }}
+                    <Controller
+                        name="startRegistration"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <DateRangePicker
+                                className="w-full"
+                                isInvalid={!!fieldState.error}
+                                errorMessage={fieldState.error?.message}
+                                label="Даты регистрации"
+                                aria-label="Выберите даты регистрации"
+                                onChange={(range) => {
+                                    if (!range) return;
+
+                                    const timeZone = getLocalTimeZone();
+                                    const start = range.start.toDate(timeZone).toISOString();
+                                    const end = range.end.toDate(timeZone).toISOString();
+
+                                    // Устанавливаем значения для обоих полей
+                                    setValue("startRegistration", start);
+                                    setValue("endRegistration", end);
+
+                                    // Если нужно сохранить в field.value (опционально)
+                                    field.onChange(start);
+                                }}
+                            />
+                        )}
+                    />
+                </div>
+                <div className="mb-4">
+                    <Controller
+                        name="start"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <DateRangePicker
+                                className="w-full"
+                                label="Даты проведения"
+                                aria-label="Выберите даты проведения"
+                                isInvalid={!!fieldState.error}
+                                errorMessage={fieldState.error?.message}
+                                onChange={(range) => {
+                                    if (!range) return;
+
+                                    const timeZone = getLocalTimeZone();
+                                    const start = range.start.toDate(timeZone).toISOString();
+                                    const end = range.end.toDate(timeZone).toISOString();
+
+                                    // Устанавливаем значения для обоих полей
+                                    setValue("start", start);
+                                    setValue("end", end);
+
+                                    // Если нужно сохранить в field.value (опционально)
+                                    field.onChange(start);
+                                }}
+                            />
+                        )}
                     />
                 </div>
                 <div className="space-y-4">
@@ -263,6 +281,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                         type="file"
                         variant="bordered"
                         accept="image/*"
+                        aria-label="Загрузить обложку соревнования"
                         onChange={handleFileImageChange}
                     />
 
@@ -275,6 +294,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 </div>
                 <Input
                     label="Минимальный возраст участника"
+                    aria-label="Минимальный возраст участника"
                     type="number"
                     variant="bordered"
                     {...register("minAge")}
@@ -283,6 +303,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 />
                 <Input
                     label="Максимальный возраст участника"
+                    aria-label="Максимальный возраст участника"
                     type="number"
                     variant="bordered"
                     {...register("maxAge")}
@@ -291,6 +312,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 />
                 <Input
                     label="Минимальное количество участников команды"
+                    aria-label="Минимальное количество участников команды"
                     type="number"
                     variant="bordered"
                     {...register("minTeamParticipantsCount")}
@@ -299,23 +321,39 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 />
                 <Input
                     label="Максимальное количество участников команды"
+                    aria-label="Максимальное количество участников команды"
                     type="number"
                     variant="bordered"
                     {...register("maxTeamParticipantsCount")}
                     isInvalid={!!errors.maxTeamParticipantsCount}
                     errorMessage={errors.maxTeamParticipantsCount?.message}
                 />
+                <Input
+                    label="Максимальное количество команд"
+                    aria-label="Максимальное количество команд"
+                    type="number"
+                    variant="bordered"
+                    {...register("maxParticipantsCount")}
+                    isInvalid={!!errors.maxParticipantsCount}
+                    errorMessage={errors.maxParticipantsCount?.message}
+                />
                 <Controller
                     name="regions"
                     control={control}
-                    render={() => {
+                    render={({ field }) => {
                         return (
                             <MultiSelectAutocomplete
                                 items={regions.map((r) => ({ key: r.id, label: r.name }))}
                                 label="Регионы проведения соревнования"
-                                placeholder=""
-                                selectedKeys={selectedKeys}
-                                onSelectionChange={handleSelectionChange}
+                                selectedKeys={new Set(field.value)}
+                                aria-label="Регионы"
+                                onSelectionChange={(keys) => {
+                                    const selected = Array.from(keys);
+                                    field.onChange(selected);
+                                    setSelectedKeys(keys);
+                                }}
+                                isInvalid={!!errors.regions}
+                                errorMessage={errors.regions?.message}
                             />
                         );
                     }}
@@ -323,6 +361,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 <Input
                     label="Адрес"
                     type="text"
+                    aria-label="Адрес"
                     variant="bordered"
                     {...register("address")}
                     isInvalid={!!errors.address}
@@ -330,6 +369,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 />
                 <Textarea
                     label="Описание соревнования"
+                    aria-label="Описание соревнования"
                     {...register("description")}
                     isInvalid={!!errors.description}
                     errorMessage={errors.description?.message}
