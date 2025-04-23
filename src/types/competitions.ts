@@ -1,4 +1,4 @@
-import { RequestStatus } from "@/app/generated/prisma";
+import { Prisma, RequestStatus } from "@/app/generated/prisma";
 
 export interface CompetitionItem {
     id: string;
@@ -12,3 +12,22 @@ export interface CompetitionItem {
     discipline: string;
     image: string;
 }
+
+export type RepresentativeEventRequest = Prisma.EventGetPayload<{
+    include: {
+        representative: {
+            include: {
+                representative: {
+                    include: {
+                        user: {
+                            include: {
+                                region: true;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        discipline: true;
+    };
+}>;

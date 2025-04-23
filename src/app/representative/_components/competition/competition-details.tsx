@@ -1,32 +1,88 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import CompetitionResultForm from "@/app/representative/_components/competition-result-form";
 import ModalOrDrawer from "@/components/modal-or-drawer";
-import { CompetitionItem } from "@/types";
-import { Button, Chip, Image, useDisclosure } from "@heroui/react";
+import { getRepresentativeRequestById } from "@/data/event";
+import { RepresentativeEventRequest } from "@/types/competitions";
+import { Button, Chip, Image, Spinner, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 interface Props {
-    competition: CompetitionItem;
+    eventId: string;
 }
-
-export default function CompetitionDetails({ competition }: Props) {
+export default function CompetitionDetails({ eventId }: Props) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [competition, setCompetition] = useState<RepresentativeEventRequest | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        const loadEvent = async () => {
+            try {
+                const data = await getRepresentativeRequestById(eventId);
+                setCompetition(data);
+            } catch {
+                setError("Не удалось загрузить данные о событии.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (eventId) {
+            void loadEvent();
+        }
+    }, [eventId]);
+    if (loading) {
+        return (
+            <div className="flex h-64 items-center justify-center">
+                <Spinner size="lg" />
+            </div>
+        );
+    }
+
+    if (error || !competition) {
+        return <div className="text-danger-500 py-8 text-center">{error ?? "Событие не найдено"}</div>;
+    }
+    const arrayBufferToBase64 = (buffer: Uint8Array) => {
+        return `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
+    };
     return (
         <>
-            <h3 className="text-2xl font-bold">{competition.title}</h3>
-            <Image alt={competition.title} src={competition.image} className="w-full rounded-xl object-cover" />
-            <div className="grid grid-cols-1 space-y-2">
-                {/* Format */}
-                <div className="grid grid-cols-2 space-y-2">
-                    <p className="pt-1 text-left text-sm">Формат:</p>
-                    <Chip className="place-self-end" color="success" variant="solid">
-                        {competition.format}
-                    </Chip>
+            <div className="flex items-center justify-between pt-2">
+                <h3 className="text-xl font-bold">{competition.name}</h3>
+                <Chip color="secondary" variant="flat">
+                    {competition.level == "FEDERAL"
+                        ? "Всероссийский"
+                        : competition.level == "OPEN"
+                          ? "Открытый"
+                          : "Региональный"}
+                </Chip>
+            </div>
+            <div className="grid grid-cols-2">
+                <Image
+                    alt={competition.name}
+                    src={arrayBufferToBase64(competition.cover)}
+                    className="w-[80%] rounded-xl object-cover"
+                />
+                <div className="grid grid-cols-1">
+                    <p className="text-md text-foreground/50 -translate-x-10">{competition.description}</p>
+                    <p className="text-md text-foreground/50 -translate-x-10">{competition.discipline.name}</p>
+                    <div className="grid grid-cols-2 space-y-2">
+                        <p className="col-span-2 pt-1 text-right text-sm">
+                            {competition.start.toLocaleDateString()} – {competition.end.toLocaleDateString()}
+                        </p>
+                    </div>
+                    <div className="flex items-center justify-between pt-2">
+                        <p className="-translate-x-10 text-sm">Формат:</p>
+                        <Chip color={competition.isOnline ? "success" : "danger"} variant="solid">
+                            {competition.isOnline ? "Онлайн" : "Оффлайн"}
+                        </Chip>
+                    </div>
                 </div>
+            </div>
+            <div className="grid grid-cols-1 space-y-2">
                 {/* Region */}
                 <div className="grid grid-cols-3 space-y-2">
                     <p className="pt-1 text-left text-sm">Регион:</p>
@@ -40,32 +96,34 @@ export default function CompetitionDetails({ competition }: Props) {
                         color="success"
                         variant="solid"
                     >
-                        {competition.region}
+                        {competition.representative.map((rep) => rep.representative.user.region.name).join(", ")}
                     </Chip>
                 </div>
                 {/* Status */}
                 <div className="grid grid-cols-2 space-y-2">
                     <p className="pt-1 text-left text-sm">Статус:</p>
-                    <Chip className="place-self-end" color="success" variant="solid">
-                        {competition.status}
+                    <Chip
+                        className="place-self-end"
+                        color={
+                            competition.requestStatus == "APPROVED"
+                                ? "success"
+                                : competition.requestStatus == "DECLINED"
+                                  ? "danger"
+                                  : "warning"
+                        }
+                        variant="solid"
+                    >
+                        {competition.requestStatus == "APPROVED"
+                            ? "Одобрено"
+                            : competition.requestStatus == "DECLINED"
+                              ? "Отклонено"
+                              : "На рассмотрении"}
                     </Chip>
                 </div>
                 {/* Application date */}
                 <div className="grid grid-cols-2 space-y-2">
                     <p className="pt-1 text-left text-sm">Зарегистрирован:</p>
-                    <p className="pt-1 text-right text-sm">{competition.applicationDate}</p>
-                </div>
-                {/* Event dates */}
-                <div className="grid grid-cols-3 space-y-2">
-                    <p className="pt-1 text-left text-sm">Даты:</p>
-                    <p className="col-span-2 pt-1 text-right text-sm">
-                        {competition.startDate} – {competition.endDate}
-                    </p>
-                </div>
-                {/* Discipline */}
-                <div className="grid grid-cols-3 space-y-2">
-                    <p className="pt-1 text-left text-sm">Дисциплина:</p>
-                    <p className="col-span-2 pt-1 text-right text-sm">{competition.discipline}</p>
+                    <p className="pt-1 text-right text-sm">{competition.applicationTime.toLocaleDateString()}</p>
                 </div>
 
                 <Button onPress={onOpen}>Распределить баллы</Button>
