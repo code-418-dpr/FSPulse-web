@@ -1,25 +1,27 @@
 "use client";
 
+import type { z } from "zod";
+
 import { Controller, useFormContext } from "react-hook-form";
+
+import type { competitionRequestSchema } from "@/schemas/competition-request-schema";
 import { Autocomplete, AutocompleteItem, Button } from "@heroui/react";
-import { competitionRequestSchema } from "@/schemas/competition-request-schema";
+
+type CompetitionRequest = z.infer<typeof competitionRequestSchema>;
 
 interface RegionItem {
     key: string;
     label: string;
 }
 
-export const MultiSelectAutocomplete = ({
-                                             regions,
-                                         }: {
-    regions: RegionItem[];
-}) => {
-    const { control, setValue, watch } = useFormContext<competitionRequestSchema>();
-    const selectedRegionKeys = watch("regions") || [];
+export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) => {
+    const { control, setValue, watch } = useFormContext<CompetitionRequest>();
 
-    const selectedRegions = selectedRegionKeys
-        .map((key: string) => regions.find(r => r.key === key))
-        .filter(Boolean) as RegionItem[];
+    // Явно указываем тип для selectedRegionKeys
+    const selectedRegionKeys: string[] = watch("regions");
+
+    // Безопасная фильтрация регионов
+    const selectedRegions = regions.filter((region): region is RegionItem => selectedRegionKeys.includes(region.key));
 
     const addRegion = (key: string) => {
         if (!selectedRegionKeys.includes(key)) {
@@ -30,23 +32,25 @@ export const MultiSelectAutocomplete = ({
     const removeRegion = (key: string) => {
         setValue(
             "regions",
-            selectedRegionKeys.filter(k => k !== key)
+            selectedRegionKeys.filter((k) => k !== key),
         );
     };
 
     return (
         <div className="space-y-4">
-            {/* Отображение выбранных регионов */}
             <div className="flex flex-wrap gap-2">
                 {selectedRegions.map((region) => (
-                    <div key={`selected-${region.key}`} className="flex items-center bg-default-100 px-3 py-1 rounded-full">
+                    <div
+                        key={`selected-${region.key}`}
+                        className="bg-default-100 flex items-center rounded-full px-3 py-1"
+                    >
                         <span>{region.label}</span>
                         <Button
                             type="button"
                             size="sm"
                             variant="light"
-                            className="ml-2 text-danger-500"
-                            onPress={() => removeRegion(region.key)}
+                            className="text-danger-500 ml-2"
+                            onPress={() => { removeRegion(region.key); }}
                         >
                             ×
                         </Button>
@@ -54,19 +58,18 @@ export const MultiSelectAutocomplete = ({
                 ))}
             </div>
 
-            {/* Autocomplete для добавления новых регионов */}
             <Controller
                 name="regionInput"
                 control={control}
                 render={({ field }) => (
                     <Autocomplete
                         label={selectedRegions.length === 0 ? "Регион" : "Добавить еще регион"}
-                        defaultItems={regions.filter(r => !selectedRegionKeys.includes(r.key))}
+                        defaultItems={regions.filter((region) => !selectedRegionKeys.includes(region.key))}
                         selectedKey={field.value}
                         onSelectionChange={(key) => {
                             if (key) {
                                 addRegion(key as string);
-                                field.onChange(null); // Сбрасываем значение после выбора
+                                field.onChange(null);
                             }
                         }}
                         allowsCustomValue={false}
