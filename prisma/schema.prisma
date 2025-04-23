@@ -23,6 +23,8 @@ model User {
   region         Region           @relation(fields: [regionId], references: [id])
   athlete        Athlete[]
   representative Representative[]
+
+  Notification Notification[]
 }
 
 enum SportsCategory {
@@ -211,4 +213,15 @@ model Representative {
 
   user   User                    @relation(fields: [id], references: [id])
   events EventOfRepresentative[]
+}
+
+model Notification {
+  id               String   @id @default(uuid())
+  userId           String
+  title            String
+  notificationTime DateTime @default(now())
+  content          String
+  isRead           Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
 }
