@@ -8,6 +8,13 @@ export const getTeams = async () => {
     return prisma.team.findMany({ orderBy: { name: "asc" } });
 };
 
+export const getTeamsByEvent = async (eventId: string) => {
+    return prisma.team.findMany({
+        where: { eventId: eventId },
+        orderBy: { name: "asc" },
+    });
+};
+
 export const seedTeams = async (teamNames: string[]) => {
     const existingRegions = (await prisma.team.findMany({ select: { name: true } })).map(({ name }) => name);
     return prisma.region.createManyAndReturn({
@@ -16,7 +23,7 @@ export const seedTeams = async (teamNames: string[]) => {
     });
 };
 
-export const registerTeam = async (data: { name: string; eventId: string }) => {
+export const registerTeam = async (data: { name: string; eventId: string }, currentAthleteId: string) => {
     try {
         return await prisma.$transaction(async (tx) => {
             // Проверка уникальности
@@ -27,12 +34,36 @@ export const registerTeam = async (data: { name: string; eventId: string }) => {
             });
             if (existingTeam) throw new Error("Команда с такими данными уже существует");
 
+            // Проверка существования пользователя
+            const athleteExists = await tx.athlete.findFirst({
+                where: { id: currentAthleteId },
+            });
+            if (!athleteExists) {
+                throw new Error("Пользователь не найден");
+            }
+
             // Создание команды
             const team = await tx.team.create({
                 data: {
-                    id: crypto.randomUUID(),
                     name: data.name,
                     eventId: data.eventId,
+                    athletes: {
+                        create: {
+                            athlete: { connect: { id: currentAthleteId } }, // Явное подключение
+                            isLeader: true,
+                        },
+                    },
+                },
+                include: {
+                    athletes: {
+                        where: {
+                            athleteId: currentAthleteId,
+                        },
+                        select: {
+                            athleteId: true,
+                            isLeader: true,
+                        },
+                    },
                 },
             });
 
@@ -40,6 +71,7 @@ export const registerTeam = async (data: { name: string; eventId: string }) => {
                 id: team.id,
                 name: team.name,
                 eventId: team.eventId,
+                athleteId: currentAthleteId,
             };
         });
     } catch (error) {

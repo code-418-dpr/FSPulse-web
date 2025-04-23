@@ -7,6 +7,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { registerTeam } from "@/data/team";
+import { useAuth } from "@/hooks/use-auth";
 import { teamRequestSchema } from "@/schemas/team-request-schema";
 import { Button, Input } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +16,7 @@ const userSchema = teamRequestSchema;
 
 type UserFormData = z.infer<typeof userSchema>;
 export default function TeamCreateForm({ eventId }: { eventId: string }) {
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
@@ -32,10 +34,15 @@ export default function TeamCreateForm({ eventId }: { eventId: string }) {
             setIsLoading(true);
             setFormError(null);
 
-            const team = await registerTeam({
-                name: data.name,
-                eventId: eventId,
-            });
+            console.log(user?.id);
+
+            const team = await registerTeam(
+                {
+                    name: data.name,
+                    eventId: eventId,
+                },
+                user?.id ?? "",
+            );
 
             console.log(team);
         } catch (error) {
