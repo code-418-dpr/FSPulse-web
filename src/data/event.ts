@@ -206,6 +206,7 @@ export async function getEventById(id: string) {
                 },
             },
             discipline: true,
+            files: true,
         },
     });
 }

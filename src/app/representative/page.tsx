@@ -5,16 +5,16 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
-import EventCards from "@/app/representative/_components/event/event-cards";
 import { MainCards } from "@/app/representative/_components/main-cards";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
 import CompetitionCreateForm from "@/components/competition/competition-create-form";
+import EventCards from "@/components/event/event-cards";
 import FooterElement from "@/components/footer";
 import ModalOrDrawer from "@/components/modal-or-drawer";
 import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
-import { searchRepresentativeRequests } from "@/data/event";
+import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
@@ -115,16 +115,34 @@ export default function RequestsPage() {
     // load events when on "events"
     useEffect(() => {
         if (activeTab !== "events") return;
-        setIsEventLoading(true);
-        void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
-            .then((r) => r.json())
-            .then((json: Paged<EventItem>) => {
-                setEventsData(json);
-            })
-            .finally(() => {
+
+        const loadEvents = async () => {
+            setIsEventLoading(true);
+            try {
+                const result = await searchRepresentativeEvents({
+                    ...searchParamsState,
+                    representativeId: user?.id,
+                    page,
+                    pageSize: perPage,
+                });
+                setEventsData({
+                    items: result.results,
+                    pagination: {
+                        page,
+                        pageSize: perPage,
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading events:", error);
+            } finally {
                 setIsEventLoading(false);
-            });
-    }, [activeTab, page]);
+            }
+        };
+
+        void loadEvents();
+    }, [activeTab, page, searchParamsState, user?.id]);
 
     useEffect(() => {
         if (activeTab !== "team") return;

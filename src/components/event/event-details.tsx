@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { getEventById } from "@/data/event";
 import { EventItemForId } from "@/types";
 import { formatDatetime, getEventStatusByDatetimes } from "@/utils";
-import { Chip, Image, Spinner, Tab, Tabs } from "@heroui/react";
+import { Accordion, AccordionItem, Checkbox, Chip, Image, Spinner, Tab, Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 interface Props {
@@ -25,6 +25,7 @@ export default function EventDetails({ eventId }: Props) {
         const loadEvent = async () => {
             try {
                 const data = await getEventById(eventId);
+                console.log(data);
                 setEvent(data);
             } catch {
                 setError("Не удалось загрузить данные о событии.");
@@ -164,6 +165,83 @@ export default function EventDetails({ eventId }: Props) {
                                 {eventStatus}
                             </Chip>
                         </div>
+                        <Accordion>
+                            <AccordionItem key="1" aria-label="More Info" title="Подробнее">
+                                <div className="grid grid-cols-1 gap-y-2">
+                                    <div className="flex items-start gap-2">
+                                        <p className="text-md min-w-[60px] pt-1">Возрастные ограничения:</p>
+                                        <div className="text-md flex flex-1 justify-end">
+                                            {event.minAge} - {event.maxAge}
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <Checkbox
+                                            isSelected={event.isPersonalFormatAllowed}
+                                            color="primary"
+                                            isDisabled
+                                            className="text-foreground"
+                                        >
+                                            Индивидуальное участие
+                                        </Checkbox>
+                                        <Checkbox
+                                            isSelected={
+                                                event.minTeamParticipantsCount !== 0 &&
+                                                event.maxTeamParticipantsCount !== 0
+                                            }
+                                            color="primary"
+                                            isDisabled
+                                            className="text-success"
+                                        >
+                                            Командное участие
+                                        </Checkbox>
+                                    </div>
+                                    <div>Квота участников: {event.maxParticipantsCount}</div>
+                                    <div className="space-y-2 text-center">
+                                        <div>Разбаловка:</div>
+                                        {event.awards.map((award, index) => (
+                                            <div key={index}>
+                                                {index === event.awards.length - 1
+                                                    ? `Остальные - ${award}`
+                                                    : `${index + 1} место - ${award}`}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {event.files.length > 0 && (
+                                        <div className="space-y-2">
+                                            <div>Файлы:</div>
+                                            {event.files.map((file) => {
+                                                const blob = new Blob([file.content], {
+                                                    type: "application/octet-stream",
+                                                });
+                                                const url = URL.createObjectURL(blob);
+
+                                                return (
+                                                    <div
+                                                        key={file.id}
+                                                        className="flex items-center justify-between rounded border p-2"
+                                                    >
+                                                        <span className="truncate">{file.name}</span>
+                                                        <a
+                                                            href={url}
+                                                            download={file.name}
+                                                            className="bg-primary-500 hover:bg-primary-600 ml-4 rounded px-3 py-1 text-white transition-colors"
+                                                            onClick={() => {
+                                                                // Освобождаем ресурсы после скачивания
+                                                                setTimeout(() => {
+                                                                    URL.revokeObjectURL(url);
+                                                                }, 100);
+                                                            }}
+                                                        >
+                                                            Скачать
+                                                        </a>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
                 </Tab>
 

@@ -29,6 +29,7 @@ export type EventItemForId = Prisma.EventGetPayload<{
             };
         };
         discipline: true;
+        files: true;
     };
 }>;
 export interface EventItem {
