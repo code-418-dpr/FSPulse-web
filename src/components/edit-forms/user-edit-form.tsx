@@ -127,7 +127,7 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                 {
                     ...data,
                     regionId: data.region,
-                    sportCategory: data.sportCategory ?? null,
+                    sportCategory: data.sportCategory ?? undefined,
                 },
                 user?.id ?? "",
             );

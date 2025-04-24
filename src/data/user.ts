@@ -41,7 +41,7 @@ export interface AthleteSpecificData {
     birthDate: Date;
     address: string;
     about?: string;
-    sportCategory?: SportsCategory;
+    sportCategory?: SportsCategory | undefined;
 }
 
 export const alterAthleteById = async (athlete: AthleteSpecificData, athleteId: string) => {
