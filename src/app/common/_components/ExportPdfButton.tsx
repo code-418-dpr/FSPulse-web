@@ -1,12 +1,17 @@
-// src/app/common/_components/ExportPdfButton.tsx
-'use client';
+// src/app/common/_components/exportPdfButton.tsx
+"use client";
 
-import React from 'react';
-import html2canvas from 'html2canvas-pro';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import { Button } from '@heroui/react';
-import { Icon } from '@iconify/react';
+import html2canvas from "html2canvas-pro";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+
+import React from "react";
+
+// импорт функции
+import { Button } from "@heroui/react";
+import { Icon } from "@iconify/react";
+
+// src/app/common/_components/exportPdfButton.tsx
 
 export interface Column {
     key: string;
@@ -14,54 +19,45 @@ export interface Column {
 }
 
 export interface ExportPdfButtonProps {
-    /** id контейнера с экспортируемой статистикой */
     exportId?: string;
-    /** имя сохраняемого файла */
     fileName?: string;
-    /** надпись на кнопке */
     label?: string;
-    /** опционально: колонки таблицы, которую нужно вывести в PDF */
     tableColumns?: Column[];
-    /** опционально: данные таблицы */
     tableData?: Record<string, any>[];
 }
 
 export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
-                                                                    exportId = 'exportable',
-                                                                    fileName = 'statistics.pdf',
-                                                                    label = 'Скачать PDF',
-                                                                    tableColumns,
-                                                                    tableData,
-                                                                }) => {
+    exportId = "exportable",
+    fileName = "statistics.pdf",
+    label = "Скачать PDF",
+    tableColumns,
+    tableData,
+}) => {
     const generatePdf = async () => {
         const element = document.getElementById(exportId);
-        if (!element) {
-            console.error(`Element "${exportId}" not found`);
-            return;
-        }
+        if (!element) return;
 
-        // 1. Захватываем область в PNG
+        // 1) Захват экрана в PNG
         const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL("image/png");
 
-        // 2. Создаём PDF
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4' });
+        // 2) Создание PDF
+        const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
         const pageWidth = pdf.internal.pageSize.getWidth();
         const imgProps = pdf.getImageProperties(imgData);
         const pageHeight = (imgProps.height * pageWidth) / imgProps.width;
+        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
 
-        // 3. Вставляем картинку (диаграммы, карточки)
-        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-
-        // 4. Если есть таблица — добавляем её на новую страницу
+        // 3) Если есть таблица — вставляем её на новую страницу
         if (tableColumns && tableData) {
             pdf.addPage();
+
+            // формируем head и body для autoTable
             const head = [tableColumns.map((c) => c.title)];
-            const body = tableData.map((row) =>
-                tableColumns.map((c) => String(row[c.key] ?? ''))
-            );
-            // @ts-ignore автотайбл должжен подтягиваться из jspdf-autotable
-            pdf.autoTable({
+            const body = tableData.map((row) => tableColumns.map((c) => String(row[c.key] ?? "")));
+
+            // Вызов новой функции autoTable(pdf, ...)
+            autoTable(pdf, {
                 head,
                 body,
                 startY: 20,
@@ -70,7 +66,7 @@ export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
             });
         }
 
-        // 5. Сохраняем
+        // 4) Сохраняем файл
         pdf.save(fileName);
     };
 
