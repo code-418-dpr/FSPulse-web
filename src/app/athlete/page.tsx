@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Statistics } from "@/app/athlete/_components/statistics/statistics";
+import Statistics from "@/app/athlete/_components/statistics/statistics";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { useAuth } from "@/hooks/use-auth";
