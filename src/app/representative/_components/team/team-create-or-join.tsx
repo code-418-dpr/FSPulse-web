@@ -29,8 +29,6 @@ export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
         const pageSize = 6;
         const teamsOnEvent = await getTeamsByEvent(eventId);
 
-        console.log(teamsOnEvent);
-
         // Объединяем тестовые данные с реальными командами
         const allTeams = teamsOnEvent.map((team) => {
             // Находим капитана (isLeader: true)

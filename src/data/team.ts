@@ -42,7 +42,10 @@ export const seedTeams = async (teamNames: string[]) => {
     });
 };
 
-export const registerTeam = async (data: { name: string; eventId: string }, currentAthleteId: string) => {
+export const registerTeam = async (
+    data: { name: string; about: string | null; eventId: string },
+    currentAthleteId: string,
+) => {
     try {
         return await prisma.$transaction(async (tx) => {
             // Проверка уникальности
@@ -65,6 +68,7 @@ export const registerTeam = async (data: { name: string; eventId: string }, curr
             const team = await tx.team.create({
                 data: {
                     name: data.name,
+                    about: data.about,
                     eventId: data.eventId,
                     athletes: {
                         create: {
