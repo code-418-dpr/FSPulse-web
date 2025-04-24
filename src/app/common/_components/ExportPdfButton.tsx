@@ -53,23 +53,7 @@ export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
         const pageHeight = (imgProps.height * pageWidth) / imgProps.width;
         pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
 
-        // 3) Если есть таблица — вставляем её на новую страницу
-        if (tableColumns && tableData) {
-            pdf.addPage();
-            const head = [tableColumns.map(c => c.title)];
-            const body = tableData.map(row =>
-                tableColumns.map(c => String(row[c.key] ?? ''))
-            );
-            autoTable(pdf, {
-                head,
-                body,
-                startY: 20,
-                styles: { fontSize: 10 },
-                headStyles: { fillColor: [41, 98, 255] },
-            });
-        }
-
-        // 4) Сохраняем файл
+        // 3) Сохраняем файл
         pdf.save(fileName);
     };
 
