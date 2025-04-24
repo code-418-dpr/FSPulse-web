@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 
+// import dynamic from "next/dynamic";
+
 import TeamsOnEvent from "@/components/event/event-team-table";
 import { getEventById } from "@/data/event";
 import { EventItemForId } from "@/types";
 import { formatDatetime, getEventStatusByDatetimes } from "@/utils";
 import { Accordion, AccordionItem, Checkbox, Chip, Image, Spinner, Tab, Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
+
+// const Map = dynamic(() => import("@/components/map"), { ssr: false });
 
 interface Props {
     eventId: string;
@@ -145,6 +149,7 @@ export default function EventDetails({ eventId }: Props) {
                                 <p className="min-w-[60px] pt-1 text-sm">{event.address}</p>
                             </div>
                         )}
+                        {/* <Map lng={Number(event.lng)} lat={Number(event.lat)} />
                         {/* Status */}
                         <div className="grid grid-cols-2 space-y-2">
                             <p className="pt-1 text-left text-sm">Статус:</p>
@@ -198,12 +203,12 @@ export default function EventDetails({ eventId }: Props) {
                                     </div>
                                     <div>Квота участников: {event.maxParticipantsCount}</div>
                                     <div className="space-y-2 text-center">
-                                        <div>Разбаловка:</div>
+                                        <div>Разбалловка:</div>
                                         {event.awards.map((award, index) => (
                                             <div key={index}>
                                                 {index === event.awards.length - 1
-                                                    ? `Остальные - ${award}`
-                                                    : `${index + 1} место - ${award}`}
+                                                    ? `Остальные — ${award}`
+                                                    : `${index + 1} место — ${award}`}
                                             </div>
                                         ))}
                                     </div>
