@@ -53,12 +53,14 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
             level: selectedLevel as EventLevel,
             requestStatus: selectedStatus as RequestStatus,
         };
-        if(tabType === "requests"){ searchParams = {
-            ...searchParams,
-            minApplicationTime: selectedDateRange.start,
-            maxApplicationTime: selectedDateRange.end,
-        } }
-        if(tabType === "events"){
+        if (tabType === "requests") {
+            searchParams = {
+                ...searchParams,
+                minApplicationTime: selectedDateRange.start,
+                maxApplicationTime: selectedDateRange.end,
+            };
+        }
+        if (tabType === "events") {
             searchParams = {
                 ...searchParams,
                 minStartTime: selectedDateRange.start,
@@ -66,7 +68,8 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                 isOnline,
                 isTeamFormatAllowed,
                 isPersonalFormatAllowed,
-        }}
+            };
+        }
 
         onSubmitAction(searchParams);
         setIsLoading(false);
@@ -280,28 +283,15 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                             },
                             true,
                         )}
-                        {renderDropdown(
-                            "Статус",
-                            [
-                                { key: "upcoming", name: "Скоро..." },
-                                { key: "registration_open", name: "Начата регистрация" },
-                                { key: "registration_closed", name: "Регистрация закончена" },
-                                { key: "in_progress", name: "Соревнование идёт" },
-                                { key: "summarizing", name: "Подведение итогов" },
-                                { key: "completed", name: "Соревнование завершено" },
-                            ],
-                            selectedStatus,
-                            (keys) => {
-                                handleSelectionChange(
-                                    keys,
-                                    setSelectedStatus as React.Dispatch<React.SetStateAction<string | undefined>>,
-                                );
-                            },
-                            true,
-                        )}
-                        <Checkbox  isSelected={isOnline} onValueChange={setIsOnline}>Онлайн</Checkbox>
-                        <Checkbox isSelected={isTeamFormatAllowed} onValueChange={setIsTeamFormatAllowed}>Командный формат</Checkbox>
-                        <Checkbox isSelected={isPersonalFormatAllowed} onValueChange={setIsPersonalFormatAllowed}>Индивидуальный формат</Checkbox>
+                        <Checkbox isSelected={isOnline} onValueChange={setIsOnline}>
+                            Онлайн
+                        </Checkbox>
+                        <Checkbox isSelected={isTeamFormatAllowed} onValueChange={setIsTeamFormatAllowed}>
+                            Командный формат
+                        </Checkbox>
+                        <Checkbox isSelected={isPersonalFormatAllowed} onValueChange={setIsPersonalFormatAllowed}>
+                            Индивидуальный формат
+                        </Checkbox>
                     </>
                 )}
             </div>

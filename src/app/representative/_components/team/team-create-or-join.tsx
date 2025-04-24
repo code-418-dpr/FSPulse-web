@@ -88,7 +88,9 @@ export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
                     },
                 });
             })
-            .finally(() => { setIsTeamsLoading(false); });
+            .finally(() => {
+                setIsTeamsLoading(false);
+            });
     }, [handleCreateValues]);
 
     return (

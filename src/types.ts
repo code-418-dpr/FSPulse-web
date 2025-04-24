@@ -1,4 +1,4 @@
-import { EventLevel, RequestStatus } from "./app/generated/prisma";
+import { Discipline, EventLevel, RequestStatus } from "./app/generated/prisma";
 
 export type Tab = "requests" | "events" | "team" | "achievement" | "representative";
 
@@ -25,6 +25,8 @@ export interface EventItem {
     endRegistration: Date;
     start: Date;
     end: Date;
+    discipline: Discipline;
+    isOnline: boolean;
 }
 
 export interface TeamItem {
