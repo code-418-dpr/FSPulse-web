@@ -11,21 +11,27 @@ import { useRouter } from "next/navigation";
 import { SportsCategory } from "@/app/generated/prisma";
 import { getCategoryLabel } from "@/data/get-category-label";
 import { getRegions } from "@/data/region";
+import { alterAthleteById, findAthleteById } from "@/data/user";
+import { useAuth } from "@/hooks/use-auth";
 import { baseUserSchema } from "@/schemas/base-user-schema";
 import { RegionOption } from "@/types/region";
-import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, cn } from "@heroui/react";
+import { Autocomplete, AutocompleteItem, Button, DatePicker, Input, Textarea, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 
 const sportsCategoryOptions = Object.values(SportsCategory).map((key) => ({
     key,
     label: getCategoryLabel(key),
 }));
 
-const userSchema = baseUserSchema;
+const userSchema = baseUserSchema.extend({
+    about: z.string().nullable(),
+    skills: z.array(z.string()),
+});
 
 type UserFormData = z.infer<typeof userSchema>;
 export default function UserEditForm({ className }: React.ComponentProps<"form">) {
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [regions, setRegions] = useState<RegionOption[]>([]);
     const [formError, setFormError] = useState<string | null>(null);
@@ -45,13 +51,66 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
 
     const {
         control,
-        register,
         handleSubmit,
         setError,
+        reset,
         formState: { errors },
-    } = useForm<UserFormData>({
+    } = useForm({
         resolver: zodResolver(userSchema),
+        defaultValues: {
+            // Начальные пустые значения
+            lastname: "",
+            firstname: "",
+            middlename: "",
+            birthDate: "",
+            address: "",
+            region: "",
+            sportCategory: "",
+            email: "",
+            phoneNumber: "",
+            about: "",
+            skills: [],
+        },
     });
+
+    useEffect(() => {
+        const fetchAthlete = async () => {
+            try {
+                if (!user?.id) return; // Ранний выход если нет ID
+
+                const data = await findAthleteById(user.id);
+
+                if (!data) {
+                    console.error("Данные пользователя не найдены");
+                    return;
+                }
+
+                const initialValues = {
+                    lastname: data.user.lastname,
+                    firstname: data.user.firstname,
+                    middlename: data.user.middlename ?? "",
+                    birthDate: data.birthDate.toISOString().split("T")[0],
+                    address: data.address,
+                    region: data.user.regionId,
+                    sportCategory: data.sportCategory ?? "",
+                    email: data.user.email,
+                    phoneNumber: data.user.phoneNumber,
+                    about: data.about ?? "",
+                };
+
+                reset(initialValues);
+            } catch (err: unknown) {
+                // Явно указываем тип unknown
+                if (err instanceof Error) {
+                    console.error("Ошибка загрузки данных:", err.message);
+                } else {
+                    console.error("Произошла неизвестная ошибка");
+                }
+            }
+        };
+
+        void fetchAthlete();
+    }, [reset, user?.id]);
 
     const onSubmit: SubmitHandler<UserFormData> = async (data) => {
         try {
@@ -63,24 +122,15 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
             await new Promise((resolve) => {
                 setTimeout(resolve, 100);
             });
-            /*
-            const athlete = await registerUser({
-                ...data,
-                role: "athlete",
-                birthDate: new Date(data.birthDate),
-                regionId: data.region,
-                sportCategory: data.sportCategory ?? undefined,
-            });
 
-            const signInResult = await signIn("credentials", {
-                email: athlete?.email,
-                password: data.password,
-                redirect: false,
-            });
-            if (signInResult?.error) {
-                throw new Error(signInResult.error);
-            }
-             */
+            await alterAthleteById(
+                {
+                    ...data,
+                    regionId: data.region,
+                    sportCategory: data.sportCategory ?? undefined,
+                },
+                user?.id ?? "",
+            );
 
             router.push("/");
             router.refresh();
@@ -106,29 +156,50 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
     return (
         <form className={cn("grid items-start gap-4", className)} onSubmit={handleFormSubmit}>
             <div className="flex flex-col gap-4">
-                <Input
-                    label="Фамилия"
-                    type="text"
-                    variant="bordered"
-                    {...register("lastname")}
-                    isInvalid={!!errors.lastname}
-                    errorMessage={errors.lastname?.message}
+                <Controller
+                    name="lastname"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            label="Фамилия"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.lastname}
+                            errorMessage={errors.lastname?.message}
+                        />
+                    )}
                 />
-                <Input
-                    label="Имя"
-                    type="text"
-                    variant="bordered"
-                    {...register("firstname")}
-                    isInvalid={!!errors.firstname}
-                    errorMessage={errors.firstname?.message}
+                <Controller
+                    name="firstname"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            label="Имя"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.firstname}
+                            errorMessage={errors.firstname?.message}
+                        />
+                    )}
                 />
-                <Input
-                    label="Отчество"
-                    type="text"
-                    variant="bordered"
-                    {...register("middlename")}
-                    isInvalid={!!errors.middlename}
-                    errorMessage={errors.middlename?.message}
+                <Controller
+                    name="middlename"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            label="Отчество"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.middlename}
+                            errorMessage={errors.middlename?.message}
+                        />
+                    )}
                 />
                 <Controller
                     name="birthDate"
@@ -139,6 +210,7 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                             showMonthAndYearPickers
                             maxValue={today(getLocalTimeZone()).subtract({ years: 14 })}
                             minValue={today(getLocalTimeZone()).subtract({ years: 60 })}
+                            value={field.value ? parseDate(field.value) : null}
                             onChange={(date) => {
                                 field.onChange(date?.toString());
                             }}
@@ -164,13 +236,20 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                         </Autocomplete>
                     )}
                 />
-                <Input
-                    label="Адрес"
-                    type="text"
-                    variant="bordered"
-                    {...register("address")}
-                    isInvalid={!!errors.address}
-                    errorMessage={errors.address?.message}
+                <Controller
+                    name="address"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            label="Адрес"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.address}
+                            errorMessage={errors.address?.message}
+                        />
+                    )}
                 />
                 <Controller
                     name="sportCategory"
@@ -189,21 +268,50 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                         </Autocomplete>
                     )}
                 />
-                <Input
-                    label="Email"
-                    type="email"
-                    variant="bordered"
-                    {...register("email")}
-                    isInvalid={!!errors.email}
-                    errorMessage={errors.email?.message}
+                <Controller
+                    name="email"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            label="Email"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.email}
+                            errorMessage={errors.email?.message}
+                        />
+                    )}
                 />
-                <Input
-                    label="Номер телефона"
-                    type="tel"
-                    variant="bordered"
-                    {...register("phoneNumber")}
-                    isInvalid={!!errors.phoneNumber}
-                    errorMessage={errors.phoneNumber?.message}
+                <Controller
+                    name="phoneNumber"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            label="Номер телефона"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.phoneNumber}
+                            errorMessage={errors.phoneNumber?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    name="about"
+                    control={control}
+                    render={({ field }) => (
+                        <Textarea
+                            label="О себе"
+                            type="text"
+                            variant="bordered"
+                            value={field.value}
+                            onChange={field.onChange}
+                            isInvalid={!!errors.about}
+                            errorMessage={errors.about?.message}
+                        />
+                    )}
                 />
                 {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
