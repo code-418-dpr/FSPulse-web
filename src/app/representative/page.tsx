@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { MainCards } from "@/app/representative/_components/main-cards";
-import { Statistics } from "@/app/representative/_components/statistics/statistics";
+import StatisticsClient from "@/app/representative/_components/statistics/statistics.client";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
 import CompetitionCreateForm from "@/components/competition/competition-create-form";
@@ -248,9 +248,9 @@ export default function RequestsPage() {
                     />
                 )}
 
-                {activeTab === "statistics" && (
+                {activeTab === "achievement" && (
                     <div className="flex-1 p-6">
-                        <Statistics />
+                        <StatisticsClient />
                     </div>
                 )}
             </div>
