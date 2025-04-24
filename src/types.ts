@@ -51,7 +51,10 @@ export interface AchievementItem {
 }
 
 export interface TeamWithMembersItem {
+    id: string;
     name: string;
+    about: string;
+    isReady: boolean;
     leader: string;
     members: string[];
 }

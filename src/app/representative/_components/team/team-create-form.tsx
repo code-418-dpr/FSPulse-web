@@ -9,7 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { registerTeam } from "@/data/team";
 import { useAuth } from "@/hooks/use-auth";
 import { teamRequestSchema } from "@/schemas/team-request-schema";
-import { Button, Input } from "@heroui/react";
+import { Button, Input, Textarea } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const userSchema = teamRequestSchema;
@@ -34,17 +34,14 @@ export default function TeamCreateForm({ eventId }: { eventId: string }) {
             setIsLoading(true);
             setFormError(null);
 
-            console.log(user?.id);
-
-            const team = await registerTeam(
+            await registerTeam(
                 {
                     name: data.name,
+                    about: data.description ?? null,
                     eventId: eventId,
                 },
                 user?.id ?? "",
             );
-
-            console.log(team);
         } catch (error) {
             if (error instanceof Error) {
                 if (error.message.includes("name")) {
@@ -75,6 +72,16 @@ export default function TeamCreateForm({ eventId }: { eventId: string }) {
                     {...register("name")}
                     isInvalid={!!errors.name}
                     errorMessage={errors.name?.message}
+                />
+                <Textarea
+                    label="Описание команды"
+                    placeholder="Здесь также можете указать кого вы ищите"
+                    aria-label="Название команды"
+                    type="text"
+                    variant="bordered"
+                    {...register("description")}
+                    isInvalid={!!errors.description}
+                    errorMessage={errors.description?.message}
                 />
                 {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
                 <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">

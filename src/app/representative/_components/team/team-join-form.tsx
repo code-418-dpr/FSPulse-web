@@ -37,11 +37,17 @@ export default function TeamJoinForm({ paginatedData }: Props) {
                         </h3>
                         <div>
                             {teamWithMembers.members.map((member, index) => (
-                                <p key={member} className="text-sm">
+                                <p key={index + 1} className="text-sm">
                                     {index + 1}. {member}
                                 </p>
                             ))}
                         </div>
+                        {!teamWithMembers.isReady && teamWithMembers.about !== "" && (
+                            <div className="mt-2">
+                                <p className="text-base">Описание:</p>
+                                <p className="text-sm">{teamWithMembers.about}</p>
+                            </div>
+                        )}
                     </CardBody>
                     <CardFooter>
                         <Button
@@ -50,6 +56,7 @@ export default function TeamJoinForm({ paginatedData }: Props) {
                             fullWidth
                             className="mt-6 text-sm"
                             onPress={() => void onSubmit(teamWithMembers.name)}
+                            isDisabled={teamWithMembers.isReady}
                         >
                             Вступить в команду
                         </Button>
