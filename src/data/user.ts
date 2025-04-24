@@ -40,7 +40,7 @@ export interface AthleteSpecificData {
     regionId: string;
     birthDate: string;
     address: string;
-    about?: string;
+    about?: string | undefined;
     sportCategory?: SportsCategory | undefined;
 }
 
