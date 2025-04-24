@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 // import dynamic from "next/dynamic";
 
 import TeamsOnEvent from "@/components/event/event-team-table";
+import GoogleCalendarButton from "@/components/google-calendar-button";
 import { getEventById } from "@/data/event";
 import { EventItemForId } from "@/types";
 import { formatDatetime, getEventStatusByDatetimes } from "@/utils";
@@ -249,6 +250,7 @@ export default function EventDetails({ eventId }: Props) {
                             </AccordionItem>
                         </Accordion>
                     </div>
+                    <GoogleCalendarButton event={event} />
                 </Tab>
 
                 <Tab key="participants" title="Участники" className="w-full">
