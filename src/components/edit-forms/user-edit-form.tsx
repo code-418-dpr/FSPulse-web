@@ -92,7 +92,7 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                     birthDate: data.birthDate.toISOString().split("T")[0],
                     address: data.address,
                     region: data.user.regionId,
-                    sportCategory: data.sportCategory ?? "",
+                    sportCategory: data.sportCategory,
                     email: data.user.email,
                     phoneNumber: data.user.phoneNumber,
                     about: data.about ?? "",
@@ -258,7 +258,7 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                         <Autocomplete
                             label="Спортивный разряд"
                             defaultItems={sportsCategoryOptions}
-                            selectedKey={field.value}
+                            selectedKey={field.value ?? ""}
                             onSelectionChange={field.onChange}
                             isInvalid={!!errors.sportCategory}
                             errorMessage={errors.sportCategory?.message}
