@@ -84,3 +84,21 @@ export const alterAthleteById = async (athlete: AthleteSpecificData, athleteId: 
                 }))
             } : undefined,
  */
+
+export const findAthletesByRegion = async (regionId: string) => {
+    return prisma.athlete.findMany({
+        where: {
+            user: {
+                regionId: regionId,
+            },
+        },
+        include: {
+            user: true,
+            skills: {
+                include: {
+                    skill: true,
+                },
+            },
+        },
+    });
+};

@@ -15,8 +15,9 @@ import ModalOrDrawer from "@/components/modal-or-drawer";
 import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
+import { getRepresentativeById } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
-import { EventItem, Tab, TeamItem } from "@/types";
+import { AthleteItem, EventItem, Tab } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { Button, CircularProgress, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react";
@@ -33,6 +34,20 @@ interface Paged<T> {
     };
 }
 
+const athletes: AthleteItem[] = Array(10).fill({
+    lastname: "Якубенко",
+    firstname: "Вадим",
+    middlename: "Виталиевич",
+    region: "ДНР",
+    birthday: "22.03.2004",
+    membership: "MAIN",
+    sportCategory: "КМС",
+    email: "Igoruk54@ya.ru",
+    phoneNumber: "+79494271795",
+    about: "Молод, красив, восхитителен",
+    skills: ["C#", "SQL", "JS", "TS"],
+}) as AthleteItem[];
+
 export default function RequestsPage() {
     const { isAuthenticated, isLoading, user } = useAuth();
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
@@ -44,7 +59,7 @@ export default function RequestsPage() {
     const [activeTab, setActiveTab] = useState<Tab>("requests");
     const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
     const [isEventLoading, setIsEventLoading] = useState(false);
-    const [teamData, setTeamData] = useState<Paged<TeamItem> | null>(null);
+    const [teamData, setTeamData] = useState<Paged<AthleteItem> | null>(null);
     const [isTeamLoading, setIsTeamLoading] = useState(false);
     //const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
     //const [isAchievementLoading, setIsAchievementLoading] = useState(false);
@@ -146,16 +161,36 @@ export default function RequestsPage() {
 
     useEffect(() => {
         if (activeTab !== "team") return;
-        setIsTeamLoading(true);
-        void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
-            .then((r) => r.json())
-            .then((json: Paged<TeamItem>) => {
-                setTeamData(json);
-            })
-            .finally(() => {
+
+        const loadAthletes = async () => {
+            setIsTeamLoading(true);
+            try {
+                const representative = await getRepresentativeById("");
+
+                console.log(representative);
+
+                //const result = await findAthletesByRegion(representative.user.region.id ?? '');
+
+                //console.log('Вернувшиеся атлеты:' + result.results);
+
+                setTeamData({
+                    items: athletes,
+                    pagination: {
+                        page,
+                        pageSize: perPage,
+                        totalItems: athletes.length,
+                        totalPages: 1,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading athletes:", error);
+            } finally {
                 setIsTeamLoading(false);
-            });
-    }, [activeTab, page]);
+            }
+        };
+
+        void loadAthletes();
+    }, [activeTab, page, searchParamsState, user?.id]);
 
     /*
     useEffect(() => {
@@ -238,7 +273,7 @@ export default function RequestsPage() {
                 )}
 
                 {activeTab === "team" && (
-                    <MainCards<TeamItem>
+                    <MainCards<AthleteItem>
                         isLoading={isTeamLoading}
                         pageItems={teamPageItems}
                         totalPages={totalTeamPages}

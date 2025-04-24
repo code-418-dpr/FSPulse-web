@@ -55,7 +55,21 @@ export interface TeamItem {
     region: string;
     birthday: string;
     status: string;
-    imageBase64: string;
+}
+
+export interface AthleteItem {
+    id: string;
+    lastname: string;
+    firstname: string;
+    middlename: string | null;
+    region: string;
+    birthday: string;
+    membership: string;
+    sportCategory: string;
+    email: string;
+    phoneNumber: string;
+    about: string;
+    skills: string[];
 }
 
 export interface AchievementItem {
