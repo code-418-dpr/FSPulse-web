@@ -37,12 +37,11 @@ export interface AthleteSpecificData {
     middlename?: string | null;
     email: string;
     phoneNumber: string;
-    password: string;
     regionId: string;
     birthDate: Date;
     address: string;
     about?: string;
-    sportCategory?: SportsCategory;
+    sportCategory?: SportsCategory | null;
 }
 
 export const alterAthleteById = async (athlete: AthleteSpecificData, athleteId: string) => {
