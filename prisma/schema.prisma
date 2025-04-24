@@ -114,9 +114,10 @@ model Athlete {
   membership    Membership      @default(NONE)
   github        String?         @unique
 
-  user   User             @relation(fields: [id], references: [id])
-  teams  AthleteOfTeam[]
-  skills SkillOfAthlete[]
+  user           User                     @relation(fields: [id], references: [id])
+  teams          AthleteOfTeam[]
+  skills         SkillOfAthlete[]
+  personalEvents AthleteOfPersonalEvent[]
 }
 
 model Coach {
@@ -141,9 +142,20 @@ model AthleteOfTeam {
   @@unique([teamId, athleteId])
 }
 
+model AthleteOfPersonalEvent {
+  athleteId String
+  eventId   String
+
+  event   Event   @relation(fields: [eventId], references: [id])
+  athlete Athlete @relation(fields: [athleteId], references: [id])
+
+  @@unique([athleteId, eventId])
+}
+
 model Team {
   id      String  @id @default(uuid())
   name    String
+  about   String?
   eventId String
   score   Int?
   coachId String?
@@ -190,10 +202,11 @@ model Event {
   requestStatus            RequestStatus @default(PENDING)
   requestComment           String?
 
-  discipline      Discipline              @relation(fields: [disciplineId], references: [id])
-  representatives EventOfRepresentative[]
-  files           File[]
-  teams           Team[]
+  discipline       Discipline               @relation(fields: [disciplineId], references: [id])
+  representatives  EventOfRepresentative[]
+  files            File[]
+  teams            Team[]
+  personalAthletes AthleteOfPersonalEvent[]
 }
 
 model EventOfRepresentative {
