@@ -36,6 +36,7 @@ export default function TeamCards({ paginatedData }: Props) {
                     }} // switched to onPress
                 >
                     <CardBody className="space-y-4">
+                        {/* eslint-disable-next-line */}
                         <Image alt={c.lastname} src={c.imageBase64} className="w-full rounded-xl object-cover" />
                         <div className="space-y-2">
                             <h3 className="text-2xl font-bold">

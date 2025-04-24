@@ -3,7 +3,7 @@ import {
     CartesianGrid,
     ComposedChart,
     Line,
-    LineChart as ReLineChart,
+    // LineChart as ReLineChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -27,7 +27,8 @@ interface LineChartProps {
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+    // eslint-disable-next-line
+    if (active && payload?.length) {
         return (
             <div className="chart-tooltip">
                 <p className="font-medium">{label}</p>
@@ -41,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export const LineChart: React.FC<LineChartProps> = ({
     data,
     strokeColor = "#2889f4",
-    areaColor = "rgba(40, 137, 244, 0.1)",
+    // areaColor = "rgba(40, 137, 244, 0.1)",
     showArea = true,
 }) => (
     <ChartContainer>

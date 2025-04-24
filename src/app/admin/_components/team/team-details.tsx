@@ -12,6 +12,7 @@ export default function TeamDetails({ team }: Props) {
     return (
         <>
             <h3 className="text-2xl font-bold">{team.lastname}</h3>
+            {/* eslint-disable-next-line */}
             <Image alt={team.lastname} src={team.imageBase64} className="w-full rounded-xl object-cover" />
             <div className="grid grid-cols-1 space-y-2">
                 {/* FullName */}

@@ -38,7 +38,7 @@ export default function TeamsOnEvent({ eventId }: { eventId: string }) {
         });
 
         setData(allTeams);
-    }, [eventId, page]); // Зависимости функции
+    }, [eventId]); // Зависимости функции }, [eventId, page]);
 
     useEffect(() => {
         setIsTeamsLoading(true);

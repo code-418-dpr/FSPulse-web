@@ -20,12 +20,12 @@ import { PieChart } from "@/app/common/_components/statistics/PieChart";
 import { TableContainer } from "@/app/common/_components/statistics/TableContainer";
 import { Tabs as StatTabs } from "@/app/common/_components/statistics/Tabs";
 
-type HistoryRow = {
+interface HistoryRow {
     competition: string;
     period: string;
     place: string | null;
     points: number;
-};
+}
 
 export default function Statistics() {
     const { user, isLoading, isAuthenticated } = useAuth();

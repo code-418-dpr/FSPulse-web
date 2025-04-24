@@ -2,7 +2,8 @@
 
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+
+// import autoTable from "jspdf-autotable";
 
 import React from "react";
 
@@ -19,6 +20,7 @@ export interface ExportPdfButtonProps {
     fileName?: string;
     label?: string;
     tableColumns?: Column[];
+    // eslint-disable-next-line
     tableData?: Record<string, any>[];
 }
 
@@ -26,8 +28,8 @@ export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
     exportId = "exportable",
     fileName = "statistics.pdf",
     label = "Скачать PDF",
-    tableColumns,
-    tableData,
+    // tableColumns,
+    // tableData,
 }) => {
     const generatePdf = async () => {
         const element = document.getElementById(exportId);
@@ -60,7 +62,13 @@ export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
     };
 
     return (
-        <Button onPress={generatePdf} size="md" className="flex items-center space-x-2">
+        <Button
+            onPress={() => {
+                void generatePdf();
+            }}
+            size="md"
+            className="flex items-center space-x-2"
+        >
             <Icon icon="iconoir:download" width={20} height={20} />
             <span>{label}</span>
         </Button>

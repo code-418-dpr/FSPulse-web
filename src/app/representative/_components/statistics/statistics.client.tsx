@@ -1,25 +1,23 @@
-// src/app/representative/_components/statistics/statistics.client.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Icon } from "@iconify/react";
-
-import { useAuth } from "@/hooks/use-auth";
-import {
-    getRepRequestsByStatus,
-    getRepEventsByFormat,
-    getRepEventsByMonth,
-    getRepAthleteRanking,
-    getRepCoachRanking,
-} from "@/data/representativeStatistics";
+import React, { useEffect, useState } from "react";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
-import { BarChart }   from "@/app/common/_components/statistics/BarChart";
-import { LineChart }  from "@/app/common/_components/statistics/LineChart";
-import { PieChart }   from "@/app/common/_components/statistics/PieChart";
-import { Card }       from "@/app/common/_components/statistics/Card";
+import { BarChart } from "@/app/common/_components/statistics/BarChart";
+import { Card } from "@/app/common/_components/statistics/Card";
+import { LineChart } from "@/app/common/_components/statistics/LineChart";
+import { PieChart } from "@/app/common/_components/statistics/PieChart";
 import { TableContainer } from "@/app/common/_components/statistics/TableContainer";
 import { Tabs as StatTabs } from "@/app/common/_components/statistics/Tabs";
+import {
+    getRepAthleteRanking,
+    getRepCoachRanking,
+    getRepEventsByFormat,
+    getRepEventsByMonth,
+    getRepRequestsByStatus,
+} from "@/data/representativeStatistics";
+import { useAuth } from "@/hooks/use-auth";
+import { Icon } from "@iconify/react";
 
 type RankingTab = "athletes" | "coaches";
 
@@ -28,21 +26,11 @@ export default function StatisticsClient() {
 
     // состояния
     const [loadingData, setLoadingData] = useState(true);
-    const [requestsByStatus, setRequestsByStatus] = useState<
-        { label: string; value: number; color: string }[]
-    >([]);
-    const [eventsByFormat, setEventsByFormat] = useState<
-        { label: string; value: number }[]
-    >([]);
-    const [eventsByMonth, setEventsByMonth] = useState<
-        { label: string; value: number }[]
-    >([]);
-    const [athleteRanking, setAthleteRanking] = useState<
-        { fio: string; region: string; points: number }[]
-    >([]);
-    const [coachRanking, setCoachRanking] = useState<
-        { fio: string; region: string; points: number }[]
-    >([]);
+    const [requestsByStatus, setRequestsByStatus] = useState<{ label: string; value: number; color: string }[]>([]);
+    const [eventsByFormat, setEventsByFormat] = useState<{ label: string; value: number }[]>([]);
+    const [eventsByMonth, setEventsByMonth] = useState<{ label: string; value: number }[]>([]);
+    const [athleteRanking, setAthleteRanking] = useState<{ fio: string; region: string; points: number }[]>([]);
+    const [coachRanking, setCoachRanking] = useState<{ fio: string; region: string; points: number }[]>([]);
     const [tab, setTab] = useState<RankingTab>("athletes");
 
     // загрузка данных после авторизации
@@ -50,27 +38,29 @@ export default function StatisticsClient() {
         if (isLoading || !isAuthenticated || !user?.id) return;
         const repId = user.id;
         const statusColors = ["#2889f4", "#39cc7d", "#f7b342", "#f43377", "#944dee"];
-
-        Promise.all([
-            getRepRequestsByStatus(repId),
-            getRepEventsByFormat(repId),
-            getRepEventsByMonth(repId),
-            getRepAthleteRanking(repId),
-            getRepCoachRanking(repId),
-        ]).then(([reqs, formats, months, aRank, cRank]) => {
-            setRequestsByStatus(
-                reqs.map((x, i) => ({
-                    label: x.status,
-                    value: x.count,
-                    color: statusColors[i % statusColors.length],
-                }))
-            );
-            setEventsByFormat(formats.map((x) => ({ label: x.label, value: x.value })));
-            setEventsByMonth(months.map((x) => ({ label: x.month, value: x.count })));
-            setAthleteRanking(aRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points })));
-            setCoachRanking(cRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points })));
-            setLoadingData(false);
-        });
+        const callback = async () => {
+            await Promise.all([
+                getRepRequestsByStatus(repId),
+                getRepEventsByFormat(repId),
+                getRepEventsByMonth(repId),
+                getRepAthleteRanking(repId),
+                getRepCoachRanking(repId),
+            ]).then(([reqs, formats, months, aRank, cRank]) => {
+                setRequestsByStatus(
+                    reqs.map((x, i) => ({
+                        label: x.status,
+                        value: x.count,
+                        color: statusColors[i % statusColors.length],
+                    })),
+                );
+                setEventsByFormat(formats.map((x) => ({ label: x.label, value: x.value })));
+                setEventsByMonth(months.map((x) => ({ label: x.month, value: x.count })));
+                setAthleteRanking(aRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points })));
+                setCoachRanking(cRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points })));
+                setLoadingData(false);
+            });
+        };
+        void callback();
     }, [user, isLoading, isAuthenticated]);
 
     // рендер по статусам
@@ -95,9 +85,9 @@ export default function StatisticsClient() {
     return (
         <div id="representative-statistics" className="space-y-8">
             {/* Header + Export */}
-            <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
+            <div className="border-content3 bg-content1 flex items-center justify-between rounded-xl border p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                    <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-10 w-10 items-center justify-center rounded-lg">
                         <Icon icon="lucide:bar-chart-3" width={24} />
                     </div>
                     <h2 className="text-2xl font-semibold">Статистика</h2>
@@ -133,7 +123,9 @@ export default function StatisticsClient() {
                         { id: "athletes", label: "Спортсмены" },
                         { id: "coaches", label: "Тренеры" },
                     ]}
-                    onSelect={(id) => setTab(id as RankingTab)}
+                    onSelect={(id) => {
+                        setTab(id as RankingTab);
+                    }}
                 />
                 <TableContainer columns={ratingColumns} data={ratingData} />
             </Card>
