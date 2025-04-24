@@ -1,39 +1,32 @@
+// src/app/common/_components/ExportPdfButton.tsx
 "use client";
 
+import React from "react";
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
-
-// import autoTable from "jspdf-autotable";
-
-import React from "react";
-
 import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
-export interface Column {
-    key: string;
-    title: string;
-}
-
 export interface ExportPdfButtonProps {
+    /** id элемента, который будем экспортировать в PDF */
     exportId?: string;
+    /** имя сохраняемого файла */
     fileName?: string;
+    /** текст на кнопке */
     label?: string;
-    tableColumns?: Column[];
-    // eslint-disable-next-line
-    tableData?: Record<string, any>[];
 }
 
 export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
-    exportId = "exportable",
-    fileName = "statistics.pdf",
-    label = "Скачать PDF",
-    // tableColumns,
-    // tableData,
-}) => {
-    const generatePdf = async () => {
+                                                                    exportId = "exportable",
+                                                                    fileName = "statistics.pdf",
+                                                                    label = "Скачать PDF",
+                                                                }) => {
+    const generatePdf = async (): Promise<void> => {
         const element = document.getElementById(exportId);
-        if (!element) return;
+        if (!element) {
+            console.warn(`Element with id "${exportId}" not found`);
+            return;
+        }
 
         // temporarily disable dark mode for accurate screenshot
         const htmlEl = document.documentElement;

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Icon } from "@iconify/react";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
 import { BarChart } from "@/app/common/_components/statistics/BarChart";
@@ -8,15 +9,14 @@ import { Card } from "@/app/common/_components/statistics/Card";
 import { LineChart } from "@/app/common/_components/statistics/LineChart";
 import { TableContainer } from "@/app/common/_components/statistics/TableContainer";
 import { Tabs as StatTabs } from "@/app/common/_components/statistics/Tabs";
-// серверные функции
+
 import {
     getAthleteRanking,
     getCoachRanking,
+    getRepresentativeRanking,
     getEventsByType,
     getEventsByWeek,
-    getRepresentativeRanking,
 } from "@/data/adminStatistics";
-import { Icon } from "@iconify/react";
 
 type RankingTab = "athletes" | "coaches" | "reps";
 
@@ -24,42 +24,78 @@ export function Statistics() {
     const [tab, setTab] = useState<RankingTab>("athletes");
 
     // рейтинги
-    const [athleteData, setAthleteData] = useState<{ fio: string; region: string; points: number }[]>([]);
-    const [coachData, setCoachData] = useState<{ fio: string; region: string; points: number }[]>([]);
-    const [repData, setRepData] = useState<{ region: string; manager: string; eventsCount: number }[]>([]);
+    const [athleteData, setAthleteData] = useState<
+        { fio: string; region: string; points: number }[]
+    >([]);
+    const [coachData, setCoachData] = useState<
+        { fio: string; region: string; points: number }[]
+    >([]);
+    const [repData, setRepData] = useState<
+        { region: string; manager: string; eventsCount: number }[]
+    >([]);
 
     // данные для графиков
-    const [eventsByType, setEventsByType] = useState<{ type: string; count: bigint }[]>([]);
-    const [eventsByWeek, setEventsByWeek] = useState<{ week: string; count: bigint }[]>([]);
+    const [eventsByType, setEventsByType] = useState<
+        { type: string; count: number }[]
+    >([]);
+    const [eventsByWeek, setEventsByWeek] = useState<
+        { week: string; count: number }[]
+    >([]);
 
     useEffect(() => {
-        const callback = async () => {
-            // загрузка рейтингов
-            await getAthleteRanking().then((raw) => {
-                setAthleteData(raw.map((r) => ({ fio: r.fio, region: r.region, points: Number(r.points) })));
-            });
-            await getCoachRanking().then((raw) => {
-                setCoachData(raw.map((r) => ({ fio: r.fio, region: r.region, points: Number(r.points) })));
-            });
-            await getRepresentativeRanking().then((raw) => {
+        async function fetchStatistics() {
+            try {
+                // рейтинги
+                const rawAthletes = await getAthleteRanking();
+                setAthleteData(
+                    rawAthletes.map((r) => ({
+                        fio: r.fio,
+                        region: r.region,
+                        points: Number(r.points),
+                    }))
+                );
+
+                const rawCoaches = await getCoachRanking();
+                setCoachData(
+                    rawCoaches.map((r) => ({
+                        fio: r.fio,
+                        region: r.region,
+                        points: Number(r.points),
+                    }))
+                );
+
+                const rawReps = await getRepresentativeRanking();
                 setRepData(
-                    raw.map((r) => ({
+                    rawReps.map((r) => ({
                         region: r.region,
                         manager: r.manager,
                         eventsCount: Number(r.eventsCount),
-                    })),
+                    }))
                 );
-            });
 
-            // загрузка статистики по мероприятиям
-            await getEventsByType().then((raw) => {
-                setEventsByType(raw);
-            });
-            await getEventsByWeek().then((raw) => {
-                setEventsByWeek(raw);
-            });
-        };
-        void callback();
+                // графики
+                const rawByType = await getEventsByType();
+                setEventsByType(
+                    rawByType.map((e) => ({
+                        type: e.type,
+                        count: Number(e.count),
+                    }))
+                );
+
+                const rawByWeek = await getEventsByWeek();
+                setEventsByWeek(
+                    rawByWeek.map((e) => ({
+                        week: e.week,
+                        count: Number(e.count),
+                    }))
+                );
+            } catch (error) {
+                console.error("Ошибка при загрузке статистики:", error);
+            }
+        }
+
+        // Оборачиваем вызов в void, чтобы не было «плавающих» промисов
+        void fetchStatistics();
     }, []);
 
     // подготовка строк таблиц
@@ -77,14 +113,16 @@ export function Statistics() {
         { key: "region", title: "Регион" },
         { key: "points", title: "Баллы" },
     ];
-    const ratingRows = (tab === "athletes" ? athleteData : coachData).map((r, i) => ({ rank: i + 1, ...r }));
+    const ratingRows = (tab === "athletes" ? athleteData : coachData).map(
+        (r, i) => ({ rank: i + 1, ...r })
+    );
 
     return (
         <div id="statistics-box" className="space-y-8">
             {/* Header */}
-            <div className="border-content3 bg-content1 flex items-center justify-between rounded-xl border p-6 shadow-sm">
+            <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-10 w-10 items-center justify-center rounded-lg">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
                         <Icon icon="lucide:bar-chart-2" width={24} />
                     </div>
                     <h2 className="text-2xl font-semibold">Статистика</h2>
@@ -102,13 +140,13 @@ export function Statistics() {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Card title="Мероприятия по типу" icon="lucide:pie-chart">
                     <BarChart
-                        data={eventsByType.map((e) => ({ label: e.type, value: Number(e.count) }))}
+                        data={eventsByType.map((e) => ({ label: e.type, value: e.count }))}
                         color="#944dee"
                     />
                 </Card>
                 <Card title="Соревнования по неделям" icon="lucide:line-chart">
                     <LineChart
-                        data={eventsByWeek.map((e) => ({ label: e.week, value: Number(e.count) }))}
+                        data={eventsByWeek.map((e) => ({ label: e.week, value: e.count }))}
                         strokeColor="#2889f4"
                     />
                 </Card>

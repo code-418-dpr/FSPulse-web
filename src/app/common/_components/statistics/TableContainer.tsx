@@ -1,6 +1,16 @@
-import React from "react";
+// src/app/common/_components/statistics/TableContainer.tsx
+"use client";
 
-import { Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
+import React from "react";
+import {
+    Pagination,
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+} from "@heroui/react";
 
 export interface Column {
     key: string;
@@ -9,12 +19,16 @@ export interface Column {
 
 interface TableContainerProps {
     columns: Column[];
-    // eslint-disable-next-line
-    data: Record<string, any>[];
+    /** Каждое поле может быть любым React-узлом */
+    data: Record<string, React.ReactNode>[];
     pageSize?: number;
 }
 
-export const TableContainer: React.FC<TableContainerProps> = ({ columns, data, pageSize = 10 }) => {
+export const TableContainer: React.FC<TableContainerProps> = ({
+                                                                  columns,
+                                                                  data,
+                                                                  pageSize = 10,
+                                                              }) => {
     const [page, setPage] = React.useState(1);
     const totalPages = Math.ceil(data.length / pageSize);
     const start = (page - 1) * pageSize;
@@ -37,14 +51,17 @@ export const TableContainer: React.FC<TableContainerProps> = ({ columns, data, p
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {pageData.map((row, index) => (
-                        <TableRow key={index} className={index % 2 === 0 ? "bg-content1" : "bg-content2/30"}>
+                    {pageData.map((row, rowIndex) => (
+                        <TableRow
+                            key={rowIndex}
+                            className={rowIndex % 2 === 0 ? "bg-content1" : "bg-content2/30"}
+                        >
                             {columns.map((column) => (
                                 <TableCell key={column.key}>
                                     {column.key === "rank" ? (
-                                        <span className="bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 inline-flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
-                                            {row[column.key]}
-                                        </span>
+                                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                      {row[column.key]}
+                    </span>
                                     ) : (
                                         row[column.key]
                                     )}
@@ -56,7 +73,7 @@ export const TableContainer: React.FC<TableContainerProps> = ({ columns, data, p
             </Table>
 
             {totalPages > 1 && (
-                <div className="mt-4 flex justify-center">
+                <div className="flex justify-center mt-4">
                     <Pagination
                         total={totalPages}
                         page={page}

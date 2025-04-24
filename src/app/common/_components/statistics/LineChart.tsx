@@ -1,17 +1,15 @@
+// src/app/common/_components/statistics/LineChart.tsx
+import React from "react";
 import {
     Area,
     CartesianGrid,
     ComposedChart,
     Line,
-    // LineChart as ReLineChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis,
 } from "recharts";
-
-import React from "react";
-
 import { ChartContainer } from "./ChartContainer";
 
 interface DataPoint {
@@ -19,16 +17,18 @@ interface DataPoint {
     value: number;
 }
 
-interface LineChartProps {
-    data: DataPoint[];
-    strokeColor?: string;
-    areaColor?: string;
-    showArea?: boolean;
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: { value: number }[];
+    label?: string;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-    // eslint-disable-next-line
-    if (active && payload?.length) {
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
+                                                         active,
+                                                         payload,
+                                                         label,
+                                                     }) => {
+    if (active && payload && payload.length > 0) {
         return (
             <div className="chart-tooltip">
                 <p className="font-medium">{label}</p>
@@ -39,27 +39,56 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
+interface LineChartProps {
+    data: DataPoint[];
+    strokeColor?: string;
+    areaColor?: string;
+    showArea?: boolean;
+}
+
 export const LineChart: React.FC<LineChartProps> = ({
-    data,
-    strokeColor = "#2889f4",
-    // areaColor = "rgba(40, 137, 244, 0.1)",
-    showArea = true,
-}) => (
+                                                        data,
+                                                        strokeColor = "#2889f4",
+                                                        areaColor = "rgba(40, 137, 244, 0.1)",
+                                                        showArea = true,
+                                                    }) => (
     <ChartContainer>
         <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <ComposedChart
+                data={data}
+                margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+            >
                 <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={strokeColor} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
+                        <stop offset="5%" stopColor={areaColor} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={areaColor} stopOpacity={0} />
                     </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#70828f", fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#70828f", fontSize: 12 }} />
+                <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e2e8f0"
+                />
+                <XAxis
+                    dataKey="label"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#70828f", fontSize: 12 }}
+                />
+                <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#70828f", fontSize: 12 }}
+                />
                 <Tooltip content={<CustomTooltip />} />
                 {showArea && (
-                    <Area type="monotone" dataKey="value" stroke="none" fillOpacity={1} fill="url(#colorValue)" />
+                    <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="none"
+                        fillOpacity={1}
+                        fill="url(#colorValue)"
+                    />
                 )}
                 <Line
                     type="monotone"

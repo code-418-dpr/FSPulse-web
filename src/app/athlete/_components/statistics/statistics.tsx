@@ -1,3 +1,4 @@
+// src/app/athlete/_components/statistics/statistics.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -18,7 +19,6 @@ import { Card } from "@/app/common/_components/statistics/Card";
 import { LineChart } from "@/app/common/_components/statistics/LineChart";
 import { PieChart } from "@/app/common/_components/statistics/PieChart";
 import { TableContainer } from "@/app/common/_components/statistics/TableContainer";
-import { Tabs as StatTabs } from "@/app/common/_components/statistics/Tabs";
 
 interface HistoryRow {
     competition: string;
@@ -30,7 +30,6 @@ interface HistoryRow {
 export default function Statistics() {
     const { user, isLoading, isAuthenticated } = useAuth();
 
-    // стейт
     const [loadingData, setLoadingData] = useState(true);
     const [overview, setOverview] = useState<{ rank: number; points: number }>({
         rank: 0,
@@ -47,33 +46,47 @@ export default function Statistics() {
     >([]);
     const [history, setHistory] = useState<HistoryRow[]>([]);
 
-    // загрузка
-    useEffect(() => {
-        if (isLoading || !isAuthenticated || !user?.id) return;
-        const athleteId = user.id;
+    // Иконки для достижений
+    const achievementIcons = [
+        "lucide:medal",
+        "lucide:trophy",
+        "lucide:flag",
+        "lucide:target",
+    ];
 
-        Promise.all([
-            getAthleteOverview(athleteId),
-            getAthleteParticipation(athleteId),
-            getAthletePointsOverTime(athleteId),
-            getAthleteAchievements(athleteId),
-            getAthleteParticipationHistory(athleteId),
-        ]).then(
-            ([
-                 ov,
-                 part,
-                 overTime,
-                 ach,
-                 hist,
-             ]) => {
+    useEffect(() => {
+        async function load() {
+            if (isLoading || !isAuthenticated || !user?.id) return;
+            const athleteId = user.id;
+
+            try {
+                const [
+                    ov,
+                    part,
+                    overTime,
+                    ach,
+                    hist,
+                ] = await Promise.all([
+                    getAthleteOverview(athleteId),
+                    getAthleteParticipation(athleteId),
+                    getAthletePointsOverTime(athleteId),
+                    getAthleteAchievements(athleteId),
+                    getAthleteParticipationHistory(athleteId),
+                ]);
+
                 setOverview(ov);
                 setParticipation(part);
                 setPointsOverTime(overTime);
                 setAchievements(ach);
                 setHistory(hist);
+            } catch (error) {
+                console.error("Ошибка загрузки статистики:", error);
+            } finally {
                 setLoadingData(false);
             }
-        );
+        }
+
+        void load();
     }, [user, isLoading, isAuthenticated]);
 
     if (isLoading) return <p>Загрузка профиля…</p>;
@@ -92,7 +105,7 @@ export default function Statistics() {
             {/* Header + Export */}
             <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-10 w-10 items-center justify-center rounded-lg">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
                         <Icon icon="lucide:activity" width={24} />
                     </div>
                     <h1 className="text-2xl font-semibold">Моя статистика</h1>
@@ -137,8 +150,8 @@ export default function Statistics() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                     {achievements.map((ach, i) => (
                         <div
-                            key={i}
-                            className="border-content3 bg-content2/50 hover:border-primary-200 hover:bg-content2 flex flex-col items-center justify-center rounded-lg border p-4 transition-all"
+                            key={ach.label}
+                            className="flex flex-col items-center justify-center rounded-lg border border-content3 bg-content2/50 p-4 transition-all hover:border-primary-200 hover:bg-content2"
                         >
                             <Badge
                                 content={ach.value}
@@ -147,7 +160,7 @@ export default function Statistics() {
                                 className="mb-2"
                             >
                                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-500 dark:bg-primary-900/30">
-                                    <Icon icon={["lucide", ["medal", "trophy", "flag", "target"][i]] as any} width={24} />
+                                    <Icon icon={achievementIcons[i % achievementIcons.length]} width={24} />
                                 </div>
                             </Badge>
                             <p className="mt-2 text-center font-medium">{ach.label}</p>
