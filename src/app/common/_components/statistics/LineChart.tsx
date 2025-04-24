@@ -1,4 +1,4 @@
-// src/app/common/_components/statistics/LineChart.tsx
+import React from "react";
 import {
     LineChart as ReLineChart,
     Line,
@@ -6,9 +6,11 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    ResponsiveContainer
-} from 'recharts';
-import { ChartContainer } from './ChartContainer';
+    ResponsiveContainer,
+    Area,
+    ComposedChart
+} from "recharts";
+import { ChartContainer } from "./ChartContainer";
 
 interface DataPoint {
     label: string;
@@ -18,21 +20,70 @@ interface DataPoint {
 interface LineChartProps {
     data: DataPoint[];
     strokeColor?: string;
+    areaColor?: string;
+    showArea?: boolean;
 }
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="chart-tooltip">
+                <p className="font-medium">{label}</p>
+                <p className="text-primary-500 font-semibold">
+                    {payload[0].value}
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
 
 export const LineChart: React.FC<LineChartProps> = ({
                                                         data,
-                                                        strokeColor = '#8884d8'
+                                                        strokeColor = "#2889f4",
+                                                        areaColor = "rgba(40, 137, 244, 0.1)",
+                                                        showArea = true
                                                     }) => (
     <ChartContainer>
         <ResponsiveContainer width="100%" height="100%">
-            <ReLineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke={strokeColor} activeDot={{ r: 6 }} />
-            </ReLineChart>
+            <ComposedChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+                <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={strokeColor} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis
+                    dataKey="label"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#70828f", fontSize: 12 }}
+                />
+                <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#70828f", fontSize: 12 }}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                {showArea && (
+                    <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="none"
+                        fillOpacity={1}
+                        fill="url(#colorValue)"
+                    />
+                )}
+                <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke={strokeColor}
+                    strokeWidth={2}
+                    dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: strokeColor }}
+                />
+            </ComposedChart>
         </ResponsiveContainer>
     </ChartContainer>
 );

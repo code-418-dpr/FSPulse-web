@@ -1,7 +1,5 @@
-// src/app/admin/_components/statistics/statistics.tsx
-"use client";
-
 import React, { useState } from "react";
+import { Icon } from "@iconify/react";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
 import { BarChart } from "@/app/common/_components/statistics/BarChart";
@@ -17,14 +15,12 @@ import {
     adminRepresentativeRanking,
 } from "@/mocks/statistics/admin";
 
-// src/app/admin/_components/statistics/statistics.tsx
-
 type RankingTab = "athletes" | "coaches" | "reps";
 
 export function Statistics() {
     const [tab, setTab] = useState<RankingTab>("athletes");
 
-    // колонки и данные для каждой под-вкладки
+    // Columns and data for each sub-tab
     const repColumns: Column[] = [
         { key: "rank", title: "№" },
         { key: "region", title: "Регион" },
@@ -51,9 +47,14 @@ export function Statistics() {
 
     return (
         <div id="statistics-box" className="space-y-8">
-            {/* Шапка с кнопкой экспорта */}
-            <div className="flex items-center justify-between rounded p-6 shadow">
-                <h2 className="text-2xl font-semibold">Статистика</h2>
+            {/* Header with export button */}
+            <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                        <Icon icon="lucide:bar-chart-2" width={24} />
+                    </div>
+                    <h2 className="text-2xl font-semibold">Статистика</h2>
+                </div>
                 <ExportPdfButton
                     exportId="statistics-box"
                     fileName="admin-statistics.pdf"
@@ -63,19 +64,24 @@ export function Statistics() {
                 />
             </div>
 
-            {/* Диаграммы */}
+            {/* Charts */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <Card title="Мероприятия по типу">
-                    <BarChart data={adminEventsByType} />
+                <Card title="Мероприятия по типу" icon="lucide:pie-chart">
+                    <BarChart
+                        data={adminEventsByType}
+                        color="#944dee"
+                    />
                 </Card>
-                <Card title="Соревнования по неделям">
-                    <LineChart data={adminEventsByWeek} />
+                <Card title="Соревнования по неделям" icon="lucide:line-chart">
+                    <LineChart
+                        data={adminEventsByWeek}
+                        strokeColor="#2889f4"
+                    />
                 </Card>
             </div>
 
-            {/* Рейтинги */}
-            <div>
-                <h3 className="mb-4 text-xl font-semibold">Рейтинги</h3>
+            {/* Rankings */}
+            <Card title="Рейтинги" icon="lucide:trophy">
                 <StatTabs
                     tabs={[
                         { id: "athletes", label: "Спортсмены" },
@@ -89,7 +95,7 @@ export function Statistics() {
                 ) : (
                     <TableContainer columns={ratingColumns} data={ratingData} />
                 )}
-            </div>
+            </Card>
         </div>
     );
 }
