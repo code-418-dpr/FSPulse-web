@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
+import { ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
 import { BarChart } from "@/app/common/_components/statistics/BarChart";
 import { Card } from "@/app/common/_components/statistics/Card";
 import { LineChart } from "@/app/common/_components/statistics/LineChart";
