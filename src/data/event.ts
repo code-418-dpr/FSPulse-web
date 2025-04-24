@@ -297,3 +297,20 @@ export async function updateEventStatus(eventId: string, status: RequestStatus, 
         throw new Error("Не удалось обновить статус мероприятия");
     }
 }
+
+export const setResultsForEvent = async (resultsArray: { teamId: string; score: number }[], eventId: string) => {
+    // Используем транзакцию для атомарного обновления
+    return prisma.$transaction(
+        resultsArray.map((result) =>
+            prisma.team.update({
+                where: {
+                    id: result.teamId,
+                    eventId: eventId, // Дополнительная проверка, что команда принадлежит событию
+                },
+                data: {
+                    score: result.score,
+                },
+            }),
+        ),
+    );
+};

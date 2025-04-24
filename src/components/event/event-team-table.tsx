@@ -94,12 +94,16 @@ export default function TeamsOnEvent({ eventId }: { eventId: string }) {
             <TableHeader>
                 <TableColumn key="name">Название команды</TableColumn>
                 <TableColumn key="Leader">Капитан</TableColumn>
+                <TableColumn key="IsReady">Готовность</TableColumn>
+                <TableColumn key="CountParcipants">Кол-во участников</TableColumn>
             </TableHeader>
             <TableBody items={items}>
                 {items?.map((item) => (
                     <TableRow key={`team-${item.id}`}>
                         <TableCell>{item.name}</TableCell>
                         <TableCell>{item.leader}</TableCell>
+                        <TableCell>{item.isReady ? "Готовы" : "Не готовы"}</TableCell>
+                        <TableCell>{item.members.length}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
