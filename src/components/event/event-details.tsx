@@ -1,15 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
+import EventResultsForm from "@/components/event/event-results-form";
 // import dynamic from "next/dynamic";
 
 import TeamsOnEvent from "@/components/event/event-team-table";
 import GoogleCalendarButton from "@/components/google-calendar-button";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import { getEventById } from "@/data/event";
+import { useAuth } from "@/hooks/use-auth";
 import { EventItemForId } from "@/types";
 import { formatDatetime, getEventStatusByDatetimes } from "@/utils";
-import { Accordion, AccordionItem, Checkbox, Chip, Image, Spinner, Tab, Tabs } from "@heroui/react";
+import {
+    Accordion,
+    AccordionItem,
+    Button,
+    Checkbox,
+    Chip,
+    Image,
+    Spinner,
+    Tab,
+    Tabs,
+    useDisclosure,
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 // const Map = dynamic(() => import("@/components/map"), { ssr: false });
@@ -22,6 +36,9 @@ export default function EventDetails({ eventId }: Props) {
     const [event, setEvent] = useState<EventItemForId | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    const { role } = useAuth();
 
     const arrayBufferToBase64 = (buffer: Uint8Array) => {
         return `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
@@ -260,7 +277,21 @@ export default function EventDetails({ eventId }: Props) {
 
                 <Tab key="results" title="Итоги" className="w-full">
                     {/* Контент для вкладки итогов */}
-                    <p className="text-foreground-500">Скоро мы поведём итоги соревнования</p>
+                    {event.endRegistration < new Date() ? (
+                        role === "representative" ? (
+                            <p>Подвести итоги</p>
+                        ) : (
+                            <p>Скоро мы подведём итоги</p>
+                        )
+                    ) : (
+                        <p>Соревнование ещё не окончено</p>
+                    )}
+                    <Button className="w-full" aria-label="Results" onPress={onOpen} size="lg">
+                        Подвести итоги
+                    </Button>
+                    <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                        <EventResultsForm eventId={event.id} />
+                    </ModalOrDrawer>
                 </Tab>
             </Tabs>
         </div>
