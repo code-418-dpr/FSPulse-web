@@ -149,7 +149,7 @@ export default function AdministratorPage() {
         setIsTeamLoading(true);
         void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
             .then((r) => r.json())
-            .then((json: Paged<TeamItem>) => {
+            .then((json: Paged<AthleteItem>) => {
                 setTeamData(json);
             })
             .finally(() => {

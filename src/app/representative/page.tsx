@@ -73,7 +73,7 @@ export default function RequestsPage() {
     // sync tab from URL
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["requests", "events", "team", "achievement"].includes(tab)) {
+        if (tab && ["requests", "events", "team", "achievement", "statistics"].includes(tab)) {
             setActiveTab(tab);
         } else {
             router.replace("/representative?tab=requests");
@@ -287,7 +287,7 @@ export default function RequestsPage() {
                     />
                 )}
 
-                {activeTab === "achievement" && (
+                {activeTab === "statistics" && (
                     <div className="flex-1 p-6">
                         <StatisticsClient />
                     </div>

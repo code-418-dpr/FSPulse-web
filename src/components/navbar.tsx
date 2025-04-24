@@ -62,7 +62,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
     // Синхронизация tab из query
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["requests", "events", "team", "achievement", "representative"].includes(tab)) {
+        if (tab && ["requests", "events", "team", "achievement", "representative", "statistics"].includes(tab)) {
             setActiveTabAction(tab);
         }
     }, [searchParams, setActiveTabAction]);
@@ -131,7 +131,34 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
             )}
             {isAuthenticated && user?.role === "admin" && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["events", "representative", "requests", "team"] as Tab[]).map((tab) => (
+                    {(["events", "representative", "requests", "statistics"] as Tab[]).map((tab) => (
+                        <NavbarItem key={tab}>
+                            <Link
+                                color="foreground"
+                                href="#"
+                                onPress={(e) => {
+                                    handleNavigation(e, tab);
+                                }}
+                                className={activeTab === tab ? "font-bold" : ""}
+                            >
+                                {
+                                    {
+                                        requests: "Заявки на мероприятия",
+                                        events: "Мероприятия",
+                                        team: "Команда",
+                                        achievement: "Достижения",
+                                        representative: "Заявки на представительства",
+                                        statistics: "Статистика",
+                                    }[tab]
+                                }
+                            </Link>
+                        </NavbarItem>
+                    ))}
+                </NavbarContent>
+            )}
+            {isAuthenticated && user?.role === "athlete" && (
+                <NavbarContent className="hidden gap-4 sm:flex" justify="center">
+                    {(["events", "representative", "requests", "statistics"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
