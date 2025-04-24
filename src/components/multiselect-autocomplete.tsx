@@ -4,6 +4,7 @@ import type { z } from "zod";
 
 import { Controller, useFormContext } from "react-hook-form";
 
+import { AgeGroup } from "@/app/generated/prisma";
 import type { competitionRequestSchema } from "@/schemas/competition-request-schema";
 import { Autocomplete, AutocompleteItem, Button } from "@heroui/react";
 
@@ -74,6 +75,86 @@ export const MultiSelectAutocomplete = ({ regions }: { regions: RegionItem[] }) 
                         allowsCustomValue={false}
                     >
                         {(region) => <AutocompleteItem key={region.key}>{region.label}</AutocompleteItem>}
+                    </Autocomplete>
+                )}
+            />
+        </div>
+    );
+};
+
+interface MultiSelectAgeGroupsProps {
+    ageGroups: AgeGroup[];
+}
+
+export const MultiSelectAgeGroups = ({ ageGroups }: MultiSelectAgeGroupsProps) => {
+    const { control, setValue, watch } = useFormContext();
+    const selectedAgeGroupKeys: string[] = (watch("ageGroups") as string[] | undefined) ?? [];
+    const selectedAgeGroups = ageGroups.filter((group) => selectedAgeGroupKeys.includes(group.id));
+
+    const addAgeGroup = (key: string) => {
+        const newSelection = [...selectedAgeGroupKeys, key];
+        updateAgeValues(newSelection);
+    };
+
+    const removeAgeGroup = (key: string) => {
+        const newSelection = selectedAgeGroupKeys.filter((k) => k !== key);
+        updateAgeValues(newSelection);
+    };
+
+    const updateAgeValues = (keys: string[]) => {
+        const selectedGroups = ageGroups.filter((g) => keys.includes(g.id));
+        const minAge = Math.min(...selectedGroups.map((g) => g.minAge));
+        const maxAge = Math.max(...selectedGroups.map((g) => g.maxAge ?? g.minAge));
+
+        setValue("ageGroups", keys);
+        setValue("minAge", minAge);
+        setValue("maxAge", maxAge);
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+                {selectedAgeGroups.map((group) => (
+                    <div
+                        key={`selected-${group.id}`}
+                        className="bg-default-100 flex items-center rounded-full px-3 py-1"
+                    >
+                        <span>{group.name}</span>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="light"
+                            className="text-danger-500 ml-2"
+                            onPress={() => {
+                                removeAgeGroup(group.id);
+                            }}
+                        >
+                            ×
+                        </Button>
+                    </div>
+                ))}
+            </div>
+
+            <Controller
+                name="ageGroups"
+                control={control}
+                render={() => (
+                    <Autocomplete
+                        label={selectedAgeGroups.length === 0 ? "Возрастные категории" : "Добавить категорию"}
+                        defaultItems={ageGroups.filter((g) => !selectedAgeGroupKeys.includes(g.id))}
+                        selectedKey={null}
+                        onSelectionChange={(key) => {
+                            if (key) {
+                                addAgeGroup(key as string);
+                            }
+                        }}
+                        allowsCustomValue={false}
+                    >
+                        {(group) => (
+                            <AutocompleteItem key={group.id}>
+                                {group.name} ({group.minAge}-{group.maxAge ?? "+"})
+                            </AutocompleteItem>
+                        )}
                     </Autocomplete>
                 )}
             />

@@ -1,6 +1,4 @@
 import React from "react";
-import { Icon } from "@iconify/react";
-import { Badge } from "@heroui/react";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
 import { Card } from "@/app/common/_components/statistics/Card";
@@ -14,6 +12,8 @@ import {
     athleteParticipationHistory,
     athletePointsOverTime,
 } from "@/mocks/statistics/athlete";
+import { Badge } from "@heroui/react";
+import { Icon } from "@iconify/react";
 
 export function Statistics() {
     // Columns and data for participation history
@@ -27,9 +27,9 @@ export function Statistics() {
     return (
         <div id="exportable-athlete" className="space-y-8">
             {/* Header + export button */}
-            <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
+            <div className="border-content3 bg-content1 flex items-center justify-between rounded-xl border p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                    <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-10 w-10 items-center justify-center rounded-lg">
                         <Icon icon="lucide:activity" width={24} />
                     </div>
                     <h1 className="text-2xl font-semibold">Моя статистика</h1>
@@ -47,12 +47,12 @@ export function Statistics() {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Card title="Мой рейтинг" icon="lucide:medal">
                     <div className="flex flex-col items-center justify-center space-y-4 py-4">
-                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary-100 text-4xl font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                        <div className="bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 flex h-24 w-24 items-center justify-center rounded-full text-4xl font-bold">
                             {athleteOverview.rank}
                         </div>
                         <div className="text-center">
-                            <p className="text-sm text-foreground/70">Место в рейтинге</p>
-                            <p className="mt-1 text-2xl font-semibold text-primary-500">
+                            <p className="text-foreground/70 text-sm">Место в рейтинге</p>
+                            <p className="text-primary-500 mt-1 text-2xl font-semibold">
                                 {athleteOverview.points} <span className="text-sm font-normal">баллов</span>
                             </p>
                         </div>
@@ -64,10 +64,7 @@ export function Statistics() {
                 </Card>
 
                 <Card title="Баллы за всё время" icon="lucide:trending-up">
-                    <LineChart
-                        data={athletePointsOverTime}
-                        strokeColor="#39cc7d"
-                    />
+                    <LineChart data={athletePointsOverTime} strokeColor="#39cc7d" />
                 </Card>
             </div>
 
@@ -77,15 +74,10 @@ export function Statistics() {
                     {athleteAchievements.map((ach, i) => (
                         <div
                             key={i}
-                            className="flex flex-col items-center justify-center rounded-lg border border-content3 bg-content2/50 p-4 transition-all hover:border-primary-200 hover:bg-content2"
+                            className="border-content3 bg-content2/50 hover:border-primary-200 hover:bg-content2 flex flex-col items-center justify-center rounded-lg border p-4 transition-all"
                         >
-                            <Badge
-                                content={ach.count}
-                                color="primary"
-                                size="lg"
-                                className="mb-2"
-                            >
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                            <Badge content={ach.count} color="primary" size="lg" className="mb-2">
+                                <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-12 w-12 items-center justify-center rounded-full">
                                     <Icon icon={getAchievementIcon(i)} width={24} />
                                 </div>
                             </Badge>
@@ -105,11 +97,6 @@ export function Statistics() {
 
 // Helper function to get different icons for achievements
 function getAchievementIcon(index: number): string {
-    const icons = [
-        "lucide:medal",
-        "lucide:trophy",
-        "lucide:flag",
-        "lucide:target"
-    ];
+    const icons = ["lucide:medal", "lucide:trophy", "lucide:flag", "lucide:target"];
     return icons[index % icons.length];
 }

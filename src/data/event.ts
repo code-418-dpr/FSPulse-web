@@ -1,6 +1,6 @@
 "use server";
 
-import { RequestStatus } from "@/app/generated/prisma";
+import { EventLevel, RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 import { SearchRepresentativeEventRequestsParams, SearchRepresentativeEventsParams } from "@/types/search";
 
@@ -210,6 +210,81 @@ export async function getEventById(id: string) {
         },
     });
 }
+
+export interface FileData {
+    name: string;
+    content: Uint8Array;
+    type: string;
+}
+
+export interface CompetitionRequestData {
+    name: string;
+    description: string;
+    address: string;
+    level: EventLevel;
+    discipline: string;
+    isOnline: boolean;
+    startRegistration: Date;
+    endRegistration: Date;
+    start: Date;
+    end: Date;
+    minAge: number;
+    maxAge: number;
+    minTeamParticipantsCount: number;
+    maxTeamParticipantsCount: number;
+    maxParticipantsCount: number;
+    cover: Uint8Array;
+    files?: FileData[]; // необязательные файлы
+    representatives?: string[]; // массив id представителей
+}
+export const createCompetitionRequest = async (data: CompetitionRequestData) => {
+    const { files = [], representatives = [], cover, ...eventData } = data;
+    const minAge = eventData.minAge;
+    const maxAge = eventData.maxAge;
+    const maxParticipantsCount = eventData.maxParticipantsCount;
+    return prisma.event.create({
+        data: {
+            ...eventData,
+            minAge, 
+            maxAge, 
+            maxParticipantsCount,
+            cover: Buffer.from(cover),
+            requestStatus: "PENDING",
+            level: eventData.level,
+            discipline: { connect: { id: eventData.discipline } },
+            isPersonalFormatAllowed: false,
+            files:
+                files.length > 0
+                    ? {
+                        create: data.files?.map((file) => ({
+                            name: file.name,
+                            content: Buffer.from(file.content), // Конвертируем Uint8Array в Buffer
+                        })),
+                      }
+                    : undefined,
+            representatives:
+                representatives.length > 0
+                    ? {
+                          create: representatives.map((id) => ({
+                              representative: { connect: { id } },
+                          })),
+                      }
+                    : undefined,
+            awards: [165, 145, 120, 100], // Инициализируем пустым массивом, если нужно
+            applicationTime: new Date(), // Добавляем текущую дату
+        },
+        include: {
+            discipline: true,
+            files: true,
+            representatives: {
+                include: {
+                    representative: true,
+                },
+            },
+        },
+    });
+};
+
 // —————————————————————————————————————————
 
 export interface EventSummary {

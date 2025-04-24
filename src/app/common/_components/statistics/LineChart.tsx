@@ -1,15 +1,17 @@
-import React from "react";
 import {
-    LineChart as ReLineChart,
+    Area,
+    CartesianGrid,
+    ComposedChart,
     Line,
+    LineChart as ReLineChart,
+    ResponsiveContainer,
+    Tooltip,
     XAxis,
     YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Area,
-    ComposedChart
 } from "recharts";
+
+import React from "react";
+
 import { ChartContainer } from "./ChartContainer";
 
 interface DataPoint {
@@ -29,9 +31,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         return (
             <div className="chart-tooltip">
                 <p className="font-medium">{label}</p>
-                <p className="text-primary-500 font-semibold">
-                    {payload[0].value}
-                </p>
+                <p className="text-primary-500 font-semibold">{payload[0].value}</p>
             </div>
         );
     }
@@ -39,11 +39,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const LineChart: React.FC<LineChartProps> = ({
-                                                        data,
-                                                        strokeColor = "#2889f4",
-                                                        areaColor = "rgba(40, 137, 244, 0.1)",
-                                                        showArea = true
-                                                    }) => (
+    data,
+    strokeColor = "#2889f4",
+    areaColor = "rgba(40, 137, 244, 0.1)",
+    showArea = true,
+}) => (
     <ChartContainer>
         <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
@@ -54,26 +54,11 @@ export const LineChart: React.FC<LineChartProps> = ({
                     </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis
-                    dataKey="label"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#70828f", fontSize: 12 }}
-                />
-                <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#70828f", fontSize: 12 }}
-                />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#70828f", fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#70828f", fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} />
                 {showArea && (
-                    <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke="none"
-                        fillOpacity={1}
-                        fill="url(#colorValue)"
-                    />
+                    <Area type="monotone" dataKey="value" stroke="none" fillOpacity={1} fill="url(#colorValue)" />
                 )}
                 <Line
                     type="monotone"

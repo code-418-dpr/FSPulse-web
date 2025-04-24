@@ -1,12 +1,7 @@
+import { Cell, Legend, Pie, PieChart as RePieChart, ResponsiveContainer, Tooltip } from "recharts";
+
 import React from "react";
-import {
-    PieChart as RePieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    Legend,
-    ResponsiveContainer
-} from "recharts";
+
 import { ChartContainer } from "./ChartContainer";
 
 interface PieData {
@@ -36,29 +31,14 @@ const CustomTooltip = ({ active, payload }: any) => {
     return null;
 };
 
-const renderCustomizedLabel = ({
-                                   cx,
-                                   cy,
-                                   midAngle,
-                                   innerRadius,
-                                   outerRadius,
-                                   percent,
-                               }: any) => {
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-        <text
-            x={x}
-            y={y}
-            fill="#fff"
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize={12}
-            fontWeight={600}
-        >
+        <text x={x} y={y} fill="#fff" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600}>
             {`${(percent * 100).toFixed(0)}%`}
         </text>
     );
@@ -94,9 +74,7 @@ export const PieChart: React.FC<PieChartProps> = ({ data }) => {
                         height={36}
                         iconType="circle"
                         iconSize={8}
-                        formatter={(value) => (
-                            <span className="text-sm text-foreground/80">{value}</span>
-                        )}
+                        formatter={(value) => <span className="text-foreground/80 text-sm">{value}</span>}
                     />
                 </RePieChart>
             </ResponsiveContainer>

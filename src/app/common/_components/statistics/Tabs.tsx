@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Tabs as HTabs, Tab } from "@heroui/react";
 
 interface TabItem {
@@ -13,11 +14,7 @@ interface TabsProps {
     defaultSelectedKey?: string;
 }
 
-export const Tabs: React.FC<TabsProps> = ({
-                                              tabs,
-                                              onSelect,
-                                              defaultSelectedKey = tabs[0]?.id
-                                          }) => {
+export const Tabs: React.FC<TabsProps> = ({ tabs, onSelect, defaultSelectedKey = tabs[0]?.id }) => {
     const [selected, setSelected] = React.useState(defaultSelectedKey);
 
     const handleSelectionChange = (key: React.Key) => {

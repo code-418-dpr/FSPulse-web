@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/admin/_components/achievement/achievement-cards";
-import { Statistics } from "./_components/statistics/statistics";
 import { MainCards } from "@/app/admin/_components/main-cards";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
@@ -23,6 +22,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { RequestStatus } from "../generated/prisma";
 import { RepresentativeTableWithPagination } from "./_components/representative-table";
+import { Statistics } from "./_components/statistics/statistics";
 
 interface Paged<T> {
     items: T[];
@@ -302,7 +302,7 @@ export default function AdministratorPage() {
                         renderCardsAction={(items) => <AchievementCards paginatedData={items} />}
                     />
                 )}
-                 {activeTab === "statistics" && <Statistics />}
+                {activeTab === "statistics" && <Statistics />}
             </div>
 
             <FooterElement />

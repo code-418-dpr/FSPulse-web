@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Icon } from "@iconify/react";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
 import { BarChart } from "@/app/common/_components/statistics/BarChart";
@@ -14,6 +13,7 @@ import {
     adminEventsByWeek,
     adminRepresentativeRanking,
 } from "@/mocks/statistics/admin";
+import { Icon } from "@iconify/react";
 
 type RankingTab = "athletes" | "coaches" | "reps";
 
@@ -48,9 +48,9 @@ export function Statistics() {
     return (
         <div id="statistics-box" className="space-y-8">
             {/* Header with export button */}
-            <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
+            <div className="border-content3 bg-content1 flex items-center justify-between rounded-xl border p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                    <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-10 w-10 items-center justify-center rounded-lg">
                         <Icon icon="lucide:bar-chart-2" width={24} />
                     </div>
                     <h2 className="text-2xl font-semibold">Статистика</h2>
@@ -67,16 +67,10 @@ export function Statistics() {
             {/* Charts */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Card title="Мероприятия по типу" icon="lucide:pie-chart">
-                    <BarChart
-                        data={adminEventsByType}
-                        color="#944dee"
-                    />
+                    <BarChart data={adminEventsByType} color="#944dee" />
                 </Card>
                 <Card title="Соревнования по неделям" icon="lucide:line-chart">
-                    <LineChart
-                        data={adminEventsByWeek}
-                        strokeColor="#2889f4"
-                    />
+                    <LineChart data={adminEventsByWeek} strokeColor="#2889f4" />
                 </Card>
             </div>
 
@@ -88,7 +82,9 @@ export function Statistics() {
                         { id: "coaches", label: "Тренеры" },
                         { id: "reps", label: "Представительства" },
                     ]}
-                    onSelect={(id) => { setTab(id as RankingTab); }}
+                    onSelect={(id) => {
+                        setTab(id as RankingTab);
+                    }}
                 />
                 {tab === "reps" ? (
                     <TableContainer columns={repColumns} data={repData} />

@@ -18,6 +18,8 @@ const baseSchema = z.object({
     level: z.string().min(1, "Выберите уровень соревнования"),
     discipline: z.string().min(1, "Укажите дисциплину"),
     regions: z.array(z.string()).min(1, "Выберите хотя бы один регион"),
+    ageGroups: z.array(z.string()).min(1, "Выберите хотя бы одну возрастную категорию"),
+    representatives: z.string().array(),
 });
 
 // Затем добавляем зависимые проверки на уровне всей схемы
