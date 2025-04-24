@@ -1,6 +1,12 @@
 import { EventLevel, RequestStatus } from "./app/generated/prisma";
 
-export type Tab = "requests" | "events" | "team" | "achievement" | "representative";
+export type Tab =
+    | "requests"
+    | "events"
+    | "team"
+    | "achievement"
+    | "representative"
+    | "statistics";
 
 export interface CompetitionItem {
     title: string;
