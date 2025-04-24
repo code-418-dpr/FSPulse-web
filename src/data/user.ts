@@ -26,7 +26,11 @@ export const findAthleteById = async (athleteId: string) => {
         },
         include: {
             user: true,
-            skills: true,
+            skills: {
+                include: {
+                    skill: true,
+                },
+            },
         },
     });
 };
@@ -68,3 +72,15 @@ export const alterAthleteById = async (athlete: AthleteSpecificData, athleteId: 
         },
     });
 };
+
+/*
+            skills: athlete.skills ? {
+                // Удалить все текущие навыки
+                deleteMany: {},
+                // Добавить новые навыки
+                create: athlete.skills.map(skillId => ({
+                    skillId,
+                    grade: 0 // или другое значение по умолчанию
+                }))
+            } : undefined,
+ */

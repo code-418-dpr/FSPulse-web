@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import TeamsOnEvent from "@/components/event/event-team-table";
 import { getEventById } from "@/data/event";
 import { EventItemForId } from "@/types";
 import { formatDatetime, getEventStatusByDatetimes } from "@/utils";
@@ -247,12 +248,12 @@ export default function EventDetails({ eventId }: Props) {
 
                 <Tab key="participants" title="Участники" className="w-full">
                     {/* Контент для вкладки участников */}
-                    <p className="text-foreground-500">Список участников будет доступен позже</p>
+                    <TeamsOnEvent eventId={event.id} />
                 </Tab>
 
                 <Tab key="results" title="Итоги" className="w-full">
                     {/* Контент для вкладки итогов */}
-                    <p className="text-foreground-500">А вот за это мне не заплатили, идите нахуй.</p>
+                    <p className="text-foreground-500">Скоро мы поведём итоги соревнования</p>
                 </Tab>
             </Tabs>
         </div>
