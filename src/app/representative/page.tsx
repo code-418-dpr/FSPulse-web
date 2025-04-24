@@ -174,7 +174,7 @@ export default function RequestsPage() {
     const totalCompPages = requestsData?.pagination.page ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
-    const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
+    const totalEvtPages = eventsData?.pagination.page ?? 1;
 
     const teamPageItems = teamData?.items ?? [];
     const totalTeamPages = teamData?.pagination.totalPages ?? 1;
