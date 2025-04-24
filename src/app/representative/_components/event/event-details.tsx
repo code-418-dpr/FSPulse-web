@@ -35,28 +35,35 @@ export default function EventDetails({ event }: Props) {
                         {event.status}
                     </Chip>
                 </div>
-                <Button className="m-3" onPress={onTeamsOpen}>
-                    Зарегистрироваться
-                </Button>
 
-                <ModalOrDrawer
-                    label="Регистрация на соревнование"
-                    isOpen={isTeamsOpen}
-                    onOpenChangeAction={onTeamsOpenChange}
-                    size="xl"
-                >
-                    <TeamCreateOrJoin />
-                </ModalOrDrawer>
+                {event.status === "DECLINED" ? (
+                    <>
+                        <Button className="m-3" onPress={onTeamsOpen}>
+                            Зарегистрироваться
+                        </Button>
 
-                <Button onPress={onGradesOpen}>Распределить баллы</Button>
+                        <ModalOrDrawer
+                            label="Регистрация на соревнование"
+                            isOpen={isTeamsOpen}
+                            onOpenChangeAction={onTeamsOpenChange}
+                            size="xl"
+                        >
+                            <TeamCreateOrJoin eventId={event.id} />
+                        </ModalOrDrawer>
+                    </>
+                ) : (
+                    <>
+                        <Button onPress={onGradesOpen}>Распределить баллы</Button>
 
-                <ModalOrDrawer
-                    label="Распределение баллов"
-                    isOpen={isGradesOpen}
-                    onOpenChangeAction={onGradesOpenChange}
-                >
-                    <CompetitionResultForm />
-                </ModalOrDrawer>
+                        <ModalOrDrawer
+                            label="Распределение баллов"
+                            isOpen={isGradesOpen}
+                            onOpenChangeAction={onGradesOpenChange}
+                        >
+                            <CompetitionResultForm />
+                        </ModalOrDrawer>
+                    </>
+                )}
             </div>
         </>
     );

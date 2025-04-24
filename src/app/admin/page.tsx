@@ -256,9 +256,15 @@ export default function AdministratorPage() {
                             setPageAction={setPage}
                             renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
                         />
-                        <div className="absolute right-10 bottom-10">
-                            <Button isIconOnly aria-label="Create" onPress={onOpen}>
-                                <Icon icon="iconoir:plus" width={25} height={25} />
+                        <div className="absolute">
+                            <Button
+                                className="fixed right-5 bottom-5 z-10"
+                                isIconOnly
+                                aria-label="Create"
+                                onPress={onOpen}
+                                size="lg"
+                            >
+                                <Icon icon="iconoir:plus" width={50} height={50} />
                             </Button>
                         </div>
                     </>
