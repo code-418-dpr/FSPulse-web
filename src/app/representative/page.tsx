@@ -59,7 +59,7 @@ export default function RequestsPage() {
     // sync tab from URL
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | null;
-        if (tab && ["requests", "events", "team"].includes(tab)) {
+        if (tab && ["requests", "events", "team", "achievement"].includes(tab)) {
             setActiveTab(tab);
         } else {
             router.replace("/representative?tab=requests");
@@ -194,7 +194,9 @@ export default function RequestsPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
+                {activeTab !== "achievement" && (
+                    <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
+                    )}
 
                 {/* Main */}
                 {activeTab === "requests" && (
@@ -246,12 +248,11 @@ export default function RequestsPage() {
                     />
                 )}
 
-                {activeTab === "achievement" && (
-                        <>
-                            <AchievementCards paginatedData={achievementData?.items ?? []} />
-                            <Statistics />
-                        </>
-                    )}
+                <div className="flex-1 p-6">
+                      {activeTab === "achievement" && (
+                        <Statistics />
+                      )}
+                    </div>
             </div>
 
             <FooterElement />

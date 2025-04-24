@@ -226,7 +226,9 @@ export default function AdministratorPage() {
 
             <div className="flex min-h-[100vh] w-full">
                 {/* Sidebar */}
-                <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
+                {activeTab !== "statistics" && (
+                    <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
+                )}
 
                 {/* Main */}
                 {activeTab === "representative" && (
@@ -292,17 +294,21 @@ export default function AdministratorPage() {
                     />
                 )}
 
-                {activeTab === "achievement" && (
-                    <MainCards<AchievementItem>
-                        isLoading={isAchievementLoading}
-                        pageItems={achievementPageItems}
-                        totalPages={totalAchievementPages}
-                        page={page}
-                        setPageAction={setPage}
-                        renderCardsAction={(items) => <AchievementCards paginatedData={items} />}
-                    />
-                )}
-                 {activeTab === "statistics" && <Statistics />}
+                {/*{activeTab === "achievement" && (*/}
+                {/*    <MainCards<AchievementItem>*/}
+                {/*        isLoading={isAchievementLoading}*/}
+                {/*        pageItems={achievementPageItems}*/}
+                {/*        totalPages={totalAchievementPages}*/}
+                {/*        page={page}*/}
+                {/*        setPageAction={setPage}*/}
+                {/*        renderCardsAction={(items) => <AchievementCards paginatedData={items} />}*/}
+                {/*    />*/}
+                {/*)}*/}
+                <div className="flex-1 p-6">
+                    {activeTab === "statistics" && (
+                        <Statistics />
+                    )}
+                </div>
             </div>
 
             <FooterElement />
