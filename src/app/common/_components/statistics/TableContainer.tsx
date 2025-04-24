@@ -1,10 +1,7 @@
-// src/app/common/_components/statistics/TableContainer.tsx
-'use client';
+import React from "react";
+import { Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/react";
 
-import React from 'react';
-import { Pagination } from '@heroui/react';
-
-interface Column {
+export interface Column {
     key: string;
     title: string;
 }
@@ -26,36 +23,52 @@ export const TableContainer: React.FC<TableContainerProps> = ({
     const pageData = data.slice(start, start + pageSize);
 
     return (
-        <div className="space-y-2">
-            <table className="w-full table-auto">
-                <thead>
-                <tr>
-                    {columns.map((c) => (
-                        <th key={c.key} className="text-left py-2">
-                            {c.title}
-                        </th>
+        <div className="space-y-4">
+            <Table
+                aria-label="Data table"
+                shadow="none"
+                classNames={{
+                    base: "border border-content3 rounded-lg",
+                    th: "bg-content2/70 text-foreground/80 font-medium",
+                    td: "text-foreground/90"
+                }}
+            >
+                <TableHeader>
+                    {columns.map((column) => (
+                        <TableColumn key={column.key}>{column.title}</TableColumn>
                     ))}
-                </tr>
-                </thead>
-                <tbody>
-                {pageData.map((row, i) => (
-                    <tr key={i} className="border-t">
-                        {columns.map((c) => (
-                            <td key={c.key} className="py-2">
-                                {row[c.key]}
-                            </td>
-                        ))}
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+                </TableHeader>
+                <TableBody>
+                    {pageData.map((row, index) => (
+                        <TableRow
+                            key={index}
+                            className={index % 2 === 0 ? "bg-content1" : "bg-content2/30"}
+                        >
+                            {columns.map((column) => (
+                                <TableCell key={column.key}>
+                                    {column.key === "rank" ? (
+                                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                      {row[column.key]}
+                    </span>
+                                    ) : (
+                                        row[column.key]
+                                    )}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
 
             {totalPages > 1 && (
                 <div className="flex justify-center mt-4">
                     <Pagination
-                        current={page}
                         total={totalPages}
+                        page={page}
                         onChange={setPage}
+                        color="primary"
+                        showControls
+                        size="sm"
                     />
                 </div>
             )}
