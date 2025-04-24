@@ -68,7 +68,7 @@ export default function TeamsOnEvent({ eventId }: { eventId: string }) {
             key={`table-${eventId}`}
             aria-label="Example table with client side pagination"
             bottomContent={
-                !data && !isTeamsLoading ? (
+                isTeamsLoading ? (
                     <div key="loading-spinner" className="flex w-full justify-center">
                         <Spinner color="white" size="sm" />
                     </div>
