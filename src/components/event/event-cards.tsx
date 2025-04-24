@@ -27,7 +27,7 @@ export default function EventCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer label="Мероприятие" isOpen={isOpen} onOpenChangeAction={onOpenChange} size="xl">
+                <ModalOrDrawer label="Мероприятие" isOpen={isOpen} onOpenChangeAction={onOpenChange} size="3xl">
                     <EventDetails eventId={selected} />
                 </ModalOrDrawer>
             )}

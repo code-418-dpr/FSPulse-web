@@ -26,7 +26,6 @@ const sportsCategoryOptions = Object.values(SportsCategory).map((key) => ({
 
 const userSchema = baseUserSchema.extend({
     about: z.string().nullable(),
-    skills: z.array(z.string()),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -69,7 +68,6 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
             email: "",
             phoneNumber: "",
             about: "",
-            skills: [],
         },
     });
 

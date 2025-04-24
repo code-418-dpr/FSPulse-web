@@ -196,6 +196,8 @@ model Event {
   disciplineId             String
   isOnline                 Boolean
   address                  String?
+  lat                      String?
+  lng                      String?
   awards                   Int[]         @db.SmallInt
   level                    EventLevel
   applicationTime          DateTime      @default(now())

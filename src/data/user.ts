@@ -26,7 +26,11 @@ export const findAthleteById = async (athleteId: string) => {
         },
         include: {
             user: true,
-            skills: true,
+            skills: {
+                include: {
+                    skill: true,
+                },
+            },
         },
     });
 };
@@ -65,6 +69,36 @@ export const alterAthleteById = async (athlete: AthleteSpecificData, athleteId: 
         },
         include: {
             user: true,
+        },
+    });
+};
+
+/*
+            skills: athlete.skills ? {
+                // Удалить все текущие навыки
+                deleteMany: {},
+                // Добавить новые навыки
+                create: athlete.skills.map(skillId => ({
+                    skillId,
+                    grade: 0 // или другое значение по умолчанию
+                }))
+            } : undefined,
+ */
+
+export const findAthletesByRegion = async (regionId: string) => {
+    return prisma.athlete.findMany({
+        where: {
+            user: {
+                regionId: regionId,
+            },
+        },
+        include: {
+            user: true,
+            skills: {
+                include: {
+                    skill: true,
+                },
+            },
         },
     });
 };
