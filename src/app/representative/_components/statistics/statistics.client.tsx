@@ -14,10 +14,10 @@ import {
 } from "@/data/representativeStatistics";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
-import { BarChart }   from "@/app/common/_components/statistics/BarChart";
-import { LineChart }  from "@/app/common/_components/statistics/LineChart";
-import { PieChart }   from "@/app/common/_components/statistics/PieChart";
-import { Card }       from "@/app/common/_components/statistics/Card";
+import { BarChart } from "@/app/common/_components/statistics/BarChart";
+import { LineChart } from "@/app/common/_components/statistics/LineChart";
+import { PieChart } from "@/app/common/_components/statistics/PieChart";
+import { Card } from "@/app/common/_components/statistics/Card";
 import { TableContainer } from "@/app/common/_components/statistics/TableContainer";
 import { Tabs as StatTabs } from "@/app/common/_components/statistics/Tabs";
 
@@ -26,7 +26,6 @@ type RankingTab = "athletes" | "coaches";
 export default function StatisticsClient() {
     const { user, isLoading, isAuthenticated } = useAuth();
 
-    // состояния
     const [loadingData, setLoadingData] = useState(true);
     const [requestsByStatus, setRequestsByStatus] = useState<
         { label: string; value: number; color: string }[]
@@ -45,52 +44,76 @@ export default function StatisticsClient() {
     >([]);
     const [tab, setTab] = useState<RankingTab>("athletes");
 
-    // загрузка данных после авторизации
     useEffect(() => {
-        if (isLoading || !isAuthenticated || !user?.id) return;
-        const repId = user.id;
-        const statusColors = ["#2889f4", "#39cc7d", "#f7b342", "#f43377", "#944dee"];
+        async function loadStatistics() {
+            if (isLoading || !isAuthenticated || !user?.id) return;
+            const repId = user.id;
+            const statusColors = [
+                "#2889f4",
+                "#39cc7d",
+                "#f7b342",
+                "#f43377",
+                "#944dee",
+            ];
 
-        Promise.all([
-            getRepRequestsByStatus(repId),
-            getRepEventsByFormat(repId),
-            getRepEventsByMonth(repId),
-            getRepAthleteRanking(repId),
-            getRepCoachRanking(repId),
-        ]).then(([reqs, formats, months, aRank, cRank]) => {
-            setRequestsByStatus(
-                reqs.map((x, i) => ({
-                    label: x.status,
-                    value: x.count,
-                    color: statusColors[i % statusColors.length],
-                }))
-            );
-            setEventsByFormat(formats.map((x) => ({ label: x.label, value: x.value })));
-            setEventsByMonth(months.map((x) => ({ label: x.month, value: x.count })));
-            setAthleteRanking(aRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points })));
-            setCoachRanking(cRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points })));
-            setLoadingData(false);
-        });
+            try {
+                const [
+                    reqs,
+                    formats,
+                    months,
+                    aRank,
+                    cRank,
+                ] = await Promise.all([
+                    getRepRequestsByStatus(repId),
+                    getRepEventsByFormat(repId),
+                    getRepEventsByMonth(repId),
+                    getRepAthleteRanking(repId),
+                    getRepCoachRanking(repId),
+                ]);
+
+                setRequestsByStatus(
+                    reqs.map((x, i) => ({
+                        label: x.status,
+                        value: x.count,
+                        color: statusColors[i % statusColors.length],
+                    }))
+                );
+                setEventsByFormat(formats.map((x) => ({ label: x.label, value: x.value })));
+                setEventsByMonth(months.map((x) => ({ label: x.month, value: x.count })));
+                setAthleteRanking(
+                    aRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points }))
+                );
+                setCoachRanking(
+                    cRank.map((x) => ({ fio: x.fio, region: x.region, points: x.points }))
+                );
+            } catch (error) {
+                console.error("Ошибка при загрузке статистики представителя:", error);
+            } finally {
+                setLoadingData(false);
+            }
+        }
+
+        void loadStatistics();
     }, [user, isLoading, isAuthenticated]);
 
-    // рендер по статусам
     if (isLoading) return <p>Загрузка профиля…</p>;
     if (!isAuthenticated) return <p>Пожалуйста, войдите.</p>;
     if (loadingData) return <p>Загрузка статистики…</p>;
 
-    // конфиг таблицы
     const ratingColumns: Column[] = [
         { key: "rank", title: "№" },
         { key: "fio", title: "ФИО" },
         { key: "region", title: "Регион" },
         { key: "points", title: "Баллы" },
     ];
-    const ratingData = (tab === "athletes" ? athleteRanking : coachRanking).map((r, i) => ({
-        rank: i + 1,
-        fio: r.fio,
-        region: r.region,
-        points: r.points,
-    }));
+    const ratingData = (tab === "athletes" ? athleteRanking : coachRanking).map(
+        (r, i) => ({
+            rank: i + 1,
+            fio: r.fio,
+            region: r.region,
+            points: r.points,
+        })
+    );
 
     return (
         <div id="representative-statistics" className="space-y-8">
@@ -133,7 +156,9 @@ export default function StatisticsClient() {
                         { id: "athletes", label: "Спортсмены" },
                         { id: "coaches", label: "Тренеры" },
                     ]}
-                    onSelect={(id) => setTab(id as RankingTab)}
+                    onSelect={(id) => {
+                        setTab(id as RankingTab);
+                    }}
                 />
                 <TableContainer columns={ratingColumns} data={ratingData} />
             </Card>

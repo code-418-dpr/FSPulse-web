@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 
 // 1. Рейтинг спортсменов (сумма оценок навыков)
 export async function getAthleteRanking() {
-    return prisma.$queryRaw<Array<{ rank: number; fio: string; region: string; points: number }>>`
+    return prisma.$queryRaw<{ rank: number; fio: string; region: string; points: number }[]>`
         SELECT
             ROW_NUMBER() OVER (ORDER BY COALESCE(SUM(soa.grade),0) DESC) AS rank,
                 CONCAT(u.lastname, ' ', u.firstname, ' ', COALESCE(u.middlename, '')) AS fio,
@@ -24,7 +24,7 @@ export async function getAthleteRanking() {
 
 // 2. Рейтинг тренеров (сумма очков команд)
 export async function getCoachRanking() {
-    return prisma.$queryRaw<Array<{ rank: number; fio: string; region: string; points: number }>>`
+    return prisma.$queryRaw<{ rank: number; fio: string; region: string; points: number }[]>`
         SELECT
             ROW_NUMBER() OVER (ORDER BY COALESCE(SUM(t.score),0) DESC) AS rank,
                 CONCAT(u.lastname, ' ', u.firstname, ' ', COALESCE(u.middlename, '')) AS fio,
@@ -43,7 +43,7 @@ export async function getCoachRanking() {
 
 // 3. Рейтинг представительств (число организованных мероприятий)
 export async function getRepresentativeRanking() {
-    return prisma.$queryRaw<Array<{ rank: number; region: string; manager: string; eventsCount: number }>>`
+    return prisma.$queryRaw<{ rank: number; region: string; manager: string; eventsCount: number }[]>`
         SELECT
             ROW_NUMBER() OVER (ORDER BY COUNT(eor."eventId") DESC) AS rank,
                 reg.name AS region,
@@ -62,7 +62,7 @@ export async function getRepresentativeRanking() {
 
 // 4. Мероприятия по типу (группировка по дисциплине)
 export async function getEventsByType() {
-    return prisma.$queryRaw<Array<{ type: string; count: number }>>`
+    return prisma.$queryRaw<{ type: string; count: number }[]>`
     SELECT
       d.name AS type,
       COUNT(*) AS count
@@ -76,7 +76,7 @@ export async function getEventsByType() {
 
 // 5. Соревнования по неделям (группировка по неделям начала)
 export async function getEventsByWeek() {
-    return prisma.$queryRaw<Array<{ week: string; count: number }>>`
+    return prisma.$queryRaw<{ week: string; count: number }[]>`
     SELECT
       to_char(date_trunc('week', e."start"), 'YYYY-MM-DD') AS week,
       COUNT(*) AS count

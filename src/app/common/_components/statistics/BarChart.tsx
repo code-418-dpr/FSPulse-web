@@ -1,5 +1,14 @@
+// src/app/common/_components/statistics/BarChart.tsx
 import React from "react";
-import { BarChart as ReBar, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+    BarChart as ReBar,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    CartesianGrid,
+} from "recharts";
 import { ChartContainer } from "./ChartContainer";
 
 interface DataPoint {
@@ -12,28 +21,35 @@ interface BarChartProps {
     color?: string;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: { value: number }[];
+    label?: string;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
+                                                         active,
+                                                         payload,
+                                                         label,
+                                                     }) => {
+    if (active && payload && payload.length > 0) {
         return (
             <div className="chart-tooltip">
                 <p className="font-medium">{label}</p>
-                <p className="text-primary-500 font-semibold">
-                    {payload[0].value}
-                </p>
+                <p className="text-primary-500 font-semibold">{payload[0].value}</p>
             </div>
         );
     }
     return null;
 };
 
-export const BarChart: React.FC<BarChartProps> = ({ data, color = "#2889f4" }) => (
+export const BarChart: React.FC<BarChartProps> = ({
+                                                      data,
+                                                      color = "#2889f4",
+                                                  }) => (
     <ChartContainer>
         <ResponsiveContainer width="100%" height="100%">
-            <ReBar
-                data={data}
-                margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
-                barSize={36}
-            >
+            <ReBar data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }} barSize={36}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis
                     dataKey="label"

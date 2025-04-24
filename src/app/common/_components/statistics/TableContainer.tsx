@@ -1,5 +1,16 @@
+// src/app/common/_components/statistics/TableContainer.tsx
+"use client";
+
 import React from "react";
-import { Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/react";
+import {
+    Pagination,
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+} from "@heroui/react";
 
 export interface Column {
     key: string;
@@ -8,7 +19,8 @@ export interface Column {
 
 interface TableContainerProps {
     columns: Column[];
-    data: Record<string, any>[];
+    /** Каждое поле может быть любым React-узлом */
+    data: Record<string, React.ReactNode>[];
     pageSize?: number;
 }
 
@@ -30,7 +42,7 @@ export const TableContainer: React.FC<TableContainerProps> = ({
                 classNames={{
                     base: "border border-content3 rounded-lg",
                     th: "bg-content2/70 text-foreground/80 font-medium",
-                    td: "text-foreground/90"
+                    td: "text-foreground/90",
                 }}
             >
                 <TableHeader>
@@ -39,10 +51,10 @@ export const TableContainer: React.FC<TableContainerProps> = ({
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {pageData.map((row, index) => (
+                    {pageData.map((row, rowIndex) => (
                         <TableRow
-                            key={index}
-                            className={index % 2 === 0 ? "bg-content1" : "bg-content2/30"}
+                            key={rowIndex}
+                            className={rowIndex % 2 === 0 ? "bg-content1" : "bg-content2/30"}
                         >
                             {columns.map((column) => (
                                 <TableCell key={column.key}>

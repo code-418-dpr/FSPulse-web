@@ -1,3 +1,4 @@
+// src/app/common/_components/statistics/PieChart.tsx
 import React from "react";
 import {
     PieChart as RePieChart,
@@ -5,7 +6,9 @@ import {
     Cell,
     Tooltip,
     Legend,
-    ResponsiveContainer
+    ResponsiveContainer,
+    TooltipProps,
+    PieLabelRenderProps,
 } from "recharts";
 import { ChartContainer } from "./ChartContainer";
 
@@ -19,16 +22,23 @@ interface PieChartProps {
     data: PieData[];
 }
 
-const COLORS = ["#2889f4", "#944dee", "#39cc7d", "#f7b342", "#f43377"];
+interface PayloadItem {
+    name: string;
+    value: number;
+    payload: PieData & { fill?: string };
+}
 
-const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-        const data = payload[0];
+const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
+                                                                   active,
+                                                                   payload,
+                                                               }) => {
+    if (active && payload && payload.length > 0) {
+        const item = payload[0] as PayloadItem;
         return (
             <div className="chart-tooltip">
-                <p className="font-medium">{data.name}</p>
-                <p className="font-semibold" style={{ color: data.payload.fill }}>
-                    {data.value}
+                <p className="font-medium">{item.name}</p>
+                <p className="font-semibold" style={{ color: item.payload.fill }}>
+                    {item.value}
                 </p>
             </div>
         );
@@ -36,18 +46,19 @@ const CustomTooltip = ({ active, payload }: any) => {
     return null;
 };
 
-const renderCustomizedLabel = ({
-                                   cx,
-                                   cy,
-                                   midAngle,
-                                   innerRadius,
-                                   outerRadius,
-                                   percent,
-                               }: any) => {
+const renderCustomizedLabel = (props: PieLabelRenderProps) => {
+    // ensure numeric values
+    const cxNum = Number(props.cx);
+    const cyNum = Number(props.cy);
+    const midAngle = Number(props.midAngle);
+    const innerRadius = Number(props.innerRadius);
+    const outerRadius = Number(props.outerRadius);
+    const percent = Number(props.percent);
+
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const x = cxNum + radius * Math.cos(-midAngle * RADIAN);
+    const y = cyNum + radius * Math.sin(-midAngle * RADIAN);
 
     return (
         <text
@@ -64,42 +75,42 @@ const renderCustomizedLabel = ({
     );
 };
 
-export const PieChart: React.FC<PieChartProps> = ({ data }) => {
-    return (
-        <ChartContainer>
-            <ResponsiveContainer width="100%" height="100%">
-                <RePieChart>
-                    <Pie
-                        data={data}
-                        dataKey="value"
-                        nameKey="label"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        innerRadius={40}
-                        labelLine={false}
-                        label={renderCustomizedLabel}
-                    >
-                        {data.map((entry, index) => (
-                            <Cell
-                                key={`slice-${index}`}
-                                fill={entry.color || COLORS[index % COLORS.length]}
-                                stroke="none"
-                            />
-                        ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend
-                        verticalAlign="bottom"
-                        height={36}
-                        iconType="circle"
-                        iconSize={8}
-                        formatter={(value) => (
-                            <span className="text-sm text-foreground/80">{value}</span>
-                        )}
-                    />
-                </RePieChart>
-            </ResponsiveContainer>
-        </ChartContainer>
-    );
-};
+const COLORS = ["#2889f4", "#944dee", "#39cc7d", "#f7b342", "#f43377"];
+
+export const PieChart: React.FC<PieChartProps> = ({ data }) => (
+    <ChartContainer>
+        <ResponsiveContainer width="100%" height="100%">
+            <RePieChart>
+                <Pie
+                    data={data}
+                    dataKey="value"
+                    nameKey="label"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={40}
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                >
+                    {data.map((entry, index) => (
+                        <Cell
+                            key={index}
+                            fill={entry.color ?? COLORS[index % COLORS.length]}
+                            stroke="none"
+                        />
+                    ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                    iconSize={8}
+                    formatter={(value: string | number) => (
+                        <span className="text-sm text-foreground/80">{value}</span>
+                    )}
+                />
+            </RePieChart>
+        </ResponsiveContainer>
+    </ChartContainer>
+);

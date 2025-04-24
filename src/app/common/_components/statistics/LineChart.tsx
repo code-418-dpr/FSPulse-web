@@ -1,14 +1,14 @@
+// src/app/common/_components/statistics/LineChart.tsx
 import React from "react";
 import {
-    LineChart as ReLineChart,
+    Area,
+    CartesianGrid,
+    ComposedChart,
     Line,
+    ResponsiveContainer,
+    Tooltip,
     XAxis,
     YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Area,
-    ComposedChart
 } from "recharts";
 import { ChartContainer } from "./ChartContainer";
 
@@ -17,6 +17,28 @@ interface DataPoint {
     value: number;
 }
 
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: { value: number }[];
+    label?: string;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
+                                                         active,
+                                                         payload,
+                                                         label,
+                                                     }) => {
+    if (active && payload && payload.length > 0) {
+        return (
+            <div className="chart-tooltip">
+                <p className="font-medium">{label}</p>
+                <p className="text-primary-500 font-semibold">{payload[0].value}</p>
+            </div>
+        );
+    }
+    return null;
+};
+
 interface LineChartProps {
     data: DataPoint[];
     strokeColor?: string;
@@ -24,36 +46,29 @@ interface LineChartProps {
     showArea?: boolean;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="chart-tooltip">
-                <p className="font-medium">{label}</p>
-                <p className="text-primary-500 font-semibold">
-                    {payload[0].value}
-                </p>
-            </div>
-        );
-    }
-    return null;
-};
-
 export const LineChart: React.FC<LineChartProps> = ({
                                                         data,
                                                         strokeColor = "#2889f4",
                                                         areaColor = "rgba(40, 137, 244, 0.1)",
-                                                        showArea = true
+                                                        showArea = true,
                                                     }) => (
     <ChartContainer>
         <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <ComposedChart
+                data={data}
+                margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+            >
                 <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={strokeColor} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
+                        <stop offset="5%" stopColor={areaColor} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={areaColor} stopOpacity={0} />
                     </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e2e8f0"
+                />
                 <XAxis
                     dataKey="label"
                     axisLine={false}
