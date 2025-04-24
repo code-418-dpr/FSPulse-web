@@ -5,10 +5,10 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/admin/_components/achievement/achievement-cards";
-import EventCards from "@/app/admin/_components/event/event-cards";
 import { MainCards } from "@/app/admin/_components/main-cards";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
+import EventCards from "@/components/event/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
@@ -111,7 +111,7 @@ export default function AdministratorPage() {
     // load events when on "events"
     useEffect(() => {
         if (activeTab !== "events") return;
-    
+
         const loadEvents = async () => {
             setIsEventLoading(true);
             try {
@@ -121,7 +121,7 @@ export default function AdministratorPage() {
                     page,
                     pageSize: perPage,
                 });
-                
+
                 console.log("Результат: ", result);
                 setEventsData({
                     items: result.results,
@@ -138,7 +138,7 @@ export default function AdministratorPage() {
                 setIsEventLoading(false);
             }
         };
-    
+
         void loadEvents();
     }, [activeTab, page, searchParamsState, user?.id]);
 
@@ -203,7 +203,7 @@ export default function AdministratorPage() {
     const totalCompPages = requestsData?.pagination.page ?? 1;
 
     const evtPageItems = eventsData?.items ?? [];
-    const totalEvtPages = eventsData?.pagination.totalPages ?? 1;
+    const totalEvtPages = eventsData?.pagination.page ?? 1;
 
     const teamPageItems = teamData?.items ?? [];
     const totalTeamPages = teamData?.pagination.totalPages ?? 1;

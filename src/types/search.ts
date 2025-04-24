@@ -52,13 +52,13 @@ export interface SearchRepresentativeEventsParams {
     minStartTime?: Date;
     maxStartTime?: Date;
     level?: EventLevel;
+    requestStatus?: RequestStatus;
     minAge?: number;
     maxAge?: number;
     isOnline?: boolean;
     isTeamFormatAllowed?: boolean;
     isPersonalFormatAllowed?: boolean;
 }
-
 
 export interface BaseSearchParams {
     query?: string;
