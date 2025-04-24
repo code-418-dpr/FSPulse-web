@@ -19,10 +19,7 @@ interface SignInFormProps extends React.ComponentPropsWithoutRef<"form"> {
 
 const formSchema = z.object({
     email: z.string().min(1, "Email обязателен").email("Некорректный email"),
-    password: z
-        .string()
-        .min(6, "Пароль должен содержать минимум 6 символов")
-        .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
+    password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
 });
 
 export default function SignInForm({ className }: SignInFormProps) {
