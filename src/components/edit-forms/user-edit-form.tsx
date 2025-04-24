@@ -65,7 +65,7 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
             birthDate: "",
             address: "",
             region: "",
-            sportCategory: "",
+            sportCategory: null,
             email: "",
             phoneNumber: "",
             about: "",
