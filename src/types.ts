@@ -1,12 +1,6 @@
-import { EventLevel, RequestStatus } from "./app/generated/prisma";
+import { Discipline, EventLevel, Prisma, RequestStatus } from "./app/generated/prisma";
 
-export type Tab =
-    | "requests"
-    | "events"
-    | "team"
-    | "achievement"
-    | "representative"
-    | "statistics";
+export type Tab = "requests" | "events" | "team" | "achievement" | "representative" | "statistics";
 
 export interface CompetitionItem {
     title: string;
@@ -19,7 +13,25 @@ export interface CompetitionItem {
     discipline: string;
     image: string;
 }
-
+export type EventItemForId = Prisma.EventGetPayload<{
+    include: {
+        representatives: {
+            include: {
+                representative: {
+                    include: {
+                        user: {
+                            include: {
+                                region: true;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        discipline: true;
+        files: true;
+    };
+}>;
 export interface EventItem {
     id: string;
     name: string;
@@ -31,6 +43,8 @@ export interface EventItem {
     endRegistration: Date;
     start: Date;
     end: Date;
+    discipline: Discipline;
+    isOnline: boolean;
 }
 
 export interface TeamItem {
@@ -55,7 +69,10 @@ export interface AchievementItem {
 }
 
 export interface TeamWithMembersItem {
+    id: string;
     name: string;
+    about: string;
+    isReady: boolean;
     leader: string;
     members: string[];
 }

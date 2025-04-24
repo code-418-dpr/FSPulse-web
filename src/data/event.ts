@@ -76,6 +76,7 @@ export async function searchRepresentativeEvents(params: SearchRepresentativeEve
         pageSize,
         representativeId,
         query,
+        requestStatus,
         disciplineId,
         minStartTime,
         maxStartTime,
@@ -87,10 +88,11 @@ export async function searchRepresentativeEvents(params: SearchRepresentativeEve
         isPersonalFormatAllowed,
     } = params;
     const requiredWhere = {
-        representative: {
-            some: { representativeId },
-        },
-        requestStatus: RequestStatus.APPROVED,
+        representatives: representativeId
+            ? {
+                  some: { representativeId },
+              }
+            : {},
     };
     const results = await prisma.event.findMany({
         where: {
@@ -116,6 +118,7 @@ export async function searchRepresentativeEvents(params: SearchRepresentativeEve
                       }
                     : {},
                 level ? { level } : {},
+                requestStatus ? { requestStatus } : {},
                 minAge || maxAge
                     ? {
                           minAge: {
@@ -147,6 +150,8 @@ export async function searchRepresentativeEvents(params: SearchRepresentativeEve
             endRegistration: true,
             start: true,
             end: true,
+            discipline: true,
+            isOnline: true,
         },
         skip: pageSize * (page - 1),
         take: pageSize,
@@ -183,6 +188,28 @@ export async function getRepresentativeRequestById(id: string) {
     });
 }
 
+export async function getEventById(id: string) {
+    return prisma.event.findUnique({
+        where: { id },
+        include: {
+            representatives: {
+                include: {
+                    representative: {
+                        include: {
+                            user: {
+                                include: {
+                                    region: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            discipline: true,
+            files: true,
+        },
+    });
+}
 // —————————————————————————————————————————
 
 export interface EventSummary {

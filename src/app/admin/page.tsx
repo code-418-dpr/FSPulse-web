@@ -6,21 +6,22 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/admin/_components/achievement/achievement-cards";
-import EventCards from "@/app/admin/_components/event/event-cards";
 import { MainCards } from "@/app/admin/_components/main-cards";
-// Вынесённый компонент статистики
+// импорт компонента статистики
 import { Statistics } from "@/app/admin/_components/statistics/statistics";
-import TeamCards from "@/app/admin/_components/team/team-cards";
+import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
+import EventCards from "@/components/event/event-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
-import { getRepresentatives } from "@/data/representative";
+import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
-import { AchievementItem, EventItem, RepresentativeItem, Tab, TeamItem } from "@/types";
+import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
-import { CircularProgress } from "@heroui/react";
+import { Button, CircularProgress, useDisclosure } from "@heroui/react";
+import { Icon } from "@iconify/react";
 
 import { RequestStatus } from "../generated/prisma";
 import { RepresentativeTableWithPagination } from "./_components/representative-table";
@@ -43,22 +44,24 @@ export default function AdministratorPage() {
         requestStatus: RequestStatus.APPROVED,
     });
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
+    const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
     const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
     const [teamData, setTeamData] = useState<Paged<TeamItem> | null>(null);
-    const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
     const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
+
     const [isLoadingTab, setIsLoadingTab] = useState(false);
     const [page, setPage] = useState(1);
 
-    // Основные вкладки (representative, events, team, requests, achievement, statistics)
+    // вкладки: representative, events, team, requests, achievement, statistics
     const [activeTab, setActiveTab] = useState<Tab | "statistics">("representative");
 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const perPage = 12;
+    const { onOpen } = useDisclosure();
 
-    // Синхронизация вкладок с URL
+    // синхронизируем таб с URL
     useEffect(() => {
         const tab = searchParams.get("tab") as Tab | "statistics" | null;
         if (tab && ["representative", "events", "team", "requests", "achievement", "statistics"].includes(tab)) {
@@ -69,14 +72,14 @@ export default function AdministratorPage() {
         }
     }, [pathname, router, searchParams]);
 
-    // Редирект, если не аутентифицирован
+    // редирект, если не аутентифицировано
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             router.push("/");
         }
     }, [isLoading, isAuthenticated, router]);
 
-    // Загрузка списка представительств
+    // загрузка представительств
     useEffect(() => {
         if (activeTab !== "representative") return;
         setIsLoadingTab(true);
@@ -102,7 +105,33 @@ export default function AdministratorPage() {
         })();
     }, [activeTab, page, searchParamsState]);
 
-    // Загрузка событий
+    // загрузка заявок
+    useEffect(() => {
+        if (activeTab !== "requests" || !user?.id) return;
+        setIsLoadingTab(true);
+        (async () => {
+            try {
+                const res = await searchRepresentativeRequests({
+                    ...searchParamsState,
+                    page,
+                    pageSize: perPage,
+                });
+                setRequestsData({
+                    items: res.results,
+                    pagination: {
+                        page,
+                        pageSize: perPage,
+                        totalItems: res.totalItems,
+                        totalPages: res.totalPages,
+                    },
+                });
+            } finally {
+                setIsLoadingTab(false);
+            }
+        })();
+    }, [activeTab, page, searchParamsState, user?.id]);
+
+    // загрузка событий
     useEffect(() => {
         if (activeTab !== "events") return;
         setIsLoadingTab(true);
@@ -128,60 +157,24 @@ export default function AdministratorPage() {
         })();
     }, [activeTab, page, searchParamsState]);
 
-    // Загрузка команд
+    // загрузка команд
     useEffect(() => {
         if (activeTab !== "team") return;
         setIsLoadingTab(true);
-        (async () => {
-            try {
-                const r = await fetch(`/api/teams?page=${page}&pageSize=${perPage}`);
-                const data = (await r.json()) as Paged<TeamItem>;
-                setTeamData(data);
-            } finally {
-                setIsLoadingTab(false);
-            }
-        })();
+        fetch(`/api/teams?page=${page}&pageSize=${perPage}`)
+            .then((r) => r.json())
+            .then((json: Paged<TeamItem>) => { setTeamData(json); })
+            .finally(() => { setIsLoadingTab(false); });
     }, [activeTab, page]);
 
-    // Загрузка заявок
-    useEffect(() => {
-        if (activeTab !== "requests") return;
-        setIsLoadingTab(true);
-        (async () => {
-            try {
-                const res = await searchRepresentativeRequests({
-                    ...searchParamsState,
-                    page,
-                    pageSize: perPage,
-                });
-                setRequestsData({
-                    items: res.results,
-                    pagination: {
-                        page,
-                        pageSize: perPage,
-                        totalItems: res.totalItems,
-                        totalPages: res.totalPages,
-                    },
-                });
-            } finally {
-                setIsLoadingTab(false);
-            }
-        })();
-    }, [activeTab, page, searchParamsState]);
-
-    // Загрузка достижений
+    // загрузка достижений
     useEffect(() => {
         if (activeTab !== "achievement") return;
         setIsLoadingTab(true);
-        (async () => {
-            try {
-                const r = await fetch(`/api/achievements?page=${page}&pageSize=${perPage}`);
-                const data = (await r.json()) as Paged<AchievementItem>;
-                setAchievementData(data);
-            } finally {
-                setIsLoadingTab(false);
-            }
-        })();
+        fetch(`/api/achievements?page=${page}&pageSize=${perPage}`)
+            .then((r) => r.json())
+            .then((json: Paged<AchievementItem>) => { setAchievementData(json); })
+            .finally(() => { setIsLoadingTab(false); });
     }, [activeTab, page]);
 
     const handleSearch = (params: SearchParams) => {
@@ -190,7 +183,7 @@ export default function AdministratorPage() {
     };
 
     if (isLoading) {
-        return <CircularProgress size="lg" />;
+        return <CircularProgress aria-label="Loading..." size="lg" />;
     }
     if (!isAuthenticated) {
         return null;
@@ -212,6 +205,17 @@ export default function AdministratorPage() {
                                 currentPage: page,
                             }}
                             onPageChangeAction={setPage}
+                        />
+                    )}
+
+                    {activeTab === "requests" && (
+                        <MainCards<RepresentativeRequestItem>
+                            isLoading={isLoadingTab}
+                            pageItems={requestsData?.items ?? []}
+                            totalPages={requestsData?.pagination.totalPages ?? 1}
+                            page={page}
+                            setPageAction={setPage}
+                            renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
                         />
                     )}
 
@@ -237,18 +241,16 @@ export default function AdministratorPage() {
                         />
                     )}
 
-                    {activeTab === "requests" && (
-                        <MainCards<RepresentativeRequestItem>
+                    {activeTab === "achievement" && (
+                        <MainCards<AchievementItem>
                             isLoading={isLoadingTab}
-                            pageItems={requestsData?.items ?? []}
-                            totalPages={requestsData?.pagination.totalPages ?? 1}
+                            pageItems={achievementData?.items ?? []}
+                            totalPages={achievementData?.pagination.totalPages ?? 1}
                             page={page}
                             setPageAction={setPage}
-                            renderCardsAction={(items) => <CompetitionCards paginatedData={items} />}
+                            renderCardsAction={(items) => <AchievementCards paginatedData={items} />}
                         />
                     )}
-
-                    {activeTab === "achievement" && <AchievementCards paginatedData={achievementData?.items ?? []} />}
 
                     {activeTab === "statistics" && <Statistics />}
                 </div>

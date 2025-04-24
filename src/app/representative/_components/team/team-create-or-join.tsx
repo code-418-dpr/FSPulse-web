@@ -18,16 +18,6 @@ interface Paged<T> {
     };
 }
 
-function createTeam(): TeamWithMembersItem {
-    return {
-        name: "Код 418",
-        leader: "Евтушенко Сергей",
-        members: ["Якубенко Вадим", "Коржов Антон", "Панков Егор", "Бубнов Гергий"],
-    };
-}
-
-const teamsWithMembers: TeamWithMembersItem[] = Array.from({ length: 13 }, createTeam);
-
 export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
     const [teamsData, setTeamsData] = useState<Paged<TeamWithMembersItem> | null>(null);
     const [isTeamsLoading, setIsTeamsLoading] = useState(false);
@@ -40,14 +30,24 @@ export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
         const teamsOnEvent = await getTeamsByEvent(eventId);
 
         // Объединяем тестовые данные с реальными командами
-        const allTeams = [
-            ...teamsOnEvent.map((team) => ({
+        const allTeams = teamsOnEvent.map((team) => {
+            // Находим капитана (isLeader: true)
+            const captain = team.athletes.find((a) => a.isLeader)?.athlete;
+
+            // Получаем всех участников (исключая капитана)
+            const members = team.athletes.filter((a) => !a.isLeader).map((a) => a.athlete);
+
+            return {
+                id: team.id,
                 name: team.name,
-                leader: "Капитан команды", // Можно получить из team.athletes
-                members: [], // Можно заполнить дополнительным запросом
-            })),
-            ...teamsWithMembers,
-        ];
+                isReady: team.isReady,
+                about: team.about ?? "",
+                leader: captain
+                    ? `${captain.user.lastname || "Неизвестно"} ${captain.user.firstname || ""}`
+                    : "Капитан не назначен",
+                members: members.map((m) => `${m.user.lastname || "Анонимный участник"} ${m.user.firstname || ""}`),
+            };
+        });
 
         const totalItems = allTeams.length;
         const totalPages = Math.ceil(totalItems / pageSize);
@@ -88,7 +88,9 @@ export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
                     },
                 });
             })
-            .finally(() => { setIsTeamsLoading(false); });
+            .finally(() => {
+                setIsTeamsLoading(false);
+            });
     }, [handleCreateValues]);
 
     return (

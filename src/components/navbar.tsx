@@ -104,7 +104,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
 
             {isAuthenticated && user?.role === "representative" && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["requests", "events", "team", "achievement"] as Tab[]).map((tab) => (
+                    {(["events", "requests", "team", "achievement"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
@@ -118,8 +118,8 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                     {
                                         requests: "Заявки",
                                         events: "Мероприятия",
-                                        team: "Сборная",
-                                        achievement: "Достижения",
+                                        team: "Спортсмены",
+                                        achievement: "Статистика",
                                         representative: "Представительства",
                                     }[tab]
                                 }
@@ -130,7 +130,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
             )}
             {isAuthenticated && user?.role === "admin" && (
                 <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-                    {(["representative", "requests", "events", "team"] as Tab[]).map((tab) => (
+                    {(["events", "representative", "requests", "team"] as Tab[]).map((tab) => (
                         <NavbarItem key={tab}>
                             <Link
                                 color="foreground"
@@ -142,11 +142,11 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                             >
                                 {
                                     {
-                                        requests: "Заявки",
+                                        requests: "Заявки на мероприятия",
                                         events: "Мероприятия",
-                                        team: "Сборная",
+                                        team: "Статистика",
                                         achievement: "Достижения",
-                                        representative: "Представительства",
+                                        representative: "Заявки на представительства",
                                     }[tab]
                                 }
                             </Link>
