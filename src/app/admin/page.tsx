@@ -22,6 +22,8 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { RequestStatus } from "../generated/prisma";
 import { RepresentativeTableWithPagination } from "./_components/representative-table";
 import { Statistics } from "./_components/statistics/statistics";
+import ModalOrDrawer from "@/components/modal-or-drawer";
+import CompetitionCreateForm from "@/components/competition/competition-create-form";
 
 interface Paged<T> {
     items: T[];
@@ -38,6 +40,7 @@ export default function AdministratorPage() {
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
         requestStatus: RequestStatus.APPROVED,
     });
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
     const [isRequestsLoading, setIsRequestsLoading] = useState(false);
@@ -49,7 +52,6 @@ export default function AdministratorPage() {
     const [isTeamLoading, setIsTeamLoading] = useState(false);
     // const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
     // const [isAchievementLoading, setIsAchievementLoading] = useState(false);
-    const { onOpen } = useDisclosure();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -269,6 +271,9 @@ export default function AdministratorPage() {
                                 <Icon icon="iconoir:plus" width={50} height={50} />
                             </Button>
                         </div>
+                        <ModalOrDrawer label="Создание соревнования" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                                                    <CompetitionCreateForm />
+                                                </ModalOrDrawer>
                     </>
                 )}
                 {activeTab === "events" && (

@@ -5,7 +5,7 @@ import { z } from "zod";
 import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 
-import { AgeGroup, EventLevel } from "@/app/generated/prisma";
+import { AgeGroup, EventLevel, RequestStatus } from "@/app/generated/prisma";
 import { MultiSelectAgeGroups, MultiSelectAutocomplete } from "@/components/multiselect-autocomplete";
 import { getAgeGroupsByDiscipline } from "@/data/age-group";
 import { getDisciplines } from "@/data/discipline";
@@ -160,6 +160,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 endRegistration: endRegDate,
                 start: startDate,
                 end: endDate,
+                requestStatus: (user?.role === "admin" ? RequestStatus.APPROVED : RequestStatus.PENDING),
                 minAge: formValues.minAge,
                 maxAge: formValues.maxAge,
                 minTeamParticipantsCount,
@@ -174,7 +175,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
 
             await createCompetitionRequest(requestData);
 
-            setFormError("Данные успешно отправлены! Форма остаётся открытой для новых записей.");
+            setFormError("Заявка успешно создана!");
         } catch (error) {
             if (error instanceof Error) {
                 setFormError(error.message);
@@ -339,7 +340,8 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                                     type="number"
                                     variant="bordered"
                                     {...field}
-                                    value={field.value.toString()}
+                                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                                    value={field.value?.toString() || ''} // Добавляем проверку на undefined
                                     onChange={(e) => { 
                                         const value = parseInt(e.target.value) || 0;
                                         field.onChange(value);
@@ -357,7 +359,8 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                                     type="number"
                                     variant="bordered"
                                     {...field}
-                                    value={field.value.toString()}
+                                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                                    value={field.value?.toString() || ''} // Добавляем проверку на undefined
                                     onChange={(e) => { 
                                         const value = parseInt(e.target.value) || 0;
                                         field.onChange(value);
@@ -421,18 +424,17 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                         }}
                     />
 
-                    {formError && <div className="text-danger-500 text-center text-sm">{formError}</div>}
-                    <Button type="submit" color="success" isLoading={isLoading} fullWidth className="mt-6">
+                    {formError && (
+                        <div
+                            className={`text-center text-sm ${
+                                formError.includes("успешно") ? "text-success" : "text-danger-500"
+                            }`}
+                        >
+                            {formError}
+                        </div>
+                    )}
+                    <Button color="success" isLoading={isLoading} fullWidth className="mt-6" onPress={() => void handleConfirm()}>
                         Зарегистрировать соревнование
-                    </Button>
-                    <Button
-                        type="button"
-                        color="primary"
-                        onPress={() => void handleConfirm()}
-                        isLoading={isLoading}
-                        fullWidth
-                    >
-                        Сохранить и добавить новое
                     </Button>
                 </div>
             </form>

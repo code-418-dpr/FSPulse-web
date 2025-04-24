@@ -228,6 +228,7 @@ export interface CompetitionRequestData {
     endRegistration: Date;
     start: Date;
     end: Date;
+    requestStatus: RequestStatus;
     minAge: number;
     maxAge: number;
     minTeamParticipantsCount: number;
@@ -249,7 +250,6 @@ export const createCompetitionRequest = async (data: CompetitionRequestData) => 
             maxAge, 
             maxParticipantsCount,
             cover: Buffer.from(cover),
-            requestStatus: "PENDING",
             level: eventData.level,
             discipline: { connect: { id: eventData.discipline } },
             isPersonalFormatAllowed: false,
@@ -271,7 +271,6 @@ export const createCompetitionRequest = async (data: CompetitionRequestData) => 
                       }
                     : undefined,
             awards: [165, 145, 120, 100], // Инициализируем пустым массивом, если нужно
-            applicationTime: new Date(), // Добавляем текущую дату
         },
         include: {
             discipline: true,
