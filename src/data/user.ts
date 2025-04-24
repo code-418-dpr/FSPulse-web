@@ -1,6 +1,6 @@
 "use server";
 
-import { Prisma, User } from "@/app/generated/prisma";
+import { Prisma, SportsCategory, User } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
 
 export const getAthletes = async () => {
@@ -17,4 +17,54 @@ export const seedUsers = async (users: Prisma.UserCreateInput[]) => {
         results.push(await prisma.user.create({ data: user }));
     }
     return results;
+};
+
+export const findAthleteById = async (athleteId: string) => {
+    return prisma.athlete.findUnique({
+        where: {
+            id: athleteId,
+        },
+        include: {
+            user: true,
+            skills: true,
+        },
+    });
+};
+
+export interface AthleteSpecificData {
+    lastname: string;
+    firstname: string;
+    middlename?: string | null;
+    email: string;
+    phoneNumber: string;
+    regionId: string;
+    birthDate: string;
+    address: string;
+    about?: string | undefined | null;
+    sportCategory?: SportsCategory | undefined;
+}
+
+export const alterAthleteById = async (athlete: AthleteSpecificData, athleteId: string) => {
+    return prisma.athlete.update({
+        where: { id: athleteId },
+        data: {
+            birthDate: new Date(athlete.birthDate),
+            address: athlete.address,
+            about: athlete.about,
+            sportCategory: athlete.sportCategory,
+            user: {
+                update: {
+                    lastname: athlete.lastname,
+                    firstname: athlete.firstname,
+                    middlename: athlete.middlename,
+                    phoneNumber: athlete.phoneNumber,
+                    email: athlete.email,
+                    regionId: athlete.regionId,
+                },
+            },
+        },
+        include: {
+            user: true,
+        },
+    });
 };

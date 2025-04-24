@@ -16,11 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const userSchema = baseSpokesmanSchema
     .extend({
-        password: z
-            .string()
-            .min(6, "Пароль должен содержать минимум 6 символов")
-            .regex(/[A-Z]/, "Пароль должен содержать хотя бы одну заглавную букву")
-            .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру"),
+        password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
         passwordRepeat: z.string(),
     })
     .refine((data) => data.password === data.passwordRepeat, {

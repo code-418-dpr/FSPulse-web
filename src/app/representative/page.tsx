@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
+import { Statistics } from "@/app/representative/_components/statistics/statistics";
 import { MainCards } from "@/app/representative/_components/main-cards";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
@@ -159,16 +160,13 @@ export default function RequestsPage() {
 
     useEffect(() => {
         if (activeTab !== "achievement") return;
-        setIsTeamLoading(true);
-        void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
+        setIsAchievementLoading(true);
+        void fetch(`/api/achievements?page=${page}&pageSize=${perPage}`)
             .then((r) => r.json())
-            .then((json: Paged<AchievementItem>) => {
-                setAchievementData(json);
-            })
-            .finally(() => {
-                setIsAchievementLoading(false);
-            });
+            .then((json: Paged<AchievementItem>) => { setAchievementData(json); })
+            .finally(() => { setIsAchievementLoading(false); });
     }, [activeTab, page]);
+
 
     const compPageItems = requestsData?.items ?? [];
     const totalCompPages = requestsData?.pagination.page ?? 1;
@@ -249,15 +247,11 @@ export default function RequestsPage() {
                 )}
 
                 {activeTab === "achievement" && (
-                    <MainCards<AchievementItem>
-                        isLoading={isAchievementLoading}
-                        pageItems={achievementPageItems}
-                        totalPages={totalAchievementPages}
-                        page={page}
-                        setPageAction={setPage}
-                        renderCardsAction={(items) => <AchievementCards paginatedData={items} />}
-                    />
-                )}
+                        <>
+                            <AchievementCards paginatedData={achievementData?.items ?? []} />
+                            <Statistics />
+                        </>
+                    )}
             </div>
 
             <FooterElement />
