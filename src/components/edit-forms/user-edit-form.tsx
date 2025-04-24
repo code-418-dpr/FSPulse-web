@@ -194,7 +194,7 @@ export default function UserEditForm({ className }: React.ComponentProps<"form">
                             label="Отчество"
                             type="text"
                             variant="bordered"
-                            value={field.value}
+                            value={field.value ?? ""}
                             onChange={field.onChange}
                             isInvalid={!!errors.middlename}
                             errorMessage={errors.middlename?.message}
