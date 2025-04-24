@@ -246,8 +246,8 @@ export const createCompetitionRequest = async (data: CompetitionRequestData) => 
     return prisma.event.create({
         data: {
             ...eventData,
-            minAge, 
-            maxAge, 
+            minAge,
+            maxAge,
             maxParticipantsCount,
             cover: Buffer.from(cover),
             level: eventData.level,
@@ -256,10 +256,10 @@ export const createCompetitionRequest = async (data: CompetitionRequestData) => 
             files:
                 files.length > 0
                     ? {
-                        create: data.files?.map((file) => ({
-                            name: file.name,
-                            content: Buffer.from(file.content), // Конвертируем Uint8Array в Buffer
-                        })),
+                          create: data.files?.map((file) => ({
+                              name: file.name,
+                              content: Buffer.from(file.content), // Конвертируем Uint8Array в Buffer
+                          })),
                       }
                     : undefined,
             representatives:
@@ -387,4 +387,17 @@ export const setResultsForEvent = async (resultsArray: { teamId: string; score: 
             }),
         ),
     );
+};
+
+export const registerAthleteForEvent = async (athleteId: string, eventId: string) => {
+    return prisma.athleteOfPersonalEvent.create({
+        data: {
+            athleteId,
+            eventId,
+        },
+        include: {
+            athlete: true, // Если нужно включить данные атлета
+            event: true, // Если нужно включить данные события
+        },
+    });
 };

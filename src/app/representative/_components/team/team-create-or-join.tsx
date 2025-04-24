@@ -96,7 +96,7 @@ export default function TeamCreateOrJoin({ eventId }: { eventId: string }) {
     return (
         <Tabs aria-label="RegisterForms" className="w-full" fullWidth>
             <Tab key="create" title="Создать команду">
-                <TeamCreateForm eventId={eventId} />
+                <TeamCreateForm eventId={eventId} isPersonalAllow />
             </Tab>
             <Tab key="join" title="Присоединиться к команде">
                 <div className="container mx-auto w-full flex-1 px-3 py-4">

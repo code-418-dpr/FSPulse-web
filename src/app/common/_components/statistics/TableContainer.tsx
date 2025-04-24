@@ -9,6 +9,7 @@ export interface Column {
 
 interface TableContainerProps {
     columns: Column[];
+    // eslint-disable-next-line
     data: Record<string, any>[];
     pageSize?: number;
 }

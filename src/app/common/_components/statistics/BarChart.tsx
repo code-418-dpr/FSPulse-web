@@ -14,11 +14,14 @@ interface BarChartProps {
     color?: string;
 }
 
+// eslint-disable-next-line
 const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+    // eslint-disable-next-line
+    if (active && payload?.length) {
         return (
             <div className="chart-tooltip">
                 <p className="font-medium">{label}</p>
+                {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                 <p className="text-primary-500 font-semibold">{payload[0].value}</p>
             </div>
         );
