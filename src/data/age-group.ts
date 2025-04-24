@@ -16,3 +16,10 @@ export const seedAgeGroups = async (ageGroups: Prisma.AgeGroupCreateInput[]) => 
         skipDuplicates: true,
     });
 };
+
+export const getAgeGroupsByDiscipline = async (disciplineId: string) => {
+    return await prisma.ageGroupOfDiscipline.findMany({
+        where: { disciplineId },
+        include: { ageGroup: true },
+    });
+};

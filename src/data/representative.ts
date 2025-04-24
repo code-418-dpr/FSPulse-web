@@ -65,6 +65,38 @@ export async function getRepresentativeById(id: string) {
         },
     });
 }
+export async function getRepresentativeByUserId(userId: string) {
+    return prisma.representative.findMany({
+        where: {
+            user: {
+                id: userId,
+            },
+        },
+        include: {
+            user: {
+                include: {
+                    region: true,
+                },
+            },
+        },
+    });
+}
+export async function getRepresentativesByRegionId(regionId: string) {
+    return prisma.representative.findMany({
+        where: {
+            user: {
+                regionId: regionId,
+            },
+        },
+        include: {
+            user: {
+                include: {
+                    region: true,
+                },
+            },
+        },
+    });
+}
 export async function updateRepresentativeStatus(id: string, status: "APPROVED" | "DECLINED", comment?: string) {
     return prisma.representative.update({
         where: { id },

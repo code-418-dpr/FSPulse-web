@@ -58,8 +58,8 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
         start?: Date;
         end?: Date;
     }>({
-        start: today(getLocalTimeZone()).subtract({ days: 7 }).toDate(getLocalTimeZone()),
-        end: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
+        start: new Date("2019-01-01"), // 1 января 2019 года
+        end: today(getLocalTimeZone()).add({ days: 7 }).toDate(getLocalTimeZone()), // Сегодня + 7 дней
     });
     const [isOnline, setIsOnline] = useState(false);
     const [isTeamFormatAllowed, setIsTeamFormatAllowed] = useState(false);

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
+import TeamCreateOrJoin from "@/app/representative/_components/team/team-create-or-join";
 import EventResultsForm from "@/components/event/event-results-form";
 // import dynamic from "next/dynamic";
 
@@ -36,7 +37,8 @@ export default function EventDetails({ eventId }: Props) {
     const [event, setEvent] = useState<EventItemForId | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isResultsOpen, onOpen: onResultsOpen, onOpenChange: onResultsOpenChange } = useDisclosure();
+    const { isOpen: isIndividOpen, onOpen: onIndividOpen, onOpenChange: onIndividOpenChange } = useDisclosure();
 
     const { role } = useAuth();
 
@@ -268,28 +270,45 @@ export default function EventDetails({ eventId }: Props) {
                         </Accordion>
                     </div>
                     <GoogleCalendarButton event={event} />
+                    {role === "athlete" ? (
+                        <Button className="mt-3 w-full" aria-label="Results" onPress={onIndividOpen} size="lg">
+                            Зарегистрироваться
+                        </Button>
+                    ) : (
+                        <></>
+                    )}
+                    <ModalOrDrawer
+                        label="Зарегистрироваться"
+                        isOpen={isIndividOpen}
+                        onOpenChangeAction={onIndividOpenChange}
+                    >
+                        <TeamCreateOrJoin eventId={event.id} />
+                    </ModalOrDrawer>
                 </Tab>
 
                 <Tab key="participants" title="Участники" className="w-full">
                     {/* Контент для вкладки участников */}
-                    <TeamsOnEvent eventId={event.id} />
+                    <TeamsOnEvent isPersonalAllow={event.isPersonalFormatAllowed} eventId={event.id} />
                 </Tab>
 
                 <Tab key="results" title="Итоги" className="w-full">
                     {/* Контент для вкладки итогов */}
                     {event.endRegistration < new Date() ? (
                         role === "representative" ? (
-                            <p>Подвести итоги</p>
+                            <Button className="w-full" aria-label="Results" onPress={onResultsOpen} size="lg">
+                                Подвести итоги
+                            </Button>
                         ) : (
                             <p>Скоро мы подведём итоги</p>
                         )
                     ) : (
                         <p>Соревнование ещё не окончено</p>
                     )}
-                    <Button className="w-full" aria-label="Results" onPress={onOpen} size="lg">
-                        Подвести итоги
-                    </Button>
-                    <ModalOrDrawer label="Распределение баллов" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                    <ModalOrDrawer
+                        label="Распределение баллов"
+                        isOpen={isResultsOpen}
+                        onOpenChangeAction={onResultsOpenChange}
+                    >
                         <EventResultsForm eventId={event.id} />
                     </ModalOrDrawer>
                 </Tab>

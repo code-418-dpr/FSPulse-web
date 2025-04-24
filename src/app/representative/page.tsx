@@ -198,8 +198,12 @@ export default function RequestsPage() {
         setIsAchievementLoading(true);
         void fetch(`/api/achievements?page=${page}&pageSize=${perPage}`)
             .then((r) => r.json())
-            .then((json: Paged<AchievementItem>) => { setAchievementData(json); })
-            .finally(() => { setIsAchievementLoading(false); });
+            .then((json: Paged<AchievementItem>) => {
+                setAchievementData(json);
+            })
+            .finally(() => {
+                setIsAchievementLoading(false);
+            });
     }, [activeTab, page]);
      */
 

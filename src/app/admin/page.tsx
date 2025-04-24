@@ -7,14 +7,16 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MainCards } from "@/app/admin/_components/main-cards";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
+import CompetitionCreateForm from "@/components/competition/competition-create-form";
 import EventCards from "@/components/event/event-cards";
 import FooterElement from "@/components/footer";
+import ModalOrDrawer from "@/components/modal-or-drawer";
 import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
 import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
-import { EventItem, Tab, TeamItem } from "@/types";
+import { AthleteItem, EventItem, Tab, TeamItem } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { Button, CircularProgress, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -38,6 +40,7 @@ export default function AdministratorPage() {
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
         requestStatus: RequestStatus.APPROVED,
     });
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
     const [isRequestsLoading, setIsRequestsLoading] = useState(false);
@@ -45,11 +48,10 @@ export default function AdministratorPage() {
     const [activeTab, setActiveTab] = useState<Tab>("representative");
     const [eventsData, setEventsData] = useState<Paged<EventItem> | null>(null);
     const [isEventLoading, setIsEventLoading] = useState(false);
-    const [teamData, setTeamData] = useState<Paged<TeamItem> | null>(null);
+    const [teamData, setTeamData] = useState<Paged<AthleteItem> | null>(null);
     const [isTeamLoading, setIsTeamLoading] = useState(false);
     // const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
     // const [isAchievementLoading, setIsAchievementLoading] = useState(false);
-    const { onOpen } = useDisclosure();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -269,6 +271,9 @@ export default function AdministratorPage() {
                                 <Icon icon="iconoir:plus" width={50} height={50} />
                             </Button>
                         </div>
+                        <ModalOrDrawer label="Создание соревнования" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                            <CompetitionCreateForm />
+                        </ModalOrDrawer>
                     </>
                 )}
                 {activeTab === "events" && (
@@ -283,7 +288,7 @@ export default function AdministratorPage() {
                 )}
 
                 {activeTab === "team" && (
-                    <MainCards<TeamItem>
+                    <MainCards<AthleteItem>
                         isLoading={isTeamLoading}
                         pageItems={teamPageItems}
                         totalPages={totalTeamPages}

@@ -4,18 +4,18 @@ import { useState } from "react";
 
 import TeamDetails from "@/app/representative/_components/team/team-details";
 import ModalOrDrawer from "@/components/modal-or-drawer";
-import { TeamItem } from "@/types";
-import { Card, CardBody, Chip, Image, useDisclosure } from "@heroui/react";
+import { AthleteItem } from "@/types";
+import { Card, CardBody, CardHeader, Chip, useDisclosure } from "@heroui/react";
 
 interface Props {
-    paginatedData: TeamItem[];
+    paginatedData: AthleteItem[];
 }
 
 export default function TeamCards({ paginatedData }: Props) {
-    const [selected, setSelected] = useState<TeamItem | null>(null);
+    const [selected, setSelected] = useState<AthleteItem | null>(null);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    const handleClick = (c: TeamItem) => {
+    const handleClick = (c: AthleteItem) => {
         setSelected(c);
         onOpen();
     };
@@ -23,33 +23,53 @@ export default function TeamCards({ paginatedData }: Props) {
     return (
         <>
             {selected && (
-                <ModalOrDrawer label="Участник сборной" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
-                    <TeamDetails team={selected} />
+                <ModalOrDrawer label="Спортсмен" isOpen={isOpen} onOpenChangeAction={onOpenChange}>
+                    <TeamDetails athlete={selected} />
                 </ModalOrDrawer>
             )}
             {paginatedData.map((c, idx) => (
-                <Card
+                <div
                     key={idx}
-                    className="cursor-pointer transition-shadow hover:shadow-lg"
-                    onPress={() => {
+                    onClick={() => {
                         handleClick(c);
-                    }} // switched to onPress
+                    }}
                 >
-                    <CardBody className="space-y-4">
-                        <Image alt={c.lastname} src={c.imageBase64} className="w-full rounded-xl object-cover" />
-                        <div className="space-y-2">
-                            <h3 className="text-2xl font-bold">
-                                {c.lastname} {c.firstname}
-                            </h3>
-                            <div className="grid grid-cols-2 pt-2">
-                                <Chip color="warning" variant="solid">
-                                    {c.status}
-                                </Chip>
+                    <Card key={`card-${idx}`} className="cursor-pointer transition-shadow hover:shadow-lg">
+                        <CardHeader>
+                            {c.lastname} {c.firstname} {c.middlename ?? ""}
+                        </CardHeader>
+                        <CardBody className="space-y-4">
+                            <div className="grid grid-cols-2 space-y-2 pt-2">
+                                <p className="text-sm">Дата рождения:</p>
                                 <p className="pt-1 text-right text-sm">{c.birthday}</p>
+
+                                <p>Спортивная категория:</p>
+                                <p className="pt-1 text-right text-sm">{c.sportCategory}</p>
+
+                                <Chip
+                                    className="col-span-2 justify-self-center"
+                                    color={
+                                        c.membership === "MAIN"
+                                            ? "primary"
+                                            : c.membership === "RESERVE"
+                                                ? "secondary"
+                                                : c.membership === "NONE"
+                                                    ? "warning"
+                                                    : "danger"
+                                    }
+                                >
+                                    {c.membership === "MAIN"
+                                        ? "Основной состав"
+                                        : c.membership === "RESERVE"
+                                            ? "Резервный состав"
+                                            : c.membership === "NONE"
+                                                ? "Не член сборной"
+                                                : "Неизвестно"}
+                                </Chip>
                             </div>
-                        </div>
-                    </CardBody>
-                </Card>
+                        </CardBody>
+                    </Card>
+                </div>
             ))}
         </>
     );
