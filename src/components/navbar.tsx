@@ -117,7 +117,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                 {
                                     {
                                         requests: "Заявки",
-                                        events: "Соревнования",
+                                        events: "Мероприятия",
                                         team: "Сборная",
                                         achievement: "Достижения",
                                         representative: "Представительства",
@@ -143,7 +143,7 @@ export default function NavbarElement({ activeTab, setActiveTabAction }: NavbarP
                                 {
                                     {
                                         requests: "Заявки",
-                                        events: "Соревнования",
+                                        events: "Мероприятия",
                                         team: "Сборная",
                                         achievement: "Достижения",
                                         representative: "Представительства",

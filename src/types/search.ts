@@ -2,13 +2,19 @@ import { Discipline, EventLevel, RequestStatus } from "@/app/generated/prisma";
 
 export interface SearchParams {
     query?: string;
-    disciplineId?: string; // Изменили на одиночное значение
-    level?: EventLevel; // Изменили на одиночное значение
-    requestStatus?: RequestStatus; // Изменили на одиночное значение
+    disciplineId?: string;
+    level?: EventLevel;
+    requestStatus?: RequestStatus;
     minApplicationTime?: Date;
     maxApplicationTime?: Date;
+    minStartTime?: Date;
+    maxStartTime?: Date;
+    minAge?: number;
+    maxAge?: number;
+    isOnline?: boolean;
+    isTeamFormatAllowed?: boolean;
+    isPersonalFormatAllowed?: boolean;
 }
-
 export interface Paged<T> {
     results: T[];
     totalItems: number;
@@ -40,7 +46,7 @@ export interface RepresentativeRequestItem {
 export interface SearchRepresentativeEventsParams {
     page: number;
     pageSize: number;
-    representativeId: string;
+    representativeId?: string;
     query?: string;
     disciplineId?: string;
     minStartTime?: Date;
@@ -52,3 +58,48 @@ export interface SearchRepresentativeEventsParams {
     isTeamFormatAllowed?: boolean;
     isPersonalFormatAllowed?: boolean;
 }
+
+
+export interface BaseSearchParams {
+    query?: string;
+    disciplineId?: string;
+    level?: EventLevel;
+}
+
+export interface DateRangeParams {
+    minStartTime?: Date;
+    maxStartTime?: Date;
+    minApplicationTime?: Date;
+    maxApplicationTime?: Date;
+}
+
+export interface FormatParams {
+    isOnline?: boolean;
+    isTeamFormatAllowed?: boolean;
+    isPersonalFormatAllowed?: boolean;
+}
+
+export interface AgeParams {
+    minAge?: number;
+    maxAge?: number;
+}
+
+export interface PaginationParams {
+    page: number;
+    pageSize: number;
+}
+
+export interface RepresentativeParams {
+    representativeId?: string;
+}
+
+export interface RequestStatusParams {
+    requestStatus?: RequestStatus;
+}
+export type UniversalSearchParams = BaseSearchParams &
+    Partial<DateRangeParams> &
+    Partial<FormatParams> &
+    Partial<AgeParams> &
+    Partial<PaginationParams> &
+    Partial<RepresentativeParams> &
+    Partial<RequestStatusParams>;

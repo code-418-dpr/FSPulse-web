@@ -12,7 +12,7 @@ import CompetitionCards from "@/components/competition/competition-cards";
 import FooterElement from "@/components/footer";
 import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
-import { searchRepresentativeRequests } from "@/data/event";
+import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
 import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
 import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
@@ -36,7 +36,7 @@ interface Paged<T> {
 export default function AdministratorPage() {
     const { isAuthenticated, isLoading, user } = useAuth();
     const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
-        requestStatus: RequestStatus.PENDING,
+        requestStatus: RequestStatus.APPROVED,
     });
     const [requestsData, setRequestsData] = useState<Paged<RepresentativeRequestItem> | null>(null);
     const [representativesData, setRepresentativesData] = useState<Paged<RepresentativeItem> | null>(null);
@@ -111,16 +111,36 @@ export default function AdministratorPage() {
     // load events when on "events"
     useEffect(() => {
         if (activeTab !== "events") return;
-        setIsEventLoading(true);
-        void fetch(`/api/events?page=${page}&pageSize=${perPage}`)
-            .then((r) => r.json())
-            .then((json: Paged<EventItem>) => {
-                setEventsData(json);
-            })
-            .finally(() => {
+    
+        const loadEvents = async () => {
+            setIsEventLoading(true);
+            try {
+                console.log("Параметры: ", searchParamsState);
+                const result = await searchRepresentativeEvents({
+                    ...searchParamsState,
+                    page,
+                    pageSize: perPage,
+                });
+                
+                console.log("Результат: ", result);
+                setEventsData({
+                    items: result.results,
+                    pagination: {
+                        page,
+                        pageSize: perPage,
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    },
+                });
+            } catch (error) {
+                console.error("Error loading events:", error);
+            } finally {
                 setIsEventLoading(false);
-            });
-    }, [activeTab, page]);
+            }
+        };
+    
+        void loadEvents();
+    }, [activeTab, page, searchParamsState, user?.id]);
 
     useEffect(() => {
         if (activeTab !== "team") return;

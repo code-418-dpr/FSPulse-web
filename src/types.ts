@@ -1,3 +1,5 @@
+import { EventLevel, RequestStatus } from "./app/generated/prisma";
+
 export type Tab = "requests" | "events" | "team" | "achievement" | "representative";
 
 export interface CompetitionItem {
@@ -15,9 +17,14 @@ export interface CompetitionItem {
 export interface EventItem {
     id: string;
     name: string;
-    start: string;
-    status: string;
-    imageBase64: string;
+    cover: Uint8Array;
+    requestStatus: RequestStatus;
+    level: EventLevel;
+    applicationTime: Date;
+    startRegistration: Date;
+    endRegistration: Date;
+    start: Date;
+    end: Date;
 }
 
 export interface TeamItem {

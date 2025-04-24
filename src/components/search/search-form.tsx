@@ -16,7 +16,6 @@ import {
     DropdownTrigger,
     Form,
     Input,
-    Switch,
 } from "@heroui/react";
 import { type Selection } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
@@ -27,7 +26,7 @@ interface SearchFormProps {
 }
 export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
     const [query, setQuery] = useState("");
-    const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.PENDING);
+    const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.APPROVED);
     const [selectedDiscipline, setSelectedDiscipline] = React.useState<string>();
     const [selectedLevel, setSelectedLevel] = React.useState<string>();
     const [selectedDateRange, setSelectedDateRange] = useState<{
@@ -37,6 +36,9 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
         start: today(getLocalTimeZone()).subtract({ days: 7 }).toDate(getLocalTimeZone()),
         end: today(getLocalTimeZone()).toDate(getLocalTimeZone()),
     });
+    const [isOnline, setIsOnline] = useState(false);
+    const [isTeamFormatAllowed, setIsTeamFormatAllowed] = useState(false);
+    const [isPersonalFormatAllowed, setIsPersonalFormatAllowed] = useState(false);
     const [disciplines, setDisciplines] = React.useState<{ id: string; name: string }[]>([]);
     const [levels] = React.useState(Object.values(EventLevel));
     const [isLoading, setIsLoading] = useState(false);
@@ -45,14 +47,26 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
         e.preventDefault();
         setIsLoading(true);
 
-        const searchParams: SearchParams = {
+        let searchParams: SearchParams = {
             query,
             disciplineId: selectedDiscipline,
             level: selectedLevel as EventLevel,
             requestStatus: selectedStatus as RequestStatus,
+        };
+        if(tabType === "requests"){ searchParams = {
+            ...searchParams,
             minApplicationTime: selectedDateRange.start,
             maxApplicationTime: selectedDateRange.end,
-        };
+        } }
+        if(tabType === "events"){
+            searchParams = {
+                ...searchParams,
+                minStartTime: selectedDateRange.start,
+                maxStartTime: selectedDateRange.end,
+                isOnline,
+                isTeamFormatAllowed,
+                isPersonalFormatAllowed,
+        }}
 
         onSubmitAction(searchParams);
         setIsLoading(false);
@@ -247,10 +261,6 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                             <label className="mb-2 block text-sm font-medium">Даты проведения</label>
                             <DateRangePicker
                                 className="w-full"
-                                defaultValue={{
-                                    start: today(getLocalTimeZone()).subtract({ days: 7 }),
-                                    end: today(getLocalTimeZone()),
-                                }}
                                 onChange={(range) => {
                                     const timeZone = getLocalTimeZone();
                                     setSelectedDateRange({
@@ -289,9 +299,9 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                             },
                             true,
                         )}
-                        <Switch defaultSelected>Онлайн</Switch>
-                        <Checkbox defaultSelected>Командный формат</Checkbox>
-                        <Checkbox>Индивидуальный формат</Checkbox>
+                        <Checkbox  isSelected={isOnline} onValueChange={setIsOnline}>Онлайн</Checkbox>
+                        <Checkbox isSelected={isTeamFormatAllowed} onValueChange={setIsTeamFormatAllowed}>Командный формат</Checkbox>
+                        <Checkbox isSelected={isPersonalFormatAllowed} onValueChange={setIsPersonalFormatAllowed}>Индивидуальный формат</Checkbox>
                     </>
                 )}
             </div>
