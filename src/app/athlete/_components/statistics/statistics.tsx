@@ -27,7 +27,7 @@ export function Statistics() {
     return (
         <div id="exportable-athlete" className="space-y-8">
             {/* Шапка + кнопка экспорта */}
-            <div className="flex items-center justify-between rounded bg-white p-6 shadow dark:bg-gray-800">
+            <div className="flex items-center justify-between rounded p-6 shadow">
                 <h1 className="text-2xl font-semibold">Моя статистика</h1>
                 <ExportPdfButton
                     exportId="exportable-athlete"

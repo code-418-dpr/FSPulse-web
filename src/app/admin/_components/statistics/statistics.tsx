@@ -52,7 +52,7 @@ export function Statistics() {
     return (
         <div id="statistics-box" className="space-y-8">
             {/* Шапка с кнопкой экспорта */}
-            <div className="flex items-center justify-between rounded bg-white p-6 shadow">
+            <div className="flex items-center justify-between rounded p-6 shadow">
                 <h2 className="text-2xl font-semibold">Статистика</h2>
                 <ExportPdfButton
                     exportId="statistics-box"

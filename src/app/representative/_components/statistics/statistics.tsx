@@ -1,4 +1,3 @@
-// src/app/representative/_components/statistics/statistics.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -17,8 +16,6 @@ import {
     repEventsByMonth,
     repRequestsByStatus,
 } from "@/mocks/statistics/representative";
-
-// src/app/representative/_components/statistics/statistics.tsx
 
 type RankingTab = "athletes" | "coaches";
 
@@ -39,7 +36,7 @@ export function Statistics() {
     return (
         <div id="representative-statistics" className="space-y-8">
             {/* Header + экспорт */}
-            <div className="flex items-center justify-between rounded bg-white p-6 shadow">
+            <div className="flex items-center justify-between rounded p-6 shadow">
                 <h2 className="text-2xl font-semibold">Статистика</h2>
                 <ExportPdfButton
                     exportId="representative-statistics"
