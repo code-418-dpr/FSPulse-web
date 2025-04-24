@@ -10,7 +10,26 @@ export const getTeams = async () => {
 
 export const getTeamsByEvent = async (eventId: string) => {
     return prisma.team.findMany({
-        where: { eventId: eventId },
+        where: { eventId },
+        include: {
+            athletes: {
+                include: {
+                    athlete: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    lastname: true,
+                                    firstname: true,
+                                    middlename: true,
+                                    email: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
         orderBy: { name: "asc" },
     });
 };
