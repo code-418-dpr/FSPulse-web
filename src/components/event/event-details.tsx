@@ -278,7 +278,7 @@ export default function EventDetails({ eventId }: Props) {
                         <></>
                     )}
                     <ModalOrDrawer
-                        label="Распределение баллов"
+                        label="Зарегистрироваться"
                         isOpen={isIndividOpen}
                         onOpenChangeAction={onIndividOpenChange}
                     >
@@ -295,16 +295,15 @@ export default function EventDetails({ eventId }: Props) {
                     {/* Контент для вкладки итогов */}
                     {event.endRegistration < new Date() ? (
                         role === "representative" ? (
-                            <p>Подвести итоги</p>
+                            <Button className="w-full" aria-label="Results" onPress={onResultsOpen} size="lg">
+                                Подвести итоги
+                            </Button>
                         ) : (
                             <p>Скоро мы подведём итоги</p>
                         )
                     ) : (
                         <p>Соревнование ещё не окончено</p>
                     )}
-                    <Button className="w-full" aria-label="Results" onPress={onResultsOpen} size="lg">
-                        Подвести итоги
-                    </Button>
                     <ModalOrDrawer
                         label="Распределение баллов"
                         isOpen={isResultsOpen}
