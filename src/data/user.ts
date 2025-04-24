@@ -38,7 +38,7 @@ export interface AthleteSpecificData {
     email: string;
     phoneNumber: string;
     regionId: string;
-    birthDate: Date;
+    birthDate: string;
     address: string;
     about?: string;
     sportCategory?: SportsCategory | undefined;
