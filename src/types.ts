@@ -1,4 +1,4 @@
-import { Discipline, EventLevel, RequestStatus } from "./app/generated/prisma";
+import { Discipline, EventLevel, Prisma, RequestStatus } from "./app/generated/prisma";
 
 export type Tab = "requests" | "events" | "team" | "achievement" | "representative";
 
@@ -13,7 +13,24 @@ export interface CompetitionItem {
     discipline: string;
     image: string;
 }
-
+export type EventItemForId = Prisma.EventGetPayload<{
+    include: {
+        representatives: {
+            include: {
+                representative: {
+                    include: {
+                        user: {
+                            include: {
+                                region: true;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        discipline: true;
+    };
+}>;
 export interface EventItem {
     id: string;
     name: string;

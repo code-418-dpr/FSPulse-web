@@ -2,7 +2,6 @@
 
 import { RequestStatus } from "@/app/generated/prisma";
 import prisma from "@/lib/prisma";
-import { EventItem } from "@/types";
 import { SearchRepresentativeEventRequestsParams, SearchRepresentativeEventsParams } from "@/types/search";
 
 export async function searchRepresentativeRequests(params: SearchRepresentativeEventRequestsParams) {
@@ -189,34 +188,26 @@ export async function getRepresentativeRequestById(id: string) {
     });
 }
 
-export async function getEventById(id: string): Promise<EventItem | null> {
+export async function getEventById(id: string) {
     return prisma.event.findUnique({
         where: { id },
-        select: {
-            id: true,
-            name: true,
-            cover: true,
-            requestStatus: true,
-            level: true,
-            applicationTime: true,
-            startRegistration: true,
-            endRegistration: true,
-            start: true,
-            end: true,
-            isOnline: true,
-            discipline: {
-                select: {
-                    id: true,
-                    name: true,
-                    minDuration: true,
-                    maxDuration: true,
-                    minTeamParticipantsCount: true,
-                    maxTeamParticipantsCount: true,
-                    isPersonalFormatAllowed: true,
+        include: {
+            representatives: {
+                include: {
+                    representative: {
+                        include: {
+                            user: {
+                                include: {
+                                    region: true,
+                                },
+                            },
+                        },
+                    },
                 },
             },
+            discipline: true,
         },
-    }) as Promise<EventItem | null>;
+    });
 }
 // —————————————————————————————————————————
 
