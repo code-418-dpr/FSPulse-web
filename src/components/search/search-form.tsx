@@ -24,10 +24,35 @@ interface SearchFormProps {
     onSubmitAction: (params: SearchParams) => void;
     tabType: Tab;
 }
+
+interface DropdownItem {
+    key: string;
+    name: string;
+}
+
+const SportsCategories: DropdownItem[] = [
+    { key: "HMS", name: "Заслуженный мастер спорта" },
+    { key: "MS", name: "Мастер спорта" },
+    { key: "A", name: "1 разряд" },
+    { key: "B", name: "2 разряд" },
+    { key: "C", name: "3 разряд" },
+    { key: "Ay", name: "1 юношеский разряд" },
+    { key: "By", name: "2 юношеский разряд" },
+    { key: "Cy", name: "3 юношеский разряд" },
+] as DropdownItem[];
+
+const Memberships: DropdownItem[] = [
+    { key: "MAIN", name: "Основной состав" },
+    { key: "RESERVE", name: "Резервный состав" },
+    { key: "NONE", name: "Не член сборной" },
+] as DropdownItem[];
+
 export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
     const [query, setQuery] = useState("");
     const [selectedStatus, setSelectedStatus] = React.useState<string>(RequestStatus.APPROVED);
     const [selectedDiscipline, setSelectedDiscipline] = React.useState<string>();
+    const [selectedSportsCategory, setSelectedSportsCategory] = React.useState<string>();
+    const [selectedMembership, setSelectedMembership] = React.useState<string>();
     const [selectedLevel, setSelectedLevel] = React.useState<string>();
     const [selectedDateRange, setSelectedDateRange] = useState<{
         start?: Date;
@@ -292,6 +317,40 @@ export function SearchForm({ onSubmitAction, tabType }: SearchFormProps) {
                         <Checkbox isSelected={isPersonalFormatAllowed} onValueChange={setIsPersonalFormatAllowed}>
                             Индивидуальный формат
                         </Checkbox>
+                    </>
+                )}
+                {tabType === "team" && (
+                    <>
+                        <div className="col-span-full">
+                            <Input
+                                label="ФИО"
+                                variant="bordered"
+                                fullWidth
+                                value={query}
+                                onChange={(e) => {
+                                    setQuery(e.target.value);
+                                }}
+                            />
+                        </div>
+                        {renderDropdown(
+                            "Статус нахождения в составе",
+                            Memberships.map((m) => ({ key: m.key, name: m.name })),
+                            selectedMembership,
+                            (keys) => {
+                                handleSelectionChange(keys, setSelectedMembership);
+                            },
+                            true,
+                        )}
+
+                        {renderDropdown(
+                            "Спортивный разряд",
+                            SportsCategories.map((d) => ({ key: d.key, name: d.name })),
+                            selectedSportsCategory,
+                            (keys) => {
+                                handleSelectionChange(keys, setSelectedSportsCategory);
+                            },
+                            true,
+                        )}
                     </>
                 )}
             </div>
