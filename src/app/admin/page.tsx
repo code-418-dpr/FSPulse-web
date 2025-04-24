@@ -201,7 +201,7 @@ export default function AdministratorPage() {
             <NavbarElement activeTab={activeTab} setActiveTabAction={setActiveTab} />
 
             <div className="flex min-h-[100vh] w-full">
-                <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab as Tab} />
+                <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
 
                 <div className="flex-1 space-y-8 p-6">
                     {activeTab === "representative" && (

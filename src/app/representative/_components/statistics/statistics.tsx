@@ -71,7 +71,7 @@ export function Statistics() {
                         { id: "athletes", label: "Спортсмены" },
                         { id: "coaches", label: "Тренеры" },
                     ]}
-                    onSelect={(id) => setTab(id as RankingTab)}
+                    onSelect={(id) => { setTab(id as RankingTab); }}
                 />
                 <TableContainer columns={ratingColumns} data={ratingData} />
             </div>

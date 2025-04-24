@@ -82,7 +82,7 @@ export function Statistics() {
                         { id: "coaches", label: "Тренеры" },
                         { id: "reps", label: "Представительства" },
                     ]}
-                    onSelect={(id) => setTab(id as RankingTab)}
+                    onSelect={(id) => { setTab(id as RankingTab); }}
                 />
                 {tab === "reps" ? (
                     <TableContainer columns={repColumns} data={repData} />

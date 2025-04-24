@@ -104,8 +104,8 @@ export default function RepresentativePage() {
             setIsEventLoading(true);
             fetch(`/api/events?page=${page}&pageSize=${perPage}`)
                 .then((r) => r.json())
-                .then((json: Paged<EventItem>) => setEventsData(json))
-                .finally(() => setIsEventLoading(false));
+                .then((json: Paged<EventItem>) => { setEventsData(json); })
+                .finally(() => { setIsEventLoading(false); });
         }
     }, [activeTab, page]);
 
@@ -114,8 +114,8 @@ export default function RepresentativePage() {
             setIsTeamLoading(true);
             fetch(`/api/teams?page=${page}&pageSize=${perPage}`)
                 .then((r) => r.json())
-                .then((json: Paged<TeamItem>) => setTeamData(json))
-                .finally(() => setIsTeamLoading(false));
+                .then((json: Paged<TeamItem>) => { setTeamData(json); })
+                .finally(() => { setIsTeamLoading(false); });
         }
     }, [activeTab, page]);
 
@@ -124,8 +124,8 @@ export default function RepresentativePage() {
             setIsAchievementLoading(true);
             fetch(`/api/achievements?page=${page}&pageSize=${perPage}`)
                 .then((r) => r.json())
-                .then((json: Paged<AchievementItem>) => setAchievementData(json))
-                .finally(() => setIsAchievementLoading(false));
+                .then((json: Paged<AchievementItem>) => { setAchievementData(json); })
+                .finally(() => { setIsAchievementLoading(false); });
         }
     }, [activeTab, page]);
 
