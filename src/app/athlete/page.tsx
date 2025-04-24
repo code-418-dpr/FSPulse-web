@@ -23,7 +23,7 @@ export default function AthletePage() {
     return (
         <>
             <NavbarElement activeTab={activeTab} setActiveTabAction={setActiveTab} />
-
+            
             <main className="space-y-8 p-6">
                 <Statistics />
             </main>

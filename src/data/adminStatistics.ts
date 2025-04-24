@@ -3,6 +3,8 @@
 
 import prisma from "@/lib/prisma";
 
+// src/data/adminStatistics.ts
+
 // 1. Рейтинг спортсменов (сумма оценок навыков)
 export async function getAthleteRanking() {
     return prisma.$queryRaw<{ rank: number; fio: string; region: string; points: number }[]>`

@@ -95,7 +95,9 @@ export default function EventResultsForm({ eventId }: { eventId: string }) {
                     variant="bordered"
                     required={true}
                     value={results[team.id] || 0}
-                    onValueChange={(value) => { handleScoreChange(team.id, value); }}
+                    onValueChange={(value) => {
+                        handleScoreChange(team.id, value);
+                    }}
                     minValue={0}
                     maxValue={300}
                 />

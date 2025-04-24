@@ -1,11 +1,15 @@
 // src/app/common/_components/ExportPdfButton.tsx
 "use client";
 
-import React from "react";
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
+
+import React from "react";
+
 import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
+
+// src/app/common/_components/ExportPdfButton.tsx
 
 export interface ExportPdfButtonProps {
     /** id элемента, который будем экспортировать в PDF */
@@ -17,10 +21,10 @@ export interface ExportPdfButtonProps {
 }
 
 export const ExportPdfButton: React.FC<ExportPdfButtonProps> = ({
-                                                                    exportId = "exportable",
-                                                                    fileName = "statistics.pdf",
-                                                                    label = "Скачать PDF",
-                                                                }) => {
+    exportId = "exportable",
+    fileName = "statistics.pdf",
+    label = "Скачать PDF",
+}) => {
     const generatePdf = async (): Promise<void> => {
         const element = document.getElementById(exportId);
         if (!element) {

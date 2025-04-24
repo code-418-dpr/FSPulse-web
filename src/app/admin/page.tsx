@@ -16,7 +16,7 @@ import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
 import { RepresentativeItem, getRepresentatives } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
-import { AthleteItem, EventItem, Tab, TeamItem } from "@/types";
+import { AthleteItem, EventItem, Tab } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { Button, CircularProgress, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react/dist/iconify.js";

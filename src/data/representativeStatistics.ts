@@ -1,13 +1,13 @@
 // src/data/representativeStatistics.ts
 "use server";
 
-import prisma from "@/lib/prisma";
 import { RequestStatus } from "@/app/generated/prisma";
+import prisma from "@/lib/prisma";
+
+// src/data/representativeStatistics.ts
 
 /** 1. Заявки по статусу */
-export async function getRepRequestsByStatus(
-    repId: string
-): Promise<{ status: RequestStatus; count: number }[]> {
+export async function getRepRequestsByStatus(repId: string): Promise<{ status: RequestStatus; count: number }[]> {
     return prisma.$queryRaw<{ status: RequestStatus; count: number }[]>`
         SELECT
             e."requestStatus" AS status,
@@ -21,9 +21,7 @@ export async function getRepRequestsByStatus(
 }
 
 /** 2. Формат мероприятий */
-export async function getRepEventsByFormat(
-    repId: string
-): Promise<{ label: string; value: number }[]> {
+export async function getRepEventsByFormat(repId: string): Promise<{ label: string; value: number }[]> {
     return prisma.$queryRaw<{ label: string; value: number }[]>`
         SELECT
             CASE
@@ -40,9 +38,7 @@ export async function getRepEventsByFormat(
 }
 
 /** 3. Мероприятия по месяцам */
-export async function getRepEventsByMonth(
-    repId: string
-): Promise<{ month: string; count: number }[]> {
+export async function getRepEventsByMonth(repId: string): Promise<{ month: string; count: number }[]> {
     return prisma.$queryRaw<{ month: string; count: number }[]>`
         SELECT
             to_char(e."start", 'YYYY-MM') AS month,
@@ -57,9 +53,7 @@ export async function getRepEventsByMonth(
 }
 
 /** 4. Рейтинг спортсменов (кол-во личных участий в событиях этого представителя) */
-export async function getRepAthleteRanking(
-    repId: string
-): Promise<{ fio: string; region: string; points: number }[]> {
+export async function getRepAthleteRanking(repId: string): Promise<{ fio: string; region: string; points: number }[]> {
     return prisma.$queryRaw<{ fio: string; region: string; points: number }[]>`
         SELECT
             u."lastname" || ' ' || u."firstname" || ' ' || COALESCE(u."middlename", '') AS fio,
@@ -79,9 +73,7 @@ export async function getRepAthleteRanking(
 }
 
 /** 5. Рейтинг тренеров (сумма score их команд в событиях этого представителя) */
-export async function getRepCoachRanking(
-    repId: string
-): Promise<{ fio: string; region: string; points: number }[]> {
+export async function getRepCoachRanking(repId: string): Promise<{ fio: string; region: string; points: number }[]> {
     return prisma.$queryRaw<{ fio: string; region: string; points: number }[]>`
         SELECT
             u."lastname" || ' ' || u."firstname" || ' ' || COALESCE(u."middlename", '') AS fio,

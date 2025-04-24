@@ -3,7 +3,12 @@
 
 import prisma from "@/lib/prisma";
 
-interface LabelValue { label: string; value: number }
+// src/data/athleteStatistics.ts
+
+interface LabelValue {
+    label: string;
+    value: number;
+}
 interface HistoryRow {
     competition: string;
     period: string;
@@ -12,12 +17,8 @@ interface HistoryRow {
 }
 
 /** 1. Общий рейтинг и место спортсмена среди всех */
-export async function getAthleteOverview(
-    athleteId: string
-): Promise<{ rank: number; points: number }> {
-    const result = await prisma.$queryRaw<
-        { rank: number; points: number }[]
-    >`
+export async function getAthleteOverview(athleteId: string): Promise<{ rank: number; points: number }> {
+    const result = await prisma.$queryRaw<{ rank: number; points: number }[]>`
         SELECT sub.rank, sub.points FROM (
                                              SELECT
                                                  a.id                                              AS athlete_id,
@@ -40,9 +41,7 @@ export async function getAthleteOverview(
 }
 
 /** 2. Участия: личные vs командные */
-export async function getAthleteParticipation(
-    athleteId: string
-): Promise<LabelValue[]> {
+export async function getAthleteParticipation(athleteId: string): Promise<LabelValue[]> {
     return prisma.$queryRaw<LabelValue[]>`
         SELECT label, COUNT(*)::int AS value FROM (
             SELECT 'Личные' AS label
@@ -58,9 +57,7 @@ export async function getAthleteParticipation(
 }
 
 /** 3. Баллы по месяцам */
-export async function getAthletePointsOverTime(
-    athleteId: string
-): Promise<LabelValue[]> {
+export async function getAthletePointsOverTime(athleteId: string): Promise<LabelValue[]> {
     return prisma.$queryRaw<LabelValue[]>`
         SELECT month, SUM(points)::int AS value FROM (
             SELECT
@@ -86,9 +83,7 @@ export async function getAthletePointsOverTime(
 }
 
 /** 4. Достижения: по уровням событий + командные участия */
-export async function getAthleteAchievements(
-    athleteId: string
-): Promise<LabelValue[]> {
+export async function getAthleteAchievements(athleteId: string): Promise<LabelValue[]> {
     return prisma.$queryRaw<LabelValue[]>`
         SELECT title, COUNT(*)::int AS value FROM (
             SELECT 'Открытые'       AS title
@@ -121,9 +116,7 @@ export async function getAthleteAchievements(
 }
 
 /** 5. История участий */
-export async function getAthleteParticipationHistory(
-    athleteId: string
-): Promise<HistoryRow[]> {
+export async function getAthleteParticipationHistory(athleteId: string): Promise<HistoryRow[]> {
     return prisma.$queryRaw<HistoryRow[]>`
         SELECT
             e.name                                                                  AS competition,

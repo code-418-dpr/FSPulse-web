@@ -10,6 +10,7 @@ import { MultiSelectAgeGroups, MultiSelectAutocomplete } from "@/components/mult
 import { getAgeGroupsByDiscipline } from "@/data/age-group";
 import { getDisciplines } from "@/data/discipline";
 import { CompetitionRequestData, createCompetitionRequest } from "@/data/event";
+import { FileData } from "@/data/event";
 import { getRegions } from "@/data/region";
 import { getRepresentativeByUserId, getRepresentativesByRegionId } from "@/data/representative";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,7 +20,7 @@ import { Textarea } from "@heroui/input";
 import { Autocomplete, AutocompleteItem, Button, DateRangePicker, Image, Input, Switch, cn } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getLocalTimeZone } from "@internationalized/date";
-import { FileData } from "@/data/event";
+
 const userSchema = competitionRequestSchema;
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -42,7 +43,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
     const [endRegistration, setEndRegistration] = useState<string>("");
     const [start, setStart] = useState<string>("");
     const [end, setEnd] = useState<string>("");
-    const [cover, setCover] = useState<File  | null>(null);
+    const [cover, setCover] = useState<File | null>(null);
     const [files, setFiles] = useState<FileList | null>(null);
     const [minTeamParticipantsCount, setMinTeamParticipantsCount] = useState<number>(0);
     const [maxTeamParticipantsCount, setMaxTeamParticipantsCount] = useState<number>(0);
@@ -63,7 +64,6 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
         control,
         formState: { errors },
     } = methods;
-
 
     const convertFileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
@@ -112,9 +112,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
             if (formValues.minAge >= formValues.maxAge) {
                 throw new Error("Максимальный возраст должен быть больше минимального");
             }
-            if (
-                minTeamParticipantsCount >= maxTeamParticipantsCount
-            ) {
+            if (minTeamParticipantsCount >= maxTeamParticipantsCount) {
                 throw new Error("Максимальное количество участников должно быть больше минимального");
             }
             if (!discipline) throw new Error("Выберите дисциплину");
@@ -150,7 +148,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                     representativeIds.push(rep.id);
                 });
             }
-            
+
             const requestData: CompetitionRequestData = {
                 name,
                 discipline,
@@ -160,7 +158,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                 endRegistration: endRegDate,
                 start: startDate,
                 end: endDate,
-                requestStatus: (user?.role === "admin" ? RequestStatus.APPROVED : RequestStatus.PENDING),
+                requestStatus: user?.role === "admin" ? RequestStatus.APPROVED : RequestStatus.PENDING,
                 minAge: formValues.minAge,
                 maxAge: formValues.maxAge,
                 minTeamParticipantsCount,
@@ -212,9 +210,7 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
 
     return (
         <FormProvider {...methods}>
-            <form
-                className={cn("grid items-start gap-4", className)}
-            >
+            <form className={cn("grid items-start gap-4", className)}>
                 <div className="flex flex-col gap-4">
                     <Controller
                         name="discipline"
@@ -336,38 +332,38 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                                 control={control}
                                 render={({ field }) => (
                                     <Input
-                                    label="Минимальный возраст участника"
-                                    type="number"
-                                    variant="bordered"
-                                    {...field}
-                                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                                    value={field.value?.toString() || ''} // Добавляем проверку на undefined
-                                    onChange={(e) => { 
-                                        const value = parseInt(e.target.value) || 0;
-                                        field.onChange(value);
-                                    }}
+                                        label="Минимальный возраст участника"
+                                        type="number"
+                                        variant="bordered"
+                                        {...field}
+                                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                                        value={field.value?.toString() || ""} // Добавляем проверку на undefined
+                                        onChange={(e) => {
+                                            const value = parseInt(e.target.value) || 0;
+                                            field.onChange(value);
+                                        }}
                                     />
                                 )}
-                                />
+                            />
 
-                                <Controller
+                            <Controller
                                 name="maxAge"
                                 control={control}
                                 render={({ field }) => (
                                     <Input
-                                    label="Максимальный возраст участника"
-                                    type="number"
-                                    variant="bordered"
-                                    {...field}
-                                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                                    value={field.value?.toString() || ''} // Добавляем проверку на undefined
-                                    onChange={(e) => { 
-                                        const value = parseInt(e.target.value) || 0;
-                                        field.onChange(value);
-                                    }}
+                                        label="Максимальный возраст участника"
+                                        type="number"
+                                        variant="bordered"
+                                        {...field}
+                                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                                        value={field.value?.toString() || ""} // Добавляем проверку на undefined
+                                        onChange={(e) => {
+                                            const value = parseInt(e.target.value) || 0;
+                                            field.onChange(value);
+                                        }}
                                     />
                                 )}
-                                />
+                            />
                         </>
                     )}
                     <Input
@@ -376,7 +372,9 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                         type="number"
                         variant="bordered"
                         value={minTeamParticipantsCount.toString()}
-                        onChange={(e) => { setMinTeamParticipantsCount(Number(e.target.value)); }}
+                        onChange={(e) => {
+                            setMinTeamParticipantsCount(Number(e.target.value));
+                        }}
                     />
 
                     <Input
@@ -385,7 +383,9 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                         type="number"
                         variant="bordered"
                         value={maxTeamParticipantsCount.toString()}
-                        onChange={(e) => { setMaxTeamParticipantsCount(Number(e.target.value)); }}
+                        onChange={(e) => {
+                            setMaxTeamParticipantsCount(Number(e.target.value));
+                        }}
                     />
 
                     <Input
@@ -394,25 +394,29 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                         type="number"
                         variant="bordered"
                         value={maxParticipantsCount.toString()}
-                        onChange={(e) => { setMaxParticipantsCount(Number(e.target.value)); }}
+                        onChange={(e) => {
+                            setMaxParticipantsCount(Number(e.target.value));
+                        }}
                     />
-                    <MultiSelectAutocomplete
-                        regions={regions.map((r) => ({ key: r.id, label: r.name }))}
-                    />
+                    <MultiSelectAutocomplete regions={regions.map((r) => ({ key: r.id, label: r.name }))} />
                     <Input
                         label="Адрес"
                         type="text"
                         aria-label="Адрес"
                         variant="bordered"
                         value={address}
-                        onChange={(e) => { setAddress(e.target.value); }}
+                        onChange={(e) => {
+                            setAddress(e.target.value);
+                        }}
                     />
 
                     <Textarea
                         label="Описание соревнования"
                         aria-label="Описание соревнования"
                         value={description}
-                        onChange={(e) => { setDescription(e.target.value); }}
+                        onChange={(e) => {
+                            setDescription(e.target.value);
+                        }}
                     />
                     <Input
                         label="Прочие файлы соревнования"
@@ -433,7 +437,13 @@ export default function CompetitionCreateForm({ className }: React.ComponentProp
                             {formError}
                         </div>
                     )}
-                    <Button color="success" isLoading={isLoading} fullWidth className="mt-6" onPress={() => void handleConfirm()}>
+                    <Button
+                        color="success"
+                        isLoading={isLoading}
+                        fullWidth
+                        className="mt-6"
+                        onPress={() => void handleConfirm()}
+                    >
                         Зарегистрировать соревнование
                     </Button>
                 </div>

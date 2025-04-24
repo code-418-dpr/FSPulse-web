@@ -1,24 +1,25 @@
 // src/app/athlete/_components/statistics/statistics.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Icon } from "@iconify/react";
-import { Badge } from "@heroui/react";
-
-import { useAuth } from "@/hooks/use-auth";
-import {
-    getAthleteOverview,
-    getAthleteParticipation,
-    getAthletePointsOverTime,
-    getAthleteAchievements,
-    getAthleteParticipationHistory,
-} from "@/data/athleteStatistics";
+import React, { useEffect, useState } from "react";
 
 import { Column, ExportPdfButton } from "@/app/common/_components/ExportPdfButton";
 import { Card } from "@/app/common/_components/statistics/Card";
 import { LineChart } from "@/app/common/_components/statistics/LineChart";
 import { PieChart } from "@/app/common/_components/statistics/PieChart";
 import { TableContainer } from "@/app/common/_components/statistics/TableContainer";
+import {
+    getAthleteAchievements,
+    getAthleteOverview,
+    getAthleteParticipation,
+    getAthleteParticipationHistory,
+    getAthletePointsOverTime,
+} from "@/data/athleteStatistics";
+import { useAuth } from "@/hooks/use-auth";
+import { Badge } from "@heroui/react";
+import { Icon } from "@iconify/react";
+
+// src/app/athlete/_components/statistics/statistics.tsx
 
 interface HistoryRow {
     competition: string;
@@ -35,24 +36,13 @@ export default function Statistics() {
         rank: 0,
         points: 0,
     });
-    const [participation, setParticipation] = useState<
-        { label: string; value: number }[]
-    >([]);
-    const [pointsOverTime, setPointsOverTime] = useState<
-        { label: string; value: number }[]
-    >([]);
-    const [achievements, setAchievements] = useState<
-        { label: string; value: number }[]
-    >([]);
+    const [participation, setParticipation] = useState<{ label: string; value: number }[]>([]);
+    const [pointsOverTime, setPointsOverTime] = useState<{ label: string; value: number }[]>([]);
+    const [achievements, setAchievements] = useState<{ label: string; value: number }[]>([]);
     const [history, setHistory] = useState<HistoryRow[]>([]);
 
     // Иконки для достижений
-    const achievementIcons = [
-        "lucide:medal",
-        "lucide:trophy",
-        "lucide:flag",
-        "lucide:target",
-    ];
+    const achievementIcons = ["lucide:medal", "lucide:trophy", "lucide:flag", "lucide:target"];
 
     useEffect(() => {
         async function load() {
@@ -60,13 +50,7 @@ export default function Statistics() {
             const athleteId = user.id;
 
             try {
-                const [
-                    ov,
-                    part,
-                    overTime,
-                    ach,
-                    hist,
-                ] = await Promise.all([
+                const [ov, part, overTime, ach, hist] = await Promise.all([
                     getAthleteOverview(athleteId),
                     getAthleteParticipation(athleteId),
                     getAthletePointsOverTime(athleteId),
@@ -103,9 +87,9 @@ export default function Statistics() {
     return (
         <div id="exportable-athlete" className="space-y-8">
             {/* Header + Export */}
-            <div className="flex items-center justify-between rounded-xl border border-content3 bg-content1 p-6 shadow-sm">
+            <div className="border-content3 bg-content1 flex items-center justify-between rounded-xl border p-6 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                    <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-10 w-10 items-center justify-center rounded-lg">
                         <Icon icon="lucide:activity" width={24} />
                     </div>
                     <h1 className="text-2xl font-semibold">Моя статистика</h1>
@@ -123,14 +107,13 @@ export default function Statistics() {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Card title="Мой рейтинг" icon="lucide:medal">
                     <div className="flex flex-col items-center justify-center space-y-4 py-4">
-                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary-100 text-4xl font-bold text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                        <div className="bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 flex h-24 w-24 items-center justify-center rounded-full text-4xl font-bold">
                             {overview.rank}
                         </div>
                         <div className="text-center">
-                            <p className="text-sm text-foreground/70">Место в рейтинге</p>
-                            <p className="mt-1 text-2xl font-semibold text-primary-500">
-                                {overview.points}{" "}
-                                <span className="text-sm font-normal">баллов</span>
+                            <p className="text-foreground/70 text-sm">Место в рейтинге</p>
+                            <p className="text-primary-500 mt-1 text-2xl font-semibold">
+                                {overview.points} <span className="text-sm font-normal">баллов</span>
                             </p>
                         </div>
                     </div>
@@ -151,15 +134,10 @@ export default function Statistics() {
                     {achievements.map((ach, i) => (
                         <div
                             key={ach.label}
-                            className="flex flex-col items-center justify-center rounded-lg border border-content3 bg-content2/50 p-4 transition-all hover:border-primary-200 hover:bg-content2"
+                            className="border-content3 bg-content2/50 hover:border-primary-200 hover:bg-content2 flex flex-col items-center justify-center rounded-lg border p-4 transition-all"
                         >
-                            <Badge
-                                content={ach.value}
-                                color="primary"
-                                size="lg"
-                                className="mb-2"
-                            >
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-500 dark:bg-primary-900/30">
+                            <Badge content={ach.value} color="primary" size="lg" className="mb-2">
+                                <div className="bg-primary-100 text-primary-500 dark:bg-primary-900/30 flex h-12 w-12 items-center justify-center rounded-full">
                                     <Icon icon={achievementIcons[i % achievementIcons.length]} width={24} />
                                 </div>
                             </Badge>

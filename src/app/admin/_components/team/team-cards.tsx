@@ -52,19 +52,19 @@ export default function TeamCards({ paginatedData }: Props) {
                                         c.membership === "MAIN"
                                             ? "primary"
                                             : c.membership === "RESERVE"
-                                                ? "secondary"
-                                                : c.membership === "NONE"
-                                                    ? "warning"
-                                                    : "danger"
+                                              ? "secondary"
+                                              : c.membership === "NONE"
+                                                ? "warning"
+                                                : "danger"
                                     }
                                 >
                                     {c.membership === "MAIN"
                                         ? "Основной состав"
                                         : c.membership === "RESERVE"
-                                            ? "Резервный состав"
-                                            : c.membership === "NONE"
-                                                ? "Не член сборной"
-                                                : "Неизвестно"}
+                                          ? "Резервный состав"
+                                          : c.membership === "NONE"
+                                            ? "Не член сборной"
+                                            : "Неизвестно"}
                                 </Chip>
                             </div>
                         </CardBody>

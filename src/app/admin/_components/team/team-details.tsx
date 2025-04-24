@@ -55,20 +55,20 @@ export default function TeamDetails({ athlete }: Props) {
                             athlete.membership === "MAIN"
                                 ? "primary"
                                 : athlete.membership === "RESERVE"
-                                    ? "secondary"
-                                    : athlete.membership === "NONE"
-                                        ? "warning"
-                                        : "danger"
+                                  ? "secondary"
+                                  : athlete.membership === "NONE"
+                                    ? "warning"
+                                    : "danger"
                         }
                         variant="bordered"
                     >
                         {athlete.membership === "MAIN"
                             ? "Основной состав"
                             : athlete.membership === "RESERVE"
-                                ? "Резервный состав"
-                                : athlete.membership === "NONE"
-                                    ? "Не член сборной"
-                                    : "Неизвестно"}
+                              ? "Резервный состав"
+                              : athlete.membership === "NONE"
+                                ? "Не член сборной"
+                                : "Неизвестно"}
                     </Chip>
                 </div>
                 {/* SportCategory */}
