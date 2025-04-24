@@ -64,46 +64,45 @@ export default function TeamsOnEvent({ eventId }: { eventId: string }) {
     }, [page, data]);
 
     return (
-        <>
-            <Table
-                key={`table-${eventId}`}
-                aria-label="Example table with client side pagination"
-                bottomContent={
-                    !data && !isTeamsLoading ? (
-                        <div key="loading-spinner" className="flex w-full justify-center">
-                            <Spinner color="white" size="sm" />
-                        </div>
-                    ) : (
-                        <div key="pagination" className="flex w-full justify-center">
-                            <Pagination
-                                showControls
-                                page={page}
-                                total={pages}
-                                onChange={(page) => {
-                                    setPage(page);
-                                }}
-                                key={`pagination-${eventId}`}
-                            />
-                        </div>
-                    )
-                }
-                classNames={{
-                    wrapper: "min-h-[222px]",
-                }}
-            >
-                <TableHeader>
-                    <TableColumn key="name">Название команды</TableColumn>
-                    <TableColumn key="Leader">Капитан</TableColumn>
-                </TableHeader>
-                <TableBody items={items}>
-                    {items?.map((item) => (
-                        <TableRow key={`team-${item.id}`}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.leader}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </>
+        <Table
+            key={`table-${eventId}`}
+            aria-label="Example table with client side pagination"
+            bottomContent={
+                !data && !isTeamsLoading ? (
+                    <div key="loading-spinner" className="flex w-full justify-center">
+                        <Spinner color="white" size="sm" />
+                    </div>
+                ) : (
+                    <div key="pagination" className="flex w-full justify-center">
+                        <Pagination
+                            initialPage={1}
+                            showControls
+                            page={page}
+                            total={pages}
+                            onChange={(page) => {
+                                setPage(page);
+                            }}
+                            key={`pagination-${eventId}`}
+                        />
+                    </div>
+                )
+            }
+            classNames={{
+                wrapper: "min-h-[222px]",
+            }}
+        >
+            <TableHeader>
+                <TableColumn key="name">Название команды</TableColumn>
+                <TableColumn key="Leader">Капитан</TableColumn>
+            </TableHeader>
+            <TableBody items={items}>
+                {items?.map((item) => (
+                    <TableRow key={`team-${item.id}`}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.leader}</TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
     );
 }

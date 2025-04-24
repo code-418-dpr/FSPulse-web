@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import AchievementCards from "@/app/representative/_components/achievement/achievement-cards";
-import { Statistics } from "@/app/representative/_components/statistics/statistics";
 import { MainCards } from "@/app/representative/_components/main-cards";
+import { Statistics } from "@/app/representative/_components/statistics/statistics";
 import TeamCards from "@/app/representative/_components/team/team-cards";
 import CompetitionCards from "@/components/competition/competition-cards";
 import CompetitionCreateForm from "@/components/competition/competition-create-form";
@@ -17,7 +16,7 @@ import NavbarElement from "@/components/navbar";
 import { SearchCardOrDrawer } from "@/components/search/search-card-or-drawer";
 import { searchRepresentativeEvents, searchRepresentativeRequests } from "@/data/event";
 import { useAuth } from "@/hooks/use-auth";
-import { AchievementItem, EventItem, Tab, TeamItem } from "@/types";
+import { EventItem, Tab, TeamItem } from "@/types";
 import { RepresentativeRequestItem, SearchParams } from "@/types/search";
 import { Button, CircularProgress, useDisclosure } from "@heroui/react";
 import { Icon } from "@iconify/react";
@@ -47,8 +46,8 @@ export default function RequestsPage() {
     const [isEventLoading, setIsEventLoading] = useState(false);
     const [teamData, setTeamData] = useState<Paged<TeamItem> | null>(null);
     const [isTeamLoading, setIsTeamLoading] = useState(false);
-    const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
-    const [isAchievementLoading, setIsAchievementLoading] = useState(false);
+    //const [achievementData, setAchievementData] = useState<Paged<AchievementItem> | null>(null);
+    //const [isAchievementLoading, setIsAchievementLoading] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -158,6 +157,7 @@ export default function RequestsPage() {
             });
     }, [activeTab, page]);
 
+    /*
     useEffect(() => {
         if (activeTab !== "achievement") return;
         setIsAchievementLoading(true);
@@ -166,7 +166,7 @@ export default function RequestsPage() {
             .then((json: Paged<AchievementItem>) => { setAchievementData(json); })
             .finally(() => { setIsAchievementLoading(false); });
     }, [activeTab, page]);
-
+     */
 
     const compPageItems = requestsData?.items ?? [];
     const totalCompPages = requestsData?.pagination.page ?? 1;
@@ -177,8 +177,8 @@ export default function RequestsPage() {
     const teamPageItems = teamData?.items ?? [];
     const totalTeamPages = teamData?.pagination.totalPages ?? 1;
 
-    const achievementPageItems = achievementData?.items ?? [];
-    const totalAchievementPages = achievementData?.pagination.totalPages ?? 1;
+    //const achievementPageItems = achievementData?.items ?? [];
+    //const totalAchievementPages = achievementData?.pagination.totalPages ?? 1;
 
     if (isLoading) {
         return <CircularProgress aria-label="Loading..." size="lg" />;
@@ -196,7 +196,7 @@ export default function RequestsPage() {
                 {/* Sidebar */}
                 {activeTab !== "achievement" && (
                     <SearchCardOrDrawer onSearchAction={handleSearch} tabType={activeTab} />
-                    )}
+                )}
 
                 {/* Main */}
                 {activeTab === "requests" && (
@@ -248,11 +248,11 @@ export default function RequestsPage() {
                     />
                 )}
 
-                <div className="flex-1 p-6">
-                      {activeTab === "achievement" && (
+                {activeTab === "statistics" && (
+                    <div className="flex-1 p-6">
                         <Statistics />
-                      )}
                     </div>
+                )}
             </div>
 
             <FooterElement />
