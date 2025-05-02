@@ -24,7 +24,7 @@
         "@eslint/eslintrc": "^3.3.1",
         "@eslint/js": "^9.20.0",
         "@faker-js/faker": "^9.7.0",
-        "@iconify/react": "^5.2.1",
+        "@iconify/react": "^6.0.0",
         "@tailwindcss/postcss": "^4.1.4",
         "@trivago/prettier-plugin-sort-imports": "^5.2.2",
         "@types/bcrypt": "^5.0.2",
@@ -339,7 +339,7 @@
 
     "@humanwhocodes/retry": ["@humanwhocodes/retry@0.4.2", "", {}, "sha512-xeO57FpIu4p1Ri3Jq/EXq4ClRm86dVF2z/+kvFnyqVYRavTZmaFaUBbWCOuuTh0o/g7DSsk6kc2vrS4Vl5oPOQ=="],
 
-    "@iconify/react": ["@iconify/react@5.2.1", "", { "dependencies": { "@iconify/types": "^2.0.0" }, "peerDependencies": { "react": ">=16" } }, "sha512-37GDR3fYDZmnmUn9RagyaX+zca24jfVOMY8E1IXTqJuE8pxNtN51KWPQe3VODOWvuUurq7q9uUu3CFrpqj5Iqg=="],
+    "@iconify/react": ["@iconify/react@6.0.0", "", { "dependencies": { "@iconify/types": "^2.0.0" }, "peerDependencies": { "react": ">=16" } }, "sha512-eqNscABVZS8eCpZLU/L5F5UokMS9mnCf56iS1nM9YYHdH8ZxqZL9zyjSwW60IOQFsXZkilbBiv+1paMXBhSQnw=="],
 
     "@iconify/types": ["@iconify/types@2.0.0", "", {}, "sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg=="],
 
