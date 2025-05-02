@@ -61,7 +61,7 @@
         "@tailwindcss/postcss": "^4.1.4",
         "@trivago/prettier-plugin-sort-imports": "^5.2.2",
         "@types/bcrypt": "^5.0.2",
-        "@types/node": "^22.13.13",
+        "@types/node": "^22.15.3",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "bcrypt": "^5.1.1",
